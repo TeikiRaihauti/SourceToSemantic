@@ -6,7 +6,7 @@ import json
 from pprint import pprint
 
 #CONFIGURATION
-system_instruction_path = ""
+system_instruction_path = "./Instructions_crop2ML.txt"
 main_file = ""
 folder_path = ""
 output_path = ""
