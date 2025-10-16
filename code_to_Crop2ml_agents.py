@@ -4,7 +4,6 @@ from pathlib import Path
 import json
 import xml.dom.minidom
 import xml.etree.ElementTree as ET
-from time import sleep
 
 
 # TO-DO
@@ -87,6 +86,8 @@ def list_files_with_extension(folder_path, extension, exclude_filename):
     for file in files:
       if extension == ".cpp" and file.lower().endswith(".h") and file != exclude_filename:
         file_list.append(os.path.join(root, file))
+      if extension == ".java" and file.lower().endswith(".xml") and file != exclude_filename:
+        file_list.append(os.path.join(root, file))
       elif file.lower().endswith(extension) and file != exclude_filename:
         file_list.append(os.path.join(root, file))
   return file_list
@@ -107,7 +108,7 @@ def create_prompt_all_files(folder_path, main_file, list_files, language_name):
   if main_file_path is None:
     raise FileNotFoundError(f"File {main_file} is not there.")
   
-  prompt = f"Analyze the {nb_files + 1} following crop model source code files, written in {language_name} as a single crop model component. The main file is {main_file}.\n"
+  prompt = f"Analyze the {nb_files + 1} following crop model source code files, written in {language_name} as a single crop model component. The main file to process is {main_file}.\n"
   prompt += f"Follow the system instructions. Each file is marked clearly with --- FILE: filename --- at the start and --- END FILE --- at the end.\n\n\n"
   prompt += f"--- FILE: {main_file} ---\n{extract_text(main_file_path)}\n--- END FILE ---"
   
@@ -123,7 +124,7 @@ def create_prompt_all_files(folder_path, main_file, list_files, language_name):
 # This function constructs a prompt based on the refactored code.
 #-----------------------------------------------------------------
 def create_prompt_refactor(code_refactored):
-  prompt = f"Analyze the following Python crop model source code as a single crop model component.\n"
+  prompt = f"Analyze the following Cython crop model source code as a single crop model component.\n"
   prompt += f"Follow the system instructions and output a JSON file describing the model.\n\n"
   prompt += f"{code_refactored}"
   return prompt
@@ -377,14 +378,14 @@ API_KEY_PATH = "./api_key.txt"
 MODEL = "gpt-5"
 
 COMPONENTS_DICT = {
-  "../Components/ApsimCampbell/": "SoilTemperature.cs",
-  "../Components/BiomaSurfacePartonSoilSWATC/": "SoilTemperatureSWAT.cs",
-  "../Components/BiomaSurfaceSWATSoilSWATC/": "SoilTemperatureSWAT.cs",
-  "../Components/DSSAT_EPICST_standalone/": "STEMP_EPIC.for",
-  "../Components/DSSAT_ST_standalone/": "STEMP.for",
-  "../Components/Simplace_Soil_Temperature/": "STMPsimCalculator.java",
-  "../Components/SQ_Soil_Temperature/": "CalculateSoilTemperature.cs",
-  "../Components/Stics_soil_temperature/": "Tempprofile.f90"
+  "ApsimCampbell/": "SoilTemperature.cs",
+  "BiomaSurfacePartonSoilSWATC/": "SoilTemperatureSWAT.cs",
+  "BiomaSurfaceSWATSoilSWATC/": "SoilTemperatureSWAT.cs",
+  "DSSAT_EPICST_standalone/": "STEMP_EPIC.for",
+  "DSSAT_ST_standalone/": "STEMP.for",
+  "Simplace_Soil_Temperature/": "STMPsimCalculator.java",
+  "SQ_Soil_Temperature/": "CalculateSoilTemperature.cs",
+  "Stics_soil_temperature/": "Tempprofile.f90"
 }
 
 ENERGY_BALANCE_DIRECTORY = "../Components/SQ_EnergyBalance/"
@@ -403,9 +404,9 @@ ENERGY_BALANCE_FILES =  [
     "Diffusionlimitedevaporation.cs"
   ]
 
-first_index_component = 0
-last_index_component = len(COMPONENTS_DICT) - 1
-number_iteration = 10
+first_index_component = 7
+last_index_component = 7 #len(COMPONENTS_DICT) - 1
+number_iteration = 1
 component_keys = list(COMPONENTS_DICT.keys())
 component_values = list(COMPONENTS_DICT.values())
 
@@ -413,17 +414,18 @@ component_values = list(COMPONENTS_DICT.values())
 # Simulation section
 #-----------------------------------------------------------------
 # Soil temperature section
-'''for i in range(first_index_component, last_index_component + 1):
+for i in range(first_index_component, last_index_component + 1):
   print(f"Processing {component_keys[i]} : {component_values[i]}")
-  for j in range(5, number_iteration + 1): 
+  for j in range(1, number_iteration + 1): 
     print(f"Iteration {j}")
-    output_path = f"{component_keys[i]}{j}/"
-    main(API_KEY_PATH, AGENT1_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, component_keys[i], output_path, component_values[i])
-'''
-# Energy balance section
+    output_path = f"../Results/{component_keys[i]}{j}/"
+    main(API_KEY_PATH, AGENT1_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, f"../Components/{component_keys[i]}", output_path, component_values[i])
+
+'''# Energy balance section
 for i in range(11, len(ENERGY_BALANCE_FILES)):
   print(f"Processing {ENERGY_BALANCE_DIRECTORY} : {ENERGY_BALANCE_FILES[i]}")
   for j in range(1, number_iteration + 1): 
     print(f"Iteration {j}")
     output_path = f"{ENERGY_BALANCE_DIRECTORY}{j}/"
     main(API_KEY_PATH, AGENT1_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, ENERGY_BALANCE_DIRECTORY, output_path, ENERGY_BALANCE_FILES[i])
+    '''
