@@ -1,0 +1,86 @@
+Inputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+25;34;24;10;1;0.7058823529411765;0.96;0.8135593220338982
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+ISWWAT;OK;OK;WRONG;OK;WRONG;WRONG;OK;WRONG;WRONG
+BD;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+DLAYR;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG
+DS;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG
+DUL;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+LL;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+NLAYR;WRONG;WRONG;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+MSALB;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+SRAD;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+SW;WRONG;WRONG;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+TAVG;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+TMAX;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+XLAT;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+TAV;WRONG;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+TAMP;WRONG;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+CUMDPT;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+DSMID;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+TDL;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+TMA;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+ATOT;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+SRFTEMP;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+ST;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG
+DOY;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+HDAY;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+control_DYNAMIC;variable;exogenous;INT
+YRDOY;variable;auxiliary;INT
+control_RUN;variable;exogenous;INT
+control_RNMODE;variable;exogenous;CHAR
+ALBEDO;variable;auxiliary;DOUBLE
+B;variable;auxiliary;DOUBLE
+DP;variable;auxiliary;DOUBLE
+PESW;variable;auxiliary;DOUBLE
+WW;variable;auxiliary;DOUBLE
+x;variable;auxiliary;DOUBLE
+
+False negative
+Name;inputtype;variablecategory;datatype
+NL;parameter;;INT
+
+
+Outputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+7;7;7;0;0;1.0;1.0;1.0
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+CUMDPT;OK;OK;OK;OK;WRONG;WRONG;OK;OK;WRONG
+DSMID;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG;WRONG
+TDL;OK;OK;OK;OK;WRONG;WRONG;OK;OK;WRONG
+TMA;OK;OK;OK;OK;WRONG;WRONG;OK;OK;WRONG
+ATOT;OK;OK;OK;OK;WRONG;WRONG;OK;OK;WRONG
+SRFTEMP;OK;OK;OK;OK;WRONG;WRONG;OK;OK;WRONG
+ST;OK;OK;OK;WRONG;WRONG;WRONG;OK;OK;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Functions stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+1;3;1;2;0;0.3333333333333333;1.0;0.5
+
+True positive
+Name
+SOILT
+
+False positive
+Name
+nint
+YR_DOY
+
+False negative
+Name
+

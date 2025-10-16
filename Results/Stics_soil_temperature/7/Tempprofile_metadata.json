@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "soil temperature model",
+        "Authors": "STICS",
+        "Institution": "INRAE",
+        "URI": "-",
+        "DOI": "10.1016/j.agrformet.2014.05.002",
+        "Extended description": "Daily soil temperature component that: (1) derives temperature amplitude from minimum and maximum canopy temperatures and computes canopy mean temperature; (2) calculates a 1 cm soil temperature profile using an exponentially damped thermal wave with fixed thermal diffusivity (5.37e-3) and angular frequency (7.272e-5), driven by previous canopy temperature and current minimum air temperature; (3) aggregates layer-mean temperatures from user-provided layer thicknesses; and (4) updates previous states (profile and canopy) for the next time step. Initialization sets previous profile and canopy temperature to air_temp_day1 over a depth equal to the sum of layer_thick.",
+        "Short description": "Computes daily soil temperature profile and layer means from canopy temperature extremes and updates previous states.",
+        "Model version": "1.0"
+    }
+}

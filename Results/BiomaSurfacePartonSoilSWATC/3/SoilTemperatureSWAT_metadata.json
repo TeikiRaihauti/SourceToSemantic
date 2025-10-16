@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SoilTemperatureSWAT",
+        "Authors": "Simone Bregaglio; Nicolò Frasso",
+        "Institution": "University Of Milan",
+        "URI": "http://bioma.jrc.ec.europa.eu/ontology/JRC_MARS_biophysical_domain.owl",
+        "DOI": "-",
+        "Extended description": "Calculates soil temperature by layers using the SWAT method (Neitsch et al., 2000). Each layer’s temperature is updated with a lagged combination of its prior value and an equilibrium temperature derived from annual average air temperature and current surface soil temperature. The approach computes a depth-dependent damping depth using soil profile depth, bulk density, layer thickness, and volumetric water content.",
+        "Short description": "Depth-resolved soil temperature model based on SWAT with lag and damping by soil properties.",
+        "Model version": "001"
+    }
+}

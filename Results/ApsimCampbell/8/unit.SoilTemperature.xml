@@ -1,0 +1,187 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".SoilTemperature" name="SoilTemperature" timestep="1" version="-">
+	<Description>
+		<Title>SoilTemperature</Title>
+		<Authors>-</Authors>
+		<Institution>-</Institution>
+		<URI>-</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>A one-dimensional soil temperature component which simulates transient heat flow and temperatures from the air node through the soil surface and layered soil profile down to a deep constant-temperature boundary. The profile is discretized into nodes (including phantom nodes below the profile). Volumetric heat capacity and thermal conductivity are computed from soil constituents and water content following Campbell (1985). Surface energy balance includes short- and long-wave radiation, sensible and latent heat fluxes, and atmospheric boundary layer conductance with stability corrections. The heat diffusion equation is solved each sub-daily step using a tridiagonal (Thomas) solver with a weighting factor (nu). It provides daily min/mean/max soil and surface temperatures and thermal properties, driven by weather, soil physical/organic properties, and soil water.</ExtendedDescription>
+		<ShortDescription>1D Campbell-based soil temperature and heat flux model for layered soils with implicit tridiagonal solver.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="physical_Thickness" description="Soil layer thicknesses from surface to bottom" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="mm" uri="-"/>
+		<Input name="physical_BD" description="Soil bulk density by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="g/cm3" uri="-"/>
+		<Input name="physical_Rocks" description="Rock fragment content by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="physical_ParticleSizeSand" description="Sand percentage by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="physical_ParticleSizeSilt" description="Silt percentage by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="physical_ParticleSizeClay" description="Clay percentage by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="waterBalance_SW" description="Volumetric soil water content by layer" inputtype="variable" variablecategory="exogenous" datatype="DOUBLELIST" len="-" max="1" min="0" default="-" unit="m3/m3" uri="-"/>
+		<Input name="organic_Carbon" description="Organic carbon content by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="weather_Tav" description="Mean annual/seasonal air temperature used for initialization" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="weather_Amp" description="Annual/seasonal temperature amplitude used for initialization" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="0" default="-" unit="degC" uri="-"/>
+		<Input name="weather_Latitude" description="Site latitude" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="90" min="-90" default="-" unit="degrees" uri="-"/>
+		<Input name="clock_Today_DayOfYear" description="Day of year at initialization" inputtype="parameter" parametercategory="constant" datatype="INT" max="366" min="1" default="-" unit="-" uri="-"/>
+		<Input name="InitialValues" description="Optional initial layer temperatures (use 999999 for ignore)" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="-" default="None" unit="degC" uri="-"/>
+		<Input name="DepthToConstantTemperature" description="Depth to constant temperature boundary" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="0" default="10000.0" unit="mm" uri="-"/>
+		<Input name="instrumHeight" description="Instrument height above ground for boundary layer calculations" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="0" default="0.0" unit="m" uri="-"/>
+		<Input name="waterBalance_Es" description="Actual soil evaporation rate" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="0" default="-" unit="mm/day" uri="-"/>
+		<Input name="waterBalance_Eos" description="Potential soil evaporation rate" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="0" default="-" unit="mm/day" uri="-"/>
+		<Input name="waterBalance_Eo" description="Reference evapotranspiration" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="0" default="-" unit="mm/day" uri="-"/>
+		<Input name="waterBalance_Salb" description="Soil albedo" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="1" min="0" default="-" unit="-" uri="-"/>
+		<Input name="microClimate_CanopyHeight" description="Canopy height used for boundary layer calculations" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="0" default="-" unit="mm" uri="-"/>
+		<Input name="weather_Wind" description="Wind speed at instrument height" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="0" default="-" unit="m/s" uri="-"/>
+		<Input name="weather_AirPressure" description="Air pressure" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="hPa" uri="-"/>
+		<Input name="weather_Radn" description="Daily incoming shortwave radiation" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="0" default="-" unit="MJ/m2/day" uri="-"/>
+		<Input name="weather_MeanT" description="Mean air temperature for the day" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="weather_MaxT" description="Daily maximum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="weather_MinT" description="Daily minimum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="clock_Today_DayOfYear" description="Day of year for the process step" inputtype="variable" variablecategory="exogenous" datatype="INT" max="366" min="1" default="-" unit="-" uri="-"/>
+		<Input name="weather_Tav_day" description="Mean temperature used within the process step" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="weather_Latitude_day" description="Latitude used within the process step" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="90" min="-90" default="-" unit="degrees" uri="-"/>
+		<Input name="airNode" description="Index of the air node" inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="0" default="0" unit="-" uri="-"/>
+		<Input name="surfaceNode" description="Index of the soil surface node" inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="1" default="1" unit="-" uri="-"/>
+		<Input name="topsoilNode" description="Index of the first subsurface node" inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="2" default="2" unit="-" uri="-"/>
+		<Input name="numPhantomNodes" description="Number of extra deep nodes appended to the profile" inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="0" default="5" unit="-" uri="-"/>
+		<Input name="doInitialisationStuff" description="Flag to perform first-day initialization logic" inputtype="variable" variablecategory="state" datatype="CHAR" max="-" min="-" default="True" unit="-" uri="-"/>
+		<Input name="internalTimeStep" description="Internal sub-daily time step" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="0" default="0.0" unit="s" uri="-"/>
+		<Input name="timeOfDaySecs" description="Current time of day within the process loop" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="86400" min="0" default="0.0" unit="s" uri="-"/>
+		<Input name="numLayers" description="Number of soil layers" inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="1" default="-" unit="-" uri="-"/>
+		<Input name="numNodes" description="Total heat nodes (layers + phantom nodes)" inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="1" default="-" unit="-" uri="-"/>
+		<Input name="nodeDepth" description="Node depths including air and phantom nodes" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="m" uri="-"/>
+		<Input name="volSpecHeatSoil" description="Volumetric specific heat of soil at nodes" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="-" uri="-"/>
+		<Input name="soilTemp" description="Current node temperatures" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="morningSoilTemp" description="Node temperatures captured near 5 AM" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="heatStorage" description="Heat storage term per node used in solver" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="-" uri="-"/>
+		<Input name="thermalConductance" description="Thermal conductance between nodes used in solver" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="-" uri="-"/>
+		<Input name="thermalConductivity" description="Effective thermal conductivity per node (and air node)" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="-" uri="-"/>
+		<Input name="boundaryLayerConductance" description="Daily-averaged boundary layer conductance over the day" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="0" default="0.0" unit="-" uri="-"/>
+		<Input name="newTemperature" description="Working array for new temperatures in the solver" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="airTemperature" description="Current air node temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="0.0" unit="degC" uri="-"/>
+		<Input name="maxTempYesterday" description="Yesterday's maximum air temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="0.0" unit="degC" uri="-"/>
+		<Input name="minTempYesterday" description="Yesterday's minimum air temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="0.0" unit="degC" uri="-"/>
+		<Input name="soilWater" description="Current soil water content by layer (mapped to nodes as needed)" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="1" min="0" default="-" unit="m3/m3" uri="-"/>
+		<Input name="minSoilTemp" description="Minimum node temperature recorded for the day" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="maxSoilTemp" description="Maximum node temperature recorded for the day" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="aveSoilTemp" description="Average node temperature accumulated over the day" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="thickness" description="Internal thickness array including phantom node layers" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="mm" uri="-"/>
+		<Input name="bulkDensity" description="Internal bulk density array aligned with layers and phantom nodes" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="0" default="-" unit="g/cm3" uri="-"/>
+		<Input name="rocks" description="Internal rock fraction array aligned with layers and phantom nodes" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="carbon" description="Internal organic carbon array aligned with layers and phantom nodes" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="sand" description="Internal sand percentage array aligned with layers and phantom nodes" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="silt" description="Internal silt percentage array aligned with layers and phantom nodes" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="clay" description="Internal clay percentage array aligned with layers and phantom nodes" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="100" min="0" default="-" unit="percent" uri="-"/>
+		<Input name="soilRoughnessHeight" description="Bare soil roughness height used as minimum canopy height" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="0" default="57.0" unit="mm" uri="-"/>
+		<Input name="instrumentHeight" description="Instrument height adjusted for canopy (stateful)" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="0.5" default="-" unit="m" uri="-"/>
+		<Input name="netRadiation" description="Net radiation at soil surface for current sub-step" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="0.0" unit="MJ/m2 per substep" uri="-"/>
+		<Input name="canopyHeight" description="Canopy height used in boundary layer dynamics (stateful copy)" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="0" default="0.0" unit="m" uri="-"/>
+		<Input name="nu" description="Implicitness factor for Crank-Nicolson scheme" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="1" min="0" default="0.6" unit="-" uri="-"/>
+		<Input name="boundarLayerConductanceSource" description="Boundary layer conductance source (calc or constant)" inputtype="parameter" parametercategory="constant" datatype="CHAR" max="-" min="-" default="calc" unit="-" uri="-"/>
+		<Input name="netRadiationSource" description="Net radiation source (calc or eos)" inputtype="parameter" parametercategory="constant" datatype="CHAR" max="-" min="-" default="calc" unit="-" uri="-"/>
+		<Input name="defaultTimeOfMaximumTemperature" description="Default hour of maximum daily air temperature" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="24" min="0" default="14.0" unit="hours" uri="-"/>
+		<Input name="InitialValues" description="Initial layer temperatures as persisted in state after setup" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="None" unit="degC" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="doInitialisationStuff" description="Flag cleared after first process call" variablecategory="state" datatype="CHAR" max="-" min="-" unit="-" uri="-"/>
+		<Output name="internalTimeStep" description="Internal sub-daily time step used in solver" variablecategory="state" datatype="DOUBLE" max="-" min="0" unit="s" uri="-"/>
+		<Output name="timeOfDaySecs" description="Last sub-step time within the day" variablecategory="state" datatype="DOUBLE" max="86400" min="0" unit="s" uri="-"/>
+		<Output name="volSpecHeatSoil" description="Volumetric specific heat at nodes for current conditions" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="0" unit="-" uri="-"/>
+		<Output name="soilTemp" description="Final node temperatures at end of day" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="morningSoilTemp" description="Node temperatures captured near dawn" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="heatStorage" description="Heat storage per node from latest solve" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="0" unit="-" uri="-"/>
+		<Output name="thermalConductance" description="Thermal conductance values used in last solve" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="0" unit="-" uri="-"/>
+		<Output name="thermalConductivity" description="Thermal conductivity values per node including air node" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="0" unit="-" uri="-"/>
+		<Output name="boundaryLayerConductance" description="Daily averaged boundary layer conductance" variablecategory="state" datatype="DOUBLE" max="-" min="0" unit="-" uri="-"/>
+		<Output name="newTemperature" description="Latest new temperature solution array" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="airTemperature" description="Air node temperature after final sub-step" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="maxTempYesterday" description="Stored yesterday's maximum air temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="minTempYesterday" description="Stored yesterday's minimum air temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="soilWater" description="Updated soil water content profile for the day" variablecategory="state" datatype="DOUBLELIST" len="-" max="1" min="0" unit="m3/m3" uri="-"/>
+		<Output name="minSoilTemp" description="Minimum node temperatures recorded over the day" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="maxSoilTemp" description="Maximum node temperatures recorded over the day" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="aveSoilTemp" description="Average node temperatures over the day" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="instrumentHeight" description="Instrument height adjusted for canopy after process" variablecategory="state" datatype="DOUBLE" max="-" min="0.5" unit="m" uri="-"/>
+		<Output name="netRadiation" description="Net radiation at soil surface for last sub-step" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="MJ/m2 per substep" uri="-"/>
+		<Output name="canopyHeight" description="Stateful canopy height used during process" variablecategory="state" datatype="DOUBLE" max="-" min="0" unit="m" uri="-"/>
+		<Output name="InitialValues" description="Persisted initial layer temperatures after first-day setup" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+	</Outputs>
+	<Initialization name="soil_temperature_init" language="cyml" filename="algo/pyx/soil_temperature_init.pyx"/>
+	<Function name="Divide" description="Safe division returning errVal when denominator is zero." language="cyml" type="external" filename="algo/pyx/Divide.pyx"/>
+	<Function name="ValuesInArray" description="Checks if array has at least one valid (not 999999 and not NaN) value." language="cyml" type="external" filename="algo/pyx/ValuesInArray.pyx"/>
+	<Function name="Sum" description="Sums values from startIndex to endIndex inclusive, skipping 999999." language="cyml" type="external" filename="algo/pyx/Sum.pyx"/>
+	<Function name="Zero" description="Sets all elements of an array to zero." language="cyml" type="external" filename="algo/pyx/Zero.pyx"/>
+	<Function name="ToCumThickness" description="Computes cumulative thickness from layer thicknesses." language="cyml" type="external" filename="algo/pyx/ToCumThickness.pyx"/>
+	<Function name="volumetricSpecificHeat" description="Returns volumetric specific heat for a named soil constituent." language="cyml" type="external" filename="algo/pyx/volumetricSpecificHeat.pyx"/>
+	<Function name="volumetricFractionRocks" description="Volumetric fraction of rocks." language="cyml" type="external" filename="algo/pyx/volumetricFractionRocks.pyx"/>
+	<Function name="volumetricFractionOrganicMatter" description="Volumetric fraction of organic matter." language="cyml" type="external" filename="algo/pyx/volumetricFractionOrganicMatter.pyx"/>
+	<Function name="volumetricFractionSand" description="Volumetric fraction of sand." language="cyml" type="external" filename="algo/pyx/volumetricFractionSand.pyx"/>
+	<Function name="volumetricFractionSilt" description="Volumetric fraction of silt." language="cyml" type="external" filename="algo/pyx/volumetricFractionSilt.pyx"/>
+	<Function name="volumetricFractionClay" description="Volumetric fraction of clay." language="cyml" type="external" filename="algo/pyx/volumetricFractionClay.pyx"/>
+	<Function name="volumetricFractionWater" description="Volumetric fraction of water." language="cyml" type="external" filename="algo/pyx/volumetricFractionWater.pyx"/>
+	<Function name="volumetricFractionIce" description="Volumetric fraction of ice (zero here)." language="cyml" type="external" filename="algo/pyx/volumetricFractionIce.pyx"/>
+	<Function name="volumetricFractionAir" description="Volumetric fraction of air as the remainder." language="cyml" type="external" filename="algo/pyx/volumetricFractionAir.pyx"/>
+	<Function name="ThermalConductance" description="Returns thermal conductance (note: implementation resets to specific heat)." language="cyml" type="external" filename="algo/pyx/ThermalConductance.pyx"/>
+	<Function name="shapeFactor" description="Returns particle shape factor (note: implementation resets to specific heat)." language="cyml" type="external" filename="algo/pyx/shapeFactor.pyx"/>
+	<Function name="airDensity" description="Air density from temperature and pressure." language="cyml" type="external" filename="algo/pyx/airDensity.pyx"/>
+	<Function name="kelvinT" description="Convert Celsius to Kelvin." language="cyml" type="external" filename="algo/pyx/kelvinT.pyx"/>
+	<Function name="longWaveRadn" description="Longwave radiation flux for given emissivity and temperature." language="cyml" type="external" filename="algo/pyx/longWaveRadn.pyx"/>
+	<Function name="mapLayer2Node" description="Maps layer-based values to node-based values by depth weighting." language="cyml" type="external" filename="algo/pyx/mapLayer2Node.pyx"/>
+	<Function name="doVolumetricSpecificHeat" description="Computes volumetric specific heat profile at nodes." language="cyml" type="external" filename="algo/pyx/doVolumetricSpecificHeat.pyx"/>
+	<Function name="doThermalConductivity" description="Computes effective thermal conductivity profile at nodes." language="cyml" type="external" filename="algo/pyx/doThermalConductivity.pyx"/>
+	<Function name="doThomas" description="Tridiagonal solver for heat diffusion with surface energy flux." language="cyml" type="external" filename="algo/pyx/doThomas.pyx"/>
+	<Function name="interpolateTemperature" description="Diurnal air temperature interpolation." language="cyml" type="external" filename="algo/pyx/interpolateTemperature.pyx"/>
+	<Function name="doUpdate" description="Updates daily min, max, average soil temperatures and boundary conductance." language="cyml" type="external" filename="algo/pyx/doUpdate.pyx"/>
+	<Function name="getBoundaryLayerConductance" description="Calculates boundary layer conductance with stability corrections." language="cyml" type="external" filename="algo/pyx/getBoundaryLayerConductance.pyx"/>
+	<Function name="calcSoilTemperature" description="Initial soil temperature profile from annual wave." language="cyml" type="external" filename="algo/pyx/calcSoilTemperature.pyx"/>
+	<Function name="calcLayerTemperature" description="Analytical layer temperature from phase lag (unused in process)." language="cyml" type="external" filename="algo/pyx/calcLayerTemperature.pyx"/>
+	<Function name="calcSurfaceTemperature" description="Surface temperature estimate from albedo, mean and max temp, and radiation." language="cyml" type="external" filename="algo/pyx/calcSurfaceTemperature.pyx"/>
+	<Function name="doNetRadiation" description="Splits daily solar radiation to sub-daily and estimates cloud fraction and vapor term." language="cyml" type="external" filename="algo/pyx/doNetRadiation.pyx"/>
+	<Function name="interpolateNetRadiation" description="Computes net radiation at soil for a substep (SW and LW)." language="cyml" type="external" filename="algo/pyx/interpolateNetRadiation.pyx"/>
+	<Function name="math_pi" description="Returns PI constant." language="cyml" type="external" filename="algo/pyx/math_pi.pyx"/>
+	<Function name="math_sin" description="Sine wrapper." language="cyml" type="external" filename="algo/pyx/math_sin.pyx"/>
+	<Function name="math_cos" description="Cosine wrapper." language="cyml" type="external" filename="algo/pyx/math_cos.pyx"/>
+	<Function name="math_sqrt" description="Square root with non-negative guard." language="cyml" type="external" filename="algo/pyx/math_sqrt.pyx"/>
+	<Function name="math_log" description="Natural log with positive guard." language="cyml" type="external" filename="algo/pyx/math_log.pyx"/>
+	<Function name="math_exp" description="Exponential wrapper." language="cyml" type="external" filename="algo/pyx/math_exp.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/soil_temperature_process.pyx"/>
+	<Parametersets>
+		<Parameterset name="p_test_initialize_and_process_simple" description="Initializes state with a 5-layer profile and runs one daily process step, asserting output size.">
+			<Param name="physical_Thickness">[150.0, 150.0, 300.0, 300.0, 300.0]</Param>
+			<Param name="physical_BD">[1.3, 1.3, 1.35, 1.35, 1.4]</Param>
+			<Param name="physical_Rocks">[0.0, 0.0, 0.0, 0.0, 0.0]</Param>
+			<Param name="physical_ParticleSizeSand">[40.0, 40.0, 40.0, 40.0, 40.0]</Param>
+			<Param name="physical_ParticleSizeSilt">[40.0, 40.0, 40.0, 40.0, 40.0]</Param>
+			<Param name="physical_ParticleSizeClay">[20.0, 20.0, 20.0, 20.0, 20.0]</Param>
+			<Param name="organic_Carbon">[1.0, 0.8, 0.6, 0.4, 0.3]</Param>
+			<Param name="weather_Tav">15.0</Param>
+			<Param name="weather_Amp">10.0</Param>
+			<Param name="weather_Latitude">-27.0</Param>
+			<Param name="DepthToConstantTemperature">10000.0</Param>
+			<Param name="instrumHeight">1.2</Param>
+		</Parameterset>
+	</Parametersets>
+	<Testsets>
+		<Testset name="t_test_initialize_and_process_simple" description="Initializes state with a 5-layer profile and runs one daily process step, asserting output size." parameterset="p_test_initialize_and_process_simple">
+			<Test name="t_test_initialize_and_process_simple">
+				<InputValue name="waterBalance_SW">[0.25, 0.25, 0.26, 0.27, 0.28]</InputValue>
+				<InputValue name="clock_Today_DayOfYear">200</InputValue>
+				<InputValue name="InitialValues">None</InputValue>
+				<InputValue name="waterBalance_Es">2.0</InputValue>
+				<InputValue name="waterBalance_Eos">5.0</InputValue>
+				<InputValue name="waterBalance_Eo">6.0</InputValue>
+				<InputValue name="waterBalance_Salb">0.2</InputValue>
+				<InputValue name="microClimate_CanopyHeight">0.0</InputValue>
+				<InputValue name="weather_Wind">3.0</InputValue>
+				<InputValue name="weather_AirPressure">1010.0</InputValue>
+				<InputValue name="weather_Radn">18.0</InputValue>
+				<InputValue name="weather_MeanT">18.0</InputValue>
+				<InputValue name="weather_MaxT">25.0</InputValue>
+				<InputValue name="weather_MinT">10.0</InputValue>
+				<InputValue name="weather_Tav_day">15.0</InputValue>
+				<InputValue name="weather_Latitude_day">-27.0</InputValue>
+				<OutputValue name="FinalSoilTemperature">list</OutputValue>
+				<OutputValue name="FinalSoilTemperature length">5</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

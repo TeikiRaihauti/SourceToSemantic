@@ -1,0 +1,62 @@
+Inputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+6;10;6;4;0;0.6;1.0;0.7499999999999999
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+air_temp_day1;WRONG;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+layer_thick;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+prev_canopy_temp;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+temp_amp;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+prev_temp_profile;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;OK;WRONG
+min_air_temp;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+max_temp;variable;exogenous;DOUBLE
+layer_thick_or_depth;parameter;;INTARRAY
+temp_profile;variable;auxiliary;DOUBLELIST
+canopy_temp_avg;variable;auxiliary;DOUBLE
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Outputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+1;2;0;2;1;0.0;0.0;0
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+
+False positive
+Name;inputtype;variablecategory;datatype
+prev_temp_profile;;state;DOUBLELIST
+prev_canopy_temp;;state;DOUBLE
+
+False negative
+Name;inputtype;variablecategory;datatype
+temp_profile;;state;DOUBLEARRAY
+
+
+Functions stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+0;8;0;8;0;0.0;0;0
+
+True positive
+Name
+
+False positive
+Name
+model_temp_profile
+model_soil_temp
+model_temp_amp
+model_canopy_temp_avg
+layer_thickness2depth
+get_layers_number
+model_layers_temp
+model_update
+
+False negative
+Name
+

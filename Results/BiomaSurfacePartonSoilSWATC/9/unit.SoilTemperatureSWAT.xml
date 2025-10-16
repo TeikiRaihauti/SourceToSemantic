@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".SoilTemperatureSWAT model" name="SoilTemperatureSWAT model" timestep="1" version="001">
+	<Description>
+		<Title>SoilTemperatureSWAT model</Title>
+		<Authors>Simone Bregaglio (simone.bregaglio@unimi.it); Nicolò Frasso (nicolo.frasso@unimi.it)</Authors>
+		<Institution>University Of Milan</Institution>
+		<URI>http://bioma.jrc.ec.europa.eu/ontology/JRC_MARS_biophysical_domain.owl</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>Strategy for the calculation of soil temperature with the SWAT method. Reference: Neitsch, S.L., Arnold, J.G., Kiniry, J.R., Williams, J.R., King, K.W. Soil and Water Assessment Tool. Theoretical documentation. Version 2000. http://swatmodel.tamu.edu/media/1290/swat2000theory.pdf</ExtendedDescription>
+		<ShortDescription>Calculates soil temperature by layers using SWAT’s damping-depth approach with a daily lag coefficient, driven by annual average air temperature, surface soil temperature, soil water content, bulk density, and layer thickness.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="LagCoefficient" description="lag coefficient (dimensionless, 0-1)" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="1" min="0" default="-" unit="1" uri="-"/>
+		<Input name="states_SoilProfileDepth" description="soil profile depth" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="m" uri="-"/>
+		<Input name="states_SurfaceSoilTemperature" description="average surface soil temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="exogenous_AirTemperatureAnnualAverage" description="annual average air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="states_SoilTemperatureByLayers" description="previous soil temperature by layer" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="states_BulkDensity" description="bulk density by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="t m-3" uri="-"/>
+		<Input name="states_VolumetricWaterContent" description="volumetric water content by layer" inputtype="variable" variablecategory="exogenous" datatype="DOUBLELIST" len="-" max="1" min="0" default="-" unit="m3 m-3" uri="-"/>
+		<Input name="states_LayerThickness" description="layer thickness by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="m" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="states_SoilTemperatureByLayers" description="updated soil temperature by layer" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+	</Outputs>
+	<Initialization name="Init" language="cyml" filename="algo/pyx/Init.pyx"/>
+	<Function name="Init" description="Initialization function for SoilTemperatureSWAT. Creates and initializes the SoilTemperatureByLayers array to 15 degC for each soil layer." language="cyml" type="external" filename="algo/pyx/Init.pyx"/>
+	<Function name="Estimate" description="Main biophysical process function for SoilTemperatureSWAT. Computes soil temperature by layer using the SWAT method." language="cyml" type="external" filename="algo/pyx/Estimate.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/Estimate.pyx"/>
+	<Parametersets/>
+	<Testsets/>
+</ModelUnit>

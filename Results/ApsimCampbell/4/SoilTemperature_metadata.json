@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SoilTemperature",
+        "Authors": "-",
+        "Institution": "-",
+        "URI": "Models.Soils.SoilTemp.SoilTemperature",
+        "DOI": "-",
+        "Extended description": "A 1D soil temperature component which simulates diurnal soil and surface temperatures and conductive heat flux through a discretised soil profile. The profile is represented by nodes for the air (0), soil surface (1), one per soil layer, plus several phantom nodes below the profile to impose a lower boundary at near-constant temperature. Thermophysical properties are estimated each step: volumetric heat capacity from soil constituents and water content, and thermal conductivity using Campbell (1985)-based parameterisations. The surface energy balance includes shortwave and longwave net radiation (estimated from daily radiation, cloud fraction and vapour content) and latent/sensible heat fluxes. An atmospheric boundary layer conductance is calculated with stability corrections from wind, canopy height and instrument height. Sub-daily air temperature is interpolated from daily min/mean/max with a default Tmax time. The heat diffusion equation is solved with a tridiagonal (Thomas) scheme using a semi-implicit weighting (nu=0.6) over multiple intra-day iterations. Initial soil temperatures can be provided or generated from an annual sinusoidal function. Inputs include layer thickness, optional initial layer temperatures and depth to constant temperature, plus linked weather, soil physical, organic and water balance data. Outputs include daily min/mean/average soil and surface temperatures, boundary layer conductance, and profiles of thermal conductivity, heat capacity and heat storage.",
+        "Short description": "Simulates diurnal soil temperature profiles and surface energy balance using a 1D heat diffusion model (Campbell 1985) with atmospheric boundary layer coupling.",
+        "Model version": "-"
+    }
+}

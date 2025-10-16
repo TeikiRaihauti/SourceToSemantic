@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".SiriusQuality-SoilTemperature" name="SiriusQuality-SoilTemperature" timestep="1" version="1.0.0.0">
+	<Description>
+		<Title>SiriusQuality-SoilTemperature</Title>
+		<Authors>Loic Manceau</Authors>
+		<Institution>INRA</Institution>
+		<URI>http://biomamodelling.org</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>Computes soil temperature dynamics for crop simulations. It estimates daily minimum and maximum soil surface temperatures from air temperatures and soil heat flux, with a first‑order memory for deep soil temperature initialized from the annual mean air temperature. It can also produce hourly soil temperatures using the Parton &amp; Logan (1981) diurnal formulation. Key parameters include lambda_ (latent heat of vaporization scaling) and a, b, c timing/shape coefficients; key states include maxTSoil, minTSoil, hourlySoilT, and deepLayerT.</ExtendedDescription>
+		<ShortDescription>Daily min/max (and hourly) soil temperature from air temperature and soil heat flux with deep-layer smoothing.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="exogenous_meanAnnualAirTemp" description="Annual mean air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="deeplayerstates_deepLayerT" description="Previous deep soil layer temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="exogenous_maxTAir" description="Maximum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="exogenous_meanTAir" description="Mean air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="exogenous_minTAir" description="Minimum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="ratesexternal_heatFlux" description="Soil heat flux" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="g m-2 d-1" uri="-"/>
+		<Input name="lambda_" description="Latent heat of water vaporization at 20°C" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="MJ kg-1" uri="-"/>
+		<Input name="weatherMaxTemp" description="Maximum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="weatherMeanTemp" description="Mean air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="weatherMinTemp" description="Minimum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="soilHeatFlux" description="Soil heat flux" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="g m-2 d-1" uri="-"/>
+		<Input name="deepTemperature" description="Deep soil layer temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="minSoilTemp" description="Minimum soil temperature" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="maxSoilTemp" description="Maximum soil temperature" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="Temperature" description="Previous deep soil layer temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="states_minTSoil" description="Minimum soil temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="°C" uri="-"/>
+		<Output name="states_maxTSoil" description="Maximum soil temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="°C" uri="-"/>
+		<Output name="deeplayerstates_deepLayerT" description="Updated deep soil layer temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="°C" uri="-"/>
+	</Outputs>
+	<Initialization name="Init" language="cyml" filename="algo/pyx/Init.pyx"/>
+	<Function name="Init" description="Initialization function. Sets the deep soil layer temperature to the annual mean air temperature." language="cyml" type="external" filename="algo/pyx/Init.pyx"/>
+	<Function name="Estimate" description="Main process. Computes daily minimum and maximum soil temperature and updates the deep soil layer temperature." language="cyml" type="external" filename="algo/pyx/Estimate.pyx"/>
+	<Function name="SoilMinimumTemperature" description="Computes daily minimum soil temperature as the minimum of SoilTempA and SoilTempB." language="cyml" type="external" filename="algo/pyx/SoilMinimumTemperature.pyx"/>
+	<Function name="SoilMaximumTemperature" description="Computes daily maximum soil temperature as the maximum of SoilTempA and SoilTempB." language="cyml" type="external" filename="algo/pyx/SoilMaximumTemperature.pyx"/>
+	<Function name="SoilTempA" description="Soil temperature component A using air temperatures, soil heat flux, and latent heat." language="cyml" type="external" filename="algo/pyx/SoilTempA.pyx"/>
+	<Function name="SoilTempB" description="Soil temperature component B using minimum air temperature and deep soil temperature." language="cyml" type="external" filename="algo/pyx/SoilTempB.pyx"/>
+	<Function name="UpdateTemperature" description="Updates the deep soil layer temperature from minimum and maximum soil temperatures." language="cyml" type="external" filename="algo/pyx/UpdateTemperature.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/Estimate.pyx"/>
+	<Parametersets/>
+	<Testsets/>
+</ModelUnit>

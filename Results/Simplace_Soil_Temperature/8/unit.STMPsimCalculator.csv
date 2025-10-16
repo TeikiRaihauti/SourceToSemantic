@@ -1,0 +1,56 @@
+Inputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+10;11;10;1;0;0.9090909090909091;1.0;0.9523809523809523
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+SoilTempArray;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;OK
+rSoilTempArrayRate;OK;WRONG;WRONG;WRONG;WRONG;WRONG;OK;WRONG;OK
+pSoilLayerDepth;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;OK
+cSoilLayerDepth;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;OK
+cABD;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK
+iSoilWaterContent;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK
+iSoilSurfaceTemperature;OK;WRONG;OK;OK;WRONG;WRONG;OK;WRONG;OK
+cAVT;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;OK
+cFirstDayMeanTemp;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;OK
+cDampingDepth;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK
+
+False positive
+Name;inputtype;variablecategory;datatype
+iDoInitialize;variable;exogenous;CHAR
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Outputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+2;2;1;1;1;0.5;0.5;0.5
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+SoilTempArray;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;OK
+
+False positive
+Name;inputtype;variablecategory;datatype
+pSoilLayerDepth;;state;DOUBLELIST
+
+False negative
+Name;inputtype;variablecategory;datatype
+rSoilTempArrayRate;;state;DOUBLEARRAY
+
+
+Functions stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+0;1;0;1;0;0.0;0;0
+
+True positive
+Name
+
+False positive
+Name
+-
+
+False negative
+Name
+

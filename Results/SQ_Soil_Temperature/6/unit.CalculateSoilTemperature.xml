@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".SiriusQuality-SoilTemperature" name="SiriusQuality-SoilTemperature" timestep="1" version="1.0.0.0">
+	<Description>
+		<Title>SiriusQuality-SoilTemperature</Title>
+		<Authors>Loic Manceau</Authors>
+		<Institution>INRA</Institution>
+		<URI>http://biomamodelling.org</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>Component for estimating soil surface temperature. It computes daily minimum and maximum soil temperatures from daily air temperatures and soil heat flux using an empirical energy-based approach, and can optionally generate an hourly soil temperature profile following Parton &amp; Logan (1981). A deep soil layer temperature state is maintained via an exponential smoothing update initialized with the annual mean air temperature. Key parameters include the latent heat of vaporization (lambda_) and diurnal curve shape parameters (a, b, c). Outputs are daily min/max soil temperatures and, if enabled, 24 hourly soil temperatures.</ExtendedDescription>
+		<ShortDescription>Calculates daily min/max and optional hourly soil temperatures, maintaining a deep-layer temperature state.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="exogenous_meanAnnualAirTemp" description="Annual mean air temperature used to initialize deep soil layer temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="deeplayerstates_deepLayerT" description="Deep soil layer temperature from previous step" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="exogenous_maxTAir" description="Maximum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="exogenous_meanTAir" description="Mean air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="exogenous_minTAir" description="Minimum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="ratesexternal_heatFlux" description="Soil heat flux" inputtype="variable" variablecategory="rate" datatype="DOUBLE" max="-" min="-" default="-" unit="g m-2 d-1" uri="-"/>
+		<Input name="lambda_" description="Latent heat of water vaporization at 20°C" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="MJ kg-1" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="states_minTSoil" description="Minimum soil temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="°C" uri="-"/>
+		<Output name="states_maxTSoil" description="Maximum soil temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="°C" uri="-"/>
+		<Output name="deeplayerstates_deepLayerT" description="Updated deep soil layer temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="°C" uri="-"/>
+	</Outputs>
+	<Initialization name="Init" language="cyml" filename="algo/pyx/Init.pyx"/>
+	<Function name="SoilMinimumTemperature" description="Computes minimum soil temperature as min of components A and B." language="cyml" type="external" filename="algo/pyx/SoilMinimumTemperature.pyx"/>
+	<Function name="SoilMaximumTemperature" description="Computes maximum soil temperature as max of components A and B." language="cyml" type="external" filename="algo/pyx/SoilMaximumTemperature.pyx"/>
+	<Function name="SoilTempA" description="Soil temperature component A driven by available energy and air temperature." language="cyml" type="external" filename="algo/pyx/SoilTempA.pyx"/>
+	<Function name="SoilTempB" description="Soil temperature component B as mean of minimum air and deep temperature." language="cyml" type="external" filename="algo/pyx/SoilTempB.pyx"/>
+	<Function name="UpdateTemperature" description="Updates deep soil layer temperature as running mean of soil mean temperature." language="cyml" type="external" filename="algo/pyx/UpdateTemperature.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/Estimate.pyx"/>
+	<Parametersets/>
+	<Testsets/>
+</ModelUnit>

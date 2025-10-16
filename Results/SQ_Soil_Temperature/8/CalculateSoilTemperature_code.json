@@ -1,0 +1,188 @@
+{
+    "init": {
+        "name": "Init"
+    },
+    "process": {
+        "name": "Estimate",
+        "description": "Calculate daily minimum and maximum soil temperatures and update deep soil layer temperature."
+    },
+    "inputs": [
+        {
+            "name": "deeplayerstates_deepLayerT",
+            "description": "Deep soil layer temperature from previous step",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_meanAnnualAirTemp",
+            "description": "Annual mean air temperature used to initialize deep soil layer temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_maxTAir",
+            "description": "Daily maximum air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_meanTAir",
+            "description": "Daily mean air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_minTAir",
+            "description": "Daily minimum air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "ratesexternal_heatFlux",
+            "description": "Soil heat flux",
+            "inputtype": "variable",
+            "category": "rate",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "lambda_",
+            "description": "Latent heat of vaporization of water",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "MJ kg-1",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "states_minTSoil",
+            "description": "Computed minimum daily soil temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "states_maxTSoil",
+            "description": "Computed maximum daily soil temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "deeplayerstates_deepLayerT",
+            "description": "Updated deep soil layer temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "Init",
+            "description": "Initialize deep soil layer temperature to the annual mean air temperature."
+        },
+        {
+            "name": "Estimate",
+            "description": "Compute daily min/max soil temperatures and update deep layer temperature."
+        },
+        {
+            "name": "SoilMinimumTemperature",
+            "description": "Return the minimum of SoilTempA and SoilTempB."
+        },
+        {
+            "name": "SoilMaximumTemperature",
+            "description": "Return the maximum of SoilTempA and SoilTempB."
+        },
+        {
+            "name": "SoilTempA",
+            "description": "Estimate soil temperature from weatherMaxTemp, weatherMeanTemp, soilHeatFlux, and lambda_, including cold adjustment."
+        },
+        {
+            "name": "SoilTempB",
+            "description": "Estimate soil temperature as the average of weatherMinTemp and deepTemperature."
+        },
+        {
+            "name": "UpdateTemperature",
+            "description": "Update deep layer temperature using a weighted moving average of previous temperature and mean soil temperature."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".STMPsimCalculator" name="STMPsimCalculator" timestep="1" version="-">
+	<Description>
+		<Title>STMPsimCalculator</Title>
+		<Authors>Andreas Enders; Gunther Krauss</Authors>
+		<Institution>Crop Science Group, Katzenburgweg 5, 53115 Bonn, Germany</Institution>
+		<URI>http://www.simplace.net</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>SIMPLACE component that computes daily soil temperature (STMP) for multiple soil layers using the EPIC/APEX formulation. Layer temperatures are updated via a lag toward the soil surface temperature and the long-term average air temperature, with a depth factor based on damping depth. The damping depth depends on bulk density and soil water content; initialization extends the profile to the damping depth and linearly interpolates between the first-day mean air temperature and AVT. The soil surface temperature is typically provided by the SnowCoverCalculator, which accounts for radiation, albedo, crop residues, and snow cover. Reference: Williams and Izaurralde (2005), The APEX model.</ExtendedDescription>
+		<ShortDescription>Daily multi-layer soil temperature calculator with damping-depth physics; surface temperature typically from SnowCoverCalculator.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="cSoilLayerDepth" description="List of soil layer bottom depths, increasing, profile bottom at last element" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="" min="" default="" unit="m" uri=""/>
+		<Input name="cFirstDayMeanTemp" description="Mean air temperature on first day for initialization/re-initialization" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="" min="" default="" unit="degC" uri=""/>
+		<Input name="cDampingDepth" description="Damping depth used to extend the profile and initialize temperatures" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="" min="" default="" unit="m" uri=""/>
+		<Input name="cAVT" description="Long-term average annual air temperature" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="" min="" default="" unit="degC" uri=""/>
+		<Input name="cABD" description="Average soil bulk density" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="" min="" default="" unit="t m-3" uri=""/>
+		<Input name="iSoilWaterContent" description="Total water stored in soil profile" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="" min="" default="" unit="mm" uri=""/>
+		<Input name="iSoilSurfaceTemperature" description="Current soil surface temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="" min="" default="" unit="degC" uri=""/>
+		<Input name="SoilTempArray" description="Current soil temperatures for each (extended) layer before update" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="" min="" default="" unit="degC" uri=""/>
+		<Input name="pSoilLayerDepth" description="Extended layer bottom depths including layers to reach damping depth" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="" min="" default="" unit="m" uri=""/>
+		<Input name="iDoInitialize" description="Flag to re-initialize states before processing this day (0/1)" inputtype="variable" variablecategory="exogenous" datatype="INT" max="1" min="0" default="" unit="-" uri=""/>
+	</Inputs>
+	<Outputs>
+		<Output name="SoilTempArray_new" description="Updated soil temperatures for each (extended) layer after one day" variablecategory="state" datatype="DOUBLELIST" len="-" max="" min="" unit="degC" uri=""/>
+		<Output name="rSoilTempArrayRate_new" description="Daily soil temperature change rate for each (extended) layer" variablecategory="state" datatype="DOUBLELIST" len="-" max="" min="" unit="degC/day" uri=""/>
+		<Output name="pSoilLayerDepth_new" description="Extended layer bottom depths used for this step" variablecategory="state" datatype="DOUBLELIST" len="-" max="" min="" unit="m" uri=""/>
+	</Outputs>
+	<Initialization name="stmp_initialize" language="cyml" filename="algo/pyx/stmp_initialize.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/stmp_process.pyx"/>
+	<Parametersets>
+		<Parameterset name="p_test_stmp_process_case0" description="Derived from STMPsimCalculator.fillTestVariables test case (aTestIndex == 0).">
+			<Param name="cSoilLayerDepth">[0.1, 0.5, 1.5]</Param>
+			<Param name="cFirstDayMeanTemp">15.0</Param>
+			<Param name="cAVT">9.0</Param>
+			<Param name="cABD">1.4</Param>
+			<Param name="cDampingDepth">6.0</Param>
+		</Parameterset>
+	</Parametersets>
+	<Testsets>
+		<Testset name="t_test_stmp_process_case0" description="Derived from STMPsimCalculator.fillTestVariables test case (aTestIndex == 0)." parameterset="p_test_stmp_process_case0">
+			<Test name="t_test_stmp_process_case0">
+				<InputValue name="iSoilWaterContent">0.3</InputValue>
+				<InputValue name="iSoilSurfaceTemperature">6.0</InputValue>
+				<InputValue name="iDoInitialize">False</InputValue>
+				<OutputValue name="SoilTempArray_new">[13.624360856350041, 13.399968504634286, 12.599999999999845, 12.2, 11.4, 10.6, 9.799999999999999, 9.0]</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

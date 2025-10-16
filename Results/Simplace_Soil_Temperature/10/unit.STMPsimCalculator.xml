@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".STMP (Soil Temperature)" name="STMP (Soil Temperature)" timestep="1" version="-">
+	<Description>
+		<Title>STMP (Soil Temperature)</Title>
+		<Authors>Andreas Enders; Gunther Krauss</Authors>
+		<Institution>Crop Science Group, Katzenburgweg 5, 53115 Bonn, Germany</Institution>
+		<URI>net.simplace.sim.components.soil.temperature.STMPsimCalculator</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>SIMPLACE implementation of the APEX STMP routine to compute daily soil temperatures by layer as a function of soil surface temperature, depth, bulk density, and soil water content. The profile is initialized by linear interpolation between the first-day mean air temperature and a long-term average (AVT) down to a specified damping depth. Daily updates apply a lag (LAG=0.8) and a depth-dependent weighting using damping depth (DD) derived from bulk density (ABD) and profile water (WC). The component can extend layers to the damping depth and is designed to couple with the SnowCoverCalculator to supply the soil surface temperature (DST0).</ExtendedDescription>
+		<ShortDescription>SIMPLACE component computing daily layered soil temperatures using APEX-based STMP equations with depth-dependent damping and optional coupling to SnowCoverCalculator.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="cSoilLayerDepth" description="Soil layer bottom depths" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="m" uri="-"/>
+		<Input name="cFirstDayMeanTemp" description="Mean air temperature on first day" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="cAVT" description="Long-term average annual air temperature" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="cDampingDepth" description="Initial damping depth of soil" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="m" uri="-"/>
+		<Input name="SoilTempArray" description="Current soil temperatures in layers" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="°C" uri="-"/>
+		<Input name="pSoilLayerDepth" description="Depths to the bottom of each layer including additional layers" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="m" uri="-"/>
+		<Input name="cABD" description="Average soil bulk density of the profile" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="t m-3" uri="-"/>
+		<Input name="iSoilWaterContent" description="Water stored in the soil profile" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="mm" uri="-"/>
+		<Input name="iSoilSurfaceTemperature" description="Soil surface temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="°C" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="SoilTempArray" description="Updated soil temperatures in layers after the step" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="°C" uri="-"/>
+	</Outputs>
+	<Initialization name="STMPsimCalculator_init" language="cyml" filename="algo/pyx/STMPsimCalculator_init.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/STMPsimCalculator_process.pyx"/>
+	<Parametersets>
+		<Parameterset name="p_test_STMPsimCalculator_process_case0" description="Derived from STMPsimCalculator.fillTestVariables test case aTestIndex == 0.">
+			<Param name="cSoilLayerDepth">[0.1, 0.5, 1.5]</Param>
+			<Param name="cAVT">9.0</Param>
+			<Param name="cABD">1.4</Param>
+			<Param name="cDampingDepth">6.0</Param>
+		</Parameterset>
+	</Parametersets>
+	<Testsets>
+		<Testset name="t_test_STMPsimCalculator_process_case0" description="Derived from STMPsimCalculator.fillTestVariables test case aTestIndex == 0." parameterset="p_test_STMPsimCalculator_process_case0">
+			<Test name="t_test_STMPsimCalculator_process_case0">
+				<InputValue name="cFirstDayMeanTemp">15.0</InputValue>
+				<InputValue name="iSoilWaterContent">0.3</InputValue>
+				<InputValue name="iSoilSurfaceTemperature">6.0</InputValue>
+				<OutputValue name="SoilTempArray">[13.624360856350041, 13.399968504634286, 12.599999999999845, 12.2, 11.4, 10.6, 9.799999999999999, 9.0]</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

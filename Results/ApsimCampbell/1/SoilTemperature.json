@@ -1,0 +1,750 @@
+{
+    "metadata": {
+        "Title": "SoilTemperature",
+        "Authors": "-",
+        "Institution": "-",
+        "URI": "-",
+        "DOI": "-",
+        "Extended description": "Numerical soil temperature model which simulates soil heat fluxes and temperatures from the atmosphere, across the soil surface, and through the soil profile. The profile is represented by nodes (air node, surface node, layer-centre nodes, and phantom nodes below the profile). Sub-daily time-stepping partitions daily net radiation and computes boundary layer conductance and heat diffusion using a tridiagonal (Thomas) solver. Material properties depend on soil constituents (rocks, organic matter, sand, silt, clay, water, air). Many formulations are based on Campbell (1985), Soil physics with BASIC.",
+        "Short description": "Sub-daily soil temperature and surface energy balance model using Thomas algorithm for 1-D heat diffusion.",
+        "Model version": "-"
+    },
+    "init": {
+        "name": "OnStartOfSimulation"
+    },
+    "process": {
+        "name": "doProcess",
+        "description": "Performs the daily soil temperature simulation by looping over sub-daily timesteps to compute net radiation, boundary layer conductance, solve heat diffusion with the Thomas algorithm, and update min/max/average soil temperatures."
+    },
+    "inputs": [
+        {
+            "name": "InitialValues",
+            "description": "Initial values for the temperature in each soil layer (top to bottom) used at start-up if provided.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "DepthToConstantTemperature",
+            "description": "Depth down to the assumed constant temperature zone for phantom nodes.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "10000.0",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "pom",
+            "description": "Particle density of organic matter.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "1.3",
+            "unit": "Mg/m3",
+            "uri": "-"
+        },
+        {
+            "name": "ps",
+            "description": "Particle density of soil fines (minerals).",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "2.63",
+            "unit": "Mg/m3",
+            "uri": "-"
+        },
+        {
+            "name": "timestep",
+            "description": "Nominal model timestep used to scale fluxes (seconds per day).",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "86400.0",
+            "unit": "s",
+            "uri": "-"
+        },
+        {
+            "name": "latentHeatOfVapourisation",
+            "description": "Latent heat of vaporisation for water.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "2465000.0",
+            "unit": "J/kg",
+            "uri": "-"
+        },
+        {
+            "name": "stefanBoltzmannConstant",
+            "description": "Stefan-Boltzmann constant for longwave radiation.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "5.67E-08",
+            "unit": "W/m2/K4",
+            "uri": "-"
+        },
+        {
+            "name": "numPhantomNodes",
+            "description": "Number of phantom nodes appended below the soil profile for lower boundary condition.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "INT",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "5",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "constantBoundaryLayerConductance",
+            "description": "Constant boundary layer conductance when using 'constant' option.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "20",
+            "unit": "W/K",
+            "uri": "-"
+        },
+        {
+            "name": "numIterationsForBoundaryLayerConductance",
+            "description": "Number of iterations used to refine boundary layer conductance within a timestep.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "INT",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "1",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "defaultTimeOfMaximumTemperature",
+            "description": "Time of day for maximum air temperature.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "24",
+            "default": "14.0",
+            "unit": "h",
+            "uri": "-"
+        },
+        {
+            "name": "defaultInstrumentHeight",
+            "description": "Default anemometer/thermometer height above ground when not provided.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "1.2",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "bareSoilRoughness",
+            "description": "Roughness element height for bare soil.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "57",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "nu",
+            "description": "Forward/backward differencing coefficient for the heat diffusion solver (Crank-Nicholson weighting).",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "1",
+            "default": "0.6",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "boundarLayerConductanceSource",
+            "description": "Option for boundary layer conductance: 'calc' or 'constant'.",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "CHAR",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "calc",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "netRadiationSource",
+            "description": "Option for net radiation: 'calc' (from radiation) or 'eos' (from potential soil evaporation).",
+            "inputtype": "parameter",
+            "category": "-",
+            "datatype": "CHAR",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "calc",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "weather_MeanT",
+            "description": "Daily mean air temperature.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "weather_Tav",
+            "description": "Long-term average air temperature.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "weather_MaxT",
+            "description": "Daily maximum air temperature.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "weather_MinT",
+            "description": "Daily minimum air temperature.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "weather_Radn",
+            "description": "Daily incoming shortwave solar radiation.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "MJ/m2/d",
+            "uri": "-"
+        },
+        {
+            "name": "weather_AirPressure",
+            "description": "Air pressure used for air density calculations.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "hPa",
+            "uri": "-"
+        },
+        {
+            "name": "weather_Latitude",
+            "description": "Site latitude used for solar geometry and seasonal phase.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-90",
+            "max": "90",
+            "default": "-",
+            "unit": "deg",
+            "uri": "-"
+        },
+        {
+            "name": "weather_Amp",
+            "description": "Annual amplitude of air temperature for seasonal soil temperature initialisation.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "weather_Wind",
+            "description": "Wind speed used in boundary layer conductance calculations.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "m/s",
+            "uri": "-"
+        },
+        {
+            "name": "clock_Today_DayOfYear",
+            "description": "Day of year used for solar geometry and seasonal phase.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "INT",
+            "len": "-",
+            "min": "1",
+            "max": "366",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "microClimate_CanopyHeight",
+            "description": "Canopy height used to determine aerodynamic roughness and displacement height.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "physical_Thickness",
+            "description": "Soil layer thicknesses (top to bottom).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "physical_BD",
+            "description": "Soil bulk density by layer.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "g/cm3",
+            "uri": "-"
+        },
+        {
+            "name": "physical_Rocks",
+            "description": "Volumetric fraction of rocks by layer (percent).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0",
+            "max": "100",
+            "default": "-",
+            "unit": "%",
+            "uri": "-"
+        },
+        {
+            "name": "physical_ParticleSizeSand",
+            "description": "Sand fraction by layer (percent).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0",
+            "max": "100",
+            "default": "-",
+            "unit": "%",
+            "uri": "-"
+        },
+        {
+            "name": "physical_ParticleSizeSilt",
+            "description": "Silt fraction by layer (percent).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0",
+            "max": "100",
+            "default": "-",
+            "unit": "%",
+            "uri": "-"
+        },
+        {
+            "name": "physical_ParticleSizeClay",
+            "description": "Clay fraction by layer (percent).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0",
+            "max": "100",
+            "default": "-",
+            "unit": "%",
+            "uri": "-"
+        },
+        {
+            "name": "organic_Carbon",
+            "description": "Soil carbon (or organic matter proxy) by layer (percent), used to compute organic volumetric fraction.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0",
+            "max": "100",
+            "default": "-",
+            "unit": "%",
+            "uri": "-"
+        },
+        {
+            "name": "waterBalance_SW",
+            "description": "Volumetric soil water content by layer.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0",
+            "max": "1",
+            "default": "-",
+            "unit": "mm3/mm3",
+            "uri": "-"
+        },
+        {
+            "name": "waterBalance_Eos",
+            "description": "Potential soil evaporation (used in net radiation option 'eos' and penetration constants).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm/d",
+            "uri": "-"
+        },
+        {
+            "name": "waterBalance_Eo",
+            "description": "Reference potential evaporation (used to estimate radiative/cover penetration constants).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm/d",
+            "uri": "-"
+        },
+        {
+            "name": "waterBalance_Es",
+            "description": "Actual soil evaporation rate (used for latent heat flux).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm/d",
+            "uri": "-"
+        },
+        {
+            "name": "waterBalance_Salb",
+            "description": "Soil surface albedo used for shortwave reflection and initial surface temperature.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "1",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "FinalSoilTemperature",
+            "description": "End-of-day soil temperatures by layer (midnight).",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "FinalSoilSurfaceTemperature",
+            "description": "End-of-day temperature at the soil surface (midnight).",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "Value",
+            "description": "Alias to AverageSoilTemperature for ISoilTemperature interface.",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "AverageSoilTemperature",
+            "description": "Daily average soil temperatures by layer.",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "AverageSoilSurfaceTemperature",
+            "description": "Daily average soil surface temperature.",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "MinimumSoilTemperature",
+            "description": "Daily minimum soil temperatures by layer.",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "MinimumSoilSurfaceTemperature",
+            "description": "Daily minimum soil surface temperature.",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "MaximumSoilTemperature",
+            "description": "Daily maximum soil temperatures by layer.",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "MaximumSoilSurfaceTemperature",
+            "description": "Daily maximum soil surface temperature.",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        },
+        {
+            "name": "BoundaryLayerConductance",
+            "description": "Average atmospheric boundary layer conductance over the day.",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "W/K",
+            "uri": "-"
+        },
+        {
+            "name": "ThermalConductivity",
+            "description": "Thermal conductivity profile (mapped to nodes/elements).",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "W.m/K",
+            "uri": "-"
+        },
+        {
+            "name": "HeatCapacity",
+            "description": "Volumetric heat capacity profile at nodes.",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "J/K/m3",
+            "uri": "-"
+        },
+        {
+            "name": "HeatStore",
+            "description": "Heat storage capacity between nodes (conductance matrix diagonal terms per element).",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "J/K",
+            "uri": "-"
+        },
+        {
+            "name": "Thr_profile",
+            "description": "Soil temperature profile recorded at early morning (debug/auxiliary exposure).",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "oC",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "doNetRadiation",
+            "description": "Pre-computes sub-daily partitioning of solar radiation, cloud fraction, and vapour concentration for the day."
+        },
+        {
+            "name": "doVolumetricSpecificHeat",
+            "description": "Computes volumetric heat capacity at nodes based on constituent fractions and maps to elements."
+        },
+        {
+            "name": "doThermalConductivity",
+            "description": "Computes thermal conductivity per layer from constituent conductances and maps to elements."
+        },
+        {
+            "name": "interpolateTemperature",
+            "description": "Interpolates hourly air temperature from daily min/max using sinusoidal/linear schemes."
+        },
+        {
+            "name": "interpolateNetRadiation",
+            "description": "Computes net radiation (shortwave plus longwave) for a sub-daily timestep considering cover."
+        },
+        {
+            "name": "getBoundaryLayerConductance",
+            "description": "Calculates atmospheric boundary layer conductance using Monin-Obukhov similarity with stability corrections."
+        },
+        {
+            "name": "doThomas",
+            "description": "Solves the tridiagonal system for heat diffusion (implicit scheme) via the Thomas algorithm."
+        },
+        {
+            "name": "doUpdate",
+            "description": "Updates soil temperatures for the step, tracks min/max/average values, and accumulates daily boundary conductance."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ]
+}

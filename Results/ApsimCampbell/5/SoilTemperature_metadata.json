@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "Soil Temperature",
+        "Authors": "-",
+        "Institution": "-",
+        "URI": "Models.Soils.SoilTemp.SoilTemperature",
+        "DOI": "-",
+        "Extended description": "Simulates soil temperature dynamics across the profile, including the surface, using sub-daily heat flux calculations. Implements Campbell (1985) formulations for volumetric heat capacity and thermal conductivity, solves the tri-diagonal heat diffusion system via the Thomas algorithm, and calculates atmospheric boundary layer conductance with radiative and stability corrections. Uses weather, soil physical/organic properties, and soil water inputs; outputs include min/max/average soil and surface temperatures and thermal properties.",
+        "Short description": "Soil temperature profile and surface model based on Campbell (1985) with sub-daily heat conduction and boundary-layer exchange.",
+        "Model version": "-"
+    }
+}

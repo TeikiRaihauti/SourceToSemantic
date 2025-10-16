@@ -1,0 +1,67 @@
+Inputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+7;15;7;8;0;0.4666666666666667;1.0;0.6363636363636364
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+meanAnnualAirTemp;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+maxTAir;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+meanTAir;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+minTAir;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+heatFlux;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+lambda_;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+deepLayerT;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+weatherMaxTemp;variable;exogenous;DOUBLE
+weatherMeanTemp;variable;exogenous;DOUBLE
+soilHeatFlux;variable;exogenous;DOUBLE
+weatherMinTemp;variable;exogenous;DOUBLE
+deepTemperature;variable;state;DOUBLE
+minSoilTemp;variable;auxiliary;DOUBLE
+maxSoilTemp;variable;auxiliary;DOUBLE
+Temperature;variable;auxiliary;DOUBLE
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Outputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+3;3;3;0;0;1.0;1.0;1.0
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+minTSoil;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+maxTSoil;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+deepLayerT;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Functions stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+3;8;3;5;0;0.375;1.0;0.5454545454545454
+
+True positive
+Name
+SoilMinimumTemperature
+SoilMaximumTemperature
+UpdateTemperature
+
+False positive
+Name
+Init
+SoilTempA
+SoilTempB
+CalculateModel
+Estimate
+
+False negative
+Name
+

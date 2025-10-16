@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "STEMP_EPIC",
+        "Authors": "Kenneth N. Potter; Jimmy R. Williams",
+        "Institution": "USDA Agricultural Research Service (USDA-ARS)",
+        "URI": "-",
+        "DOI": "10.2134/agronj1994.00021962008600060014x",
+        "Extended description": "Daily soil temperature module implementing the EPIC method. It computes surface and layered soil temperatures using air temperatures (TAVG, TMAX, TMIN), average annual temperature (TAV), soil water status, soil bulk density and layer geometry, with a damping depth derived from soil properties. The routine accounts for residue/snow cover and recent wet-day frequency, maintains a 5-day moving average of surface temperature, and updates the soil temperature profile by layer each day.",
+        "Short description": "Determines daily soil temperature by layer using the EPIC method.",
+        "Model version": "1.0"
+    }
+}

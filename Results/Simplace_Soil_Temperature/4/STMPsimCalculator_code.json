@@ -1,0 +1,257 @@
+{
+    "init": {
+        "name": "initialize_STMPsimCalculator"
+    },
+    "process": {
+        "name": "model_STMPsimCalculator",
+        "description": "Main daily soil temperature process for the STMP model."
+    },
+    "inputs": [
+        {
+            "name": "cSoilLayerDepth",
+            "description": "Depths to the bottom of each soil layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "cFirstDayMeanTemp",
+            "description": "Mean air temperature on the first day",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "cDampingDepth",
+            "description": "Initial damping depth of soil",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "cAVT",
+            "description": "Constant temperature of deepest soil layer - long term mean air temperature",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "cABD",
+            "description": "Mean bulk density",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "t/m3",
+            "uri": "-"
+        },
+        {
+            "name": "iSoilWaterContent",
+            "description": "Water content, sum over whole soil profile",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "iSoilSurfaceTemperature",
+            "description": "Soil surface temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "iDoInitialize",
+            "description": "If True, reinitialize the model state before processing the day",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "INT",
+            "len": "-",
+            "min": "0",
+            "max": "1",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "SoilTempArray",
+            "description": "Current soil temperature per layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "rSoilTempArrayRate",
+            "description": "Current daily temperature change per layer",
+            "inputtype": "variable",
+            "category": "rate",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC/day",
+            "uri": "-"
+        },
+        {
+            "name": "pSoilLayerDepth",
+            "description": "Depths to the bottom of each (possibly extended) soil layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "SoilTempArray",
+            "description": "Updated soil temperature per layer after the daily step",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "rSoilTempArrayRate",
+            "description": "Updated daily temperature change per layer after the daily step",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC/day",
+            "uri": "-"
+        },
+        {
+            "name": "pSoilLayerDepth",
+            "description": "Updated depths to the bottom of each (possibly extended) soil layer after the daily step",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "test_STMPsimCalculator_case0",
+            "description": "Initializes the model and performs one process step, then checks expected SoilTempArray.",
+            "inputs": [
+                {
+                    "name": "cSoilLayerDepth",
+                    "value": [
+                        0.1,
+                        0.5,
+                        1.5
+                    ]
+                },
+                {
+                    "name": "cFirstDayMeanTemp",
+                    "value": 15.0
+                },
+                {
+                    "name": "cAVT",
+                    "value": 9.0
+                },
+                {
+                    "name": "cABD",
+                    "value": 1.4
+                },
+                {
+                    "name": "cDampingDepth",
+                    "value": 6.0
+                },
+                {
+                    "name": "iSoilWaterContent",
+                    "value": 0.3
+                },
+                {
+                    "name": "iSoilSurfaceTemperature",
+                    "value": 6.0
+                },
+                {
+                    "name": "iDoInitialize",
+                    "value": false
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "SoilTempArray",
+                    "value": [
+                        13.624360856350041,
+                        13.399968504634286,
+                        12.599999999999845,
+                        12.2,
+                        11.4,
+                        10.6,
+                        9.799999999999999,
+                        9.0
+                    ]
+                }
+            ]
+        }
+    ]
+}

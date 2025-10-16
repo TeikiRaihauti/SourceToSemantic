@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SoilTemperature",
+        "Authors": "-",
+        "Institution": "-",
+        "URI": "-",
+        "DOI": "-",
+        "Extended description": "Simulates soil temperature over a 1-D profile including the surface and several phantom nodes below the profile. The approach follows Campbell (1985): layers are mapped to temperature nodes, volumetric heat capacity and thermal conductivity are derived from soil constituents and water content, and heat flow is solved each sub-daily timestep with an implicit tri-diagonal (Thomas) algorithm using a nu weighting (Crank–Nicholson-like) scheme. The surface energy balance includes net shortwave/longwave radiation, sensible and latent heat, with optional calculation of atmospheric boundary-layer conductance using wind, canopy height, and stability corrections. Air temperature and net radiation are interpolated intra-day from daily weather. The component integrates with APSIM weather, soil physical, organic matter, and soil water modules.",
+        "Short description": "1-D soil temperature model with atmospheric coupling and sub-daily heat flow based on Campbell (1985).",
+        "Model version": "-"
+    }
+}

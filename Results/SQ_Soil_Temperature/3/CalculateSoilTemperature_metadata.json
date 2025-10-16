@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SiriusQuality Soil Temperature",
+        "Authors": "Loic Manceau",
+        "Institution": "INRA",
+        "URI": "http://biomamodelling.org",
+        "DOI": "-",
+        "Extended description": "SoilTemperature is a SiriusQuality component that computes soil temperature dynamics. It estimates daily minimum and maximum soil temperature from daily air temperatures (min, mean, max), soil heat flux, and a latent heat parameter (lambda_), while updating a deep soil layer temperature state with exponential smoothing initialized from the mean annual air temperature. Optionally, it derives hourly soil temperatures using the Parton & Logan (1981) diurnal model parameterized by a, b, and c and driven by day length. Inputs include meteorological variables and soil heat flux; outputs include daily min/max soil temperature, an hourly temperature profile, and an updated deep-layer temperature.",
+        "Short description": "Component to compute daily min/max and hourly soil temperatures with deep-layer smoothing, including a Parton–Logan diurnal scheme.",
+        "Model version": "1.0.0.0"
+    }
+}

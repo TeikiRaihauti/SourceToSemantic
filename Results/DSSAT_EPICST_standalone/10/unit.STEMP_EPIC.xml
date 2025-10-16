@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".STEMP_EPIC" name="STEMP_EPIC" timestep="1" version="1.0">
+	<Description>
+		<Title>STEMP_EPIC</Title>
+		<Authors>Kenneth N. Potter; Jimmy R. Williams</Authors>
+		<Institution>USDA Agricultural Research Service (USDA-ARS)</Institution>
+		<URI>-</URI>
+		<Reference>10.2134/agronj1994.00021962008600060014x</Reference>
+		<ExtendedDescription>Daily soil temperature module implementing the EPIC method. It computes surface and layered soil temperatures using air temperatures (TAVG, TMAX, TMIN), average annual temperature (TAV), soil water status, soil bulk density and layer geometry, with a damping depth derived from soil properties. The routine accounts for residue/snow cover and recent wet-day frequency, maintains a 5-day moving average of surface temperature, and updates the soil temperature profile by layer each day.</ExtendedDescription>
+		<ShortDescription>Determines daily soil temperature by layer using the EPIC method.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="ISWWAT" description="Water simulation switch ('Y' or 'N')" inputtype="parameter" parametercategory="constant" datatype="CHAR" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="BD" description="Soil bulk density by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" default="-" unit="g/cm3" uri="-"/>
+		<Input name="DLAYR" description="Soil layer thickness" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" default="-" unit="cm" uri="-"/>
+		<Input name="DS" description="Cumulative depth at bottom of each layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" default="-" unit="cm" uri="-"/>
+		<Input name="DUL" description="Drained upper limit (field capacity) by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="LL" description="Lower limit by layer" inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="NLAYR" description="Number of soil layers" inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="SW" description="Soil water content by layer" inputtype="variable" variablecategory="exogenous" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="TAVG" description="Daily average air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="TMAX" description="Daily maximum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="TMIN" description="Daily minimum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="TAV" description="Long-term average air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="MULCHMASS" description="Surface mulch mass" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="kg/ha" uri="-"/>
+		<Input name="SNOW" description="Snow amount used in surface cover function" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="X2_PREV" description="Previous-day surface temperature forcing (memory)" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="RAIN" description="Daily rainfall" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="mm/d" uri="-"/>
+		<Input name="DEPIR" description="Daily irrigation depth" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="mm/d" uri="-"/>
+		<Input name="BIOMAS" description="Aboveground biomass used in surface cover function" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="kg/ha" uri="-"/>
+		<Input name="CUMDPT" description="Cumulative soil profile depth" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="-" min="-" default="-" unit="mm" uri="-"/>
+		<Input name="DSMID" description="Depth to midpoint of each soil layer" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" default="-" unit="mm" uri="-"/>
+		<Input name="TDL" description="Profile water at drained upper limit (sum DUL*DLAYR)" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="cm" uri="-"/>
+		<Input name="TMA" description="5-day surface temperature forcing memory (most recent first)" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="5" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="NDays" description="Number of days tracked in wet-day memory (up to 30)" inputtype="variable" variablecategory="state" datatype="INT" max="30" min="0" default="-" unit="-" uri="-"/>
+		<Input name="WetDay" description="30-day wet day memory (0/1 flags)" inputtype="variable" variablecategory="state" datatype="INTARRAY" max="1" min="0" default="-" unit="-" uri="-"/>
+		<Input name="SRFTEMP" description="Surface litter temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="ST" description="Soil temperature by layer" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="B" description="Thermal diffusivity factor (log(500/DP))" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="BCV" description="Soil surface cover factor (from biomass/mulch/snow)" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="1" min="0" default="-" unit="-" uri="-"/>
+		<Input name="DP" description="Damping depth for temperature wave" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="-" min="-" default="-" unit="mm" uri="-"/>
+		<Input name="PESW" description="Plant-extractable soil water in profile" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="-" min="0" default="-" unit="cm" uri="-"/>
+		<Input name="WFT" description="Wet day fraction over memory period" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="1" min="0" default="-" unit="-" uri="-"/>
+		<Input name="WW" description="Volumetric water content parameter from bulk density" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="1" min="0" default="-" unit="-" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="TDL" description="Profile water at drained upper limit (sum DUL*DLAYR)" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="cm" uri="-"/>
+		<Output name="TMA" description="5-day surface temperature forcing memory (most recent first)" variablecategory="state" datatype="DOUBLELIST" len="5" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="NDays" description="Number of days tracked in wet-day memory (up to 30)" variablecategory="state" datatype="INT" max="30" min="0" unit="-" uri="-"/>
+		<Output name="WetDay" description="30-day wet day memory (0/1 flags)" variablecategory="state" datatype="INTARRAY" max="1" min="0" unit="-" uri="-"/>
+		<Output name="X2_PREV" description="Previous-day surface temperature forcing (memory)" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="SRFTEMP" description="Surface litter temperature" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="ST" description="Soil temperature by layer" variablecategory="state" datatype="DOUBLELIST" len="NLAYR" max="-" min="-" unit="degC" uri="-"/>
+	</Outputs>
+	<Initialization name="STEMP_EPIC_initialize" language="cyml" filename="algo/pyx/STEMP_EPIC_initialize.pyx"/>
+	<Function name="SOILT_EPIC" description="Update surface and soil layer temperatures using EPIC method given wet-day fraction, cover, and thermal parameters." language="cyml" type="external" filename="algo/pyx/SOILT_EPIC.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/STEMP_EPIC_rate.pyx"/>
+	<Parametersets>
+		<Parameterset name="p_test_STEMP_EPIC_runs" description="Initialize a 4-layer soil and perform one daily EPIC soil temperature update.">
+			<Param name="ISWWAT">Y</Param>
+			<Param name="NLAYR">4</Param>
+			<Param name="BD">[1.6, 1.6, 1.6, 1.6]</Param>
+			<Param name="DLAYR">[10.0, 10.0, 10.0, 10.0]</Param>
+			<Param name="DS">[10.0, 20.0, 30.0, 40.0]</Param>
+			<Param name="DUL">[0.3, 0.3, 0.3, 0.3]</Param>
+			<Param name="LL">[0.2, 0.2, 0.2, 0.2]</Param>
+		</Parameterset>
+	</Parametersets>
+	<Testsets>
+		<Testset name="t_test_STEMP_EPIC_runs" description="Initialize a 4-layer soil and perform one daily EPIC soil temperature update." parameterset="p_test_STEMP_EPIC_runs">
+			<Test name="t_test_STEMP_EPIC_runs">
+				<InputValue name="SW">[0.2, 0.2, 0.2, 0.2]</InputValue>
+				<InputValue name="TAVG">25.0</InputValue>
+				<InputValue name="TMAX">30.0</InputValue>
+				<InputValue name="TMIN">20.0</InputValue>
+				<InputValue name="TAV">20.0</InputValue>
+				<InputValue name="MULCHMASS">0.0</InputValue>
+				<InputValue name="SNOW">0.0</InputValue>
+				<InputValue name="X2_PREV">0.0</InputValue>
+				<InputValue name="RAIN">0.0</InputValue>
+				<InputValue name="DEPIR">0.0</InputValue>
+				<InputValue name="BIOMAS">0.0</InputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".soil temperature model" name="soil temperature model" timestep="1" version="1.0">
+	<Description>
+		<Title>soil temperature model</Title>
+		<Authors>STICS</Authors>
+		<Institution>INRAE</Institution>
+		<URI>-</URI>
+		<Reference>10.1016/j.agrformet.2014.05.002</Reference>
+		<ExtendedDescription>Daily soil temperature component that: (1) derives temperature amplitude from minimum and maximum canopy temperatures and computes canopy mean temperature; (2) calculates a 1 cm soil temperature profile using an exponentially damped thermal wave with fixed thermal diffusivity (5.37e-3) and angular frequency (7.272e-5), driven by previous canopy temperature and current minimum air temperature; (3) aggregates layer-mean temperatures from user-provided layer thicknesses; and (4) updates previous states (profile and canopy) for the next time step. Initialization sets previous profile and canopy temperature to air_temp_day1 over a depth equal to the sum of layer_thick.</ExtendedDescription>
+		<ShortDescription>Computes daily soil temperature profile and layer means from canopy temperature extremes and updates previous states.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="air_temp_day1" description="Mean temperature on first day" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="layer_thick" description="List of layer thicknesses" inputtype="parameter" parametercategory="constant" datatype="INTARRAY" max="-" min="-" default="-" unit="cm" uri="-"/>
+		<Input name="prev_temp_profile" description="Previous soil temperature profile" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="prev_canopy_temp" description="Previous canopy (crop) temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="min_canopy_temp" description="Current minimum canopy temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="max_canopy_temp" description="Current maximum canopy temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="min_air_temp" description="Current minimum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="min_temp" description="Current minimum temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="max_temp" description="Current maximum temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="temp_amp" description="Current temperature amplitude" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="temp_profile" description="Soil temperature profile for 1 cm layers" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="canopy_temp_avg" description="Canopy mean temperature" inputtype="variable" variablecategory="auxiliary" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="layer_thick_or_depth" description="List of layer thicknesses or depths" inputtype="parameter" parametercategory="constant" datatype="INTARRAY" max="-" min="-" default="-" unit="cm" uri="-"/>
+		<Input name="therm_diff" description="Thermal diffusivity constant" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="5.37e-3" unit="-" uri="-"/>
+		<Input name="temp_freq" description="Temperature forcing angular frequency constant" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="7.272e-5" unit="-" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="prev_temp_profile" description="Updated previous soil temperature profile for next step" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="prev_canopy_temp" description="Updated previous canopy temperature for next step" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+	</Outputs>
+	<Initialization name="init_temp_profile" language="cyml" filename="algo/pyx/init_temp_profile.pyx"/>
+	<Function name="model_temp_amp" description="Calculates temperature amplitude." language="cyml" type="external" filename="algo/pyx/model_temp_amp.pyx"/>
+	<Function name="model_canopy_temp_avg" description="Calculates canopy average temperature." language="cyml" type="external" filename="algo/pyx/model_canopy_temp_avg.pyx"/>
+	<Function name="layer_thickness2depth" description="Convert layer thickness to cumulative bottom depths." language="cyml" type="external" filename="algo/pyx/layer_thickness2depth.pyx"/>
+	<Function name="get_layers_number" description="Count number of non-zero layers." language="cyml" type="external" filename="algo/pyx/get_layers_number.pyx"/>
+	<Function name="model_layers_temp" description="Calculates soil layers mean temperature from 1-cm temperature profile." language="cyml" type="external" filename="algo/pyx/model_layers_temp.pyx"/>
+	<Function name="model_temp_profile" description="Calculates soil temperature profile for 1 cm layers." language="cyml" type="external" filename="algo/pyx/model_temp_profile.pyx"/>
+	<Function name="model_update" description="Update previous state variables." language="cyml" type="external" filename="algo/pyx/model_update.pyx"/>
+	<Function name="init_temp_profile" description="Initialization function for the soil temperature profile and canopy temp." language="cyml" type="external" filename="algo/pyx/init_temp_profile.pyx"/>
+	<Function name="model_soil_temp" description="Composition: soil temperature model for one timestep." language="cyml" type="external" filename="algo/pyx/model_soil_temp.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/model_soil_temp.pyx"/>
+	<Parametersets/>
+	<Testsets>
+		<Testset name="t_-" description="-">
+			<Test name="t_-">
+				<OutputValue name="-">-</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

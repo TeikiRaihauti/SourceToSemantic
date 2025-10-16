@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".soil temperature model" name="soil temperature model" timestep="1" version="1.0">
+	<Description>
+		<Title>soil temperature model</Title>
+		<Authors>STICS</Authors>
+		<Institution>INRAE</Institution>
+		<URI>-</URI>
+		<Reference>10.1016/j.agrformet.2014.05.002</Reference>
+		<ExtendedDescription>This component computes daily soil temperature at 1 cm resolution and aggregates it to user-defined layers. It derives temperature amplitude from minimum and maximum canopy temperatures, updates the soil profile using an exponential damping with depth and the difference between previous canopy temperature and current minimum air temperature, and produces layer-mean temperatures from the profile and layer thicknesses. It also computes daily mean canopy temperature and updates previous state variables. An initialization routine sets the initial profile and canopy temperature from the first-day air temperature.</ExtendedDescription>
+		<ShortDescription>Daily soil temperature profile and layer means from canopy and air temperatures, with state updating.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="temp_amp" description="Current temperature amplitude" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="prev_temp_profile" description="Previous soil temperature profile for 1 cm layers" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="prev_canopy_temp" description="Previous crop canopy temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="min_air_temp" description="Current minimum air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="air_temp_day1" description="Mean air temperature on first day for initialization" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="layer_thick" description="Soil layer thicknesses" inputtype="parameter" parametercategory="constant" datatype="INTARRAY" max="-" min="-" default="-" unit="cm" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="temp_profile" description="Current soil temperature profile for 1 cm layers" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+	</Outputs>
+	<Initialization name="init_temp_profile" language="cyml" filename="algo/pyx/init_temp_profile.pyx"/>
+	<Function name="model_temp_profile" description="Calculates soil temperature profile for 1 cm layers using exponential decay with depth." language="cyml" type="external" filename="algo/pyx/model_temp_profile.pyx"/>
+	<Function name="init_temp_profile" description="Initializes soil temperature profile and previous canopy temperature from first-day mean air temperature and layer thickness." language="cyml" type="external" filename="algo/pyx/init_temp_profile.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/model_temp_profile.pyx"/>
+	<Parametersets/>
+	<Testsets/>
+</ModelUnit>
