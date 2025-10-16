@@ -108,7 +108,7 @@ def create_prompt_all_files(folder_path, main_file, list_files, language_name):
   if main_file_path is None:
     raise FileNotFoundError(f"File {main_file} is not there.")
   
-  prompt = f"Analyze the {nb_files + 1} following crop model source code files, written in {language_name} as a single crop model component. The main file to process is {main_file}.\n"
+  prompt = f"Analyze the {nb_files + 1} following crop model source code files, written in {language_name} as a single crop model component. The main file to process is {main_file}, the rest is auxiliary files for context only.\n"
   prompt += f"Follow the system instructions. Each file is marked clearly with --- FILE: filename --- at the start and --- END FILE --- at the end.\n\n\n"
   prompt += f"--- FILE: {main_file} ---\n{extract_text(main_file_path)}\n--- END FILE ---"
   
