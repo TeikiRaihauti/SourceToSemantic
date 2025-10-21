@@ -1,31 +1,36 @@
-from math import floor, ceil, fabs, exp, log
+from typing import List, Tuple
+import math
 
 
-def init(cSoilLayerDepth, cFirstDayMeanTemp, cDampingDepth, cAVT):
+def STMPsimCalculator_init(
+    cSoilLayerDepth: List[float],
+    cFirstDayMeanTemp: float,
+    cDampingDepth: float,
+    cAVT: float,
+) -> Tuple[List[float], List[float], List[float]]:
     """
-    Initialize soil temperature profile and layer depths.
+    Initialize soil temperature profile and depths.
 
     Inputs:
-    - cSoilLayerDepth: list of depths to the bottom of each soil layer (m)
-    - cFirstDayMeanTemp: mean air temperature on first day (degC)
-    - cDampingDepth: damping depth (m)
-    - cAVT: long-term average annual air temperature (degC)
+    - cSoilLayerDepth: List[float] - Depth to the bottom of each soil layer (m).
+    - cFirstDayMeanTemp: float - Mean air temperature on first day (°C).
+    - cDampingDepth: float - Initial damping depth for soil (m).
+    - cAVT: float - Long-term average annual air temperature (°C).
 
     Returns:
-    - SoilTempArray: list of initialized soil temperatures per layer (degC)
-    - rSoilTempArrayRate: list of daily soil temperature change rates per layer (degC/day), initialized to 0
-    - pSoilLayerDepth: list of depths to the bottom of each (possibly extended) soil layer (m)
+    - SoilTempArray: List[float] - Initial soil temperature per layer (°C).
+    - rSoilTempArrayRate: List[float] - Initial daily temperature change per layer (°C/day), initialized to 0.0.
+    - pSoilLayerDepth: List[float] - Depth to the bottom of each (including added) soil layer (m).
     """
-    Z = cSoilLayerDepth
+    Z = list(cSoilLayerDepth)
     tProfileDepth = Z[-1]
-    firstDayMeanTemp = cFirstDayMeanTemp
     additionalDepth = cDampingDepth - tProfileDepth
-    firstAdditionalLayerHight = additionalDepth - floor(additionalDepth)
-    layers = int(fabs(ceil(additionalDepth))) + len(Z)
+    firstAdditionalLayerHight = additionalDepth - math.floor(additionalDepth)
+    layers = int(abs(math.ceil(additionalDepth))) + len(Z)
 
-    tStmp = [0.0] * layers
-    tStmpRate = [0.0] * layers
-    tz = [0.0] * layers
+    tStmp: List[float] = [0.0] * layers
+    tStmpRate: List[float] = [0.0] * layers
+    tz: List[float] = [0.0] * layers
 
     for i in range(layers):
         if i < len(Z):
@@ -33,79 +38,109 @@ def init(cSoilLayerDepth, cFirstDayMeanTemp, cDampingDepth, cAVT):
         else:
             depth = tProfileDepth + firstAdditionalLayerHight + i - len(Z)
         tz[i] = depth
-        # Linear approximation to soil temperature as initial value
-        tStmp[i] = (firstDayMeanTemp * (cDampingDepth - depth) + cAVT * depth) / cDampingDepth
+        # Linear approximation for initial temperature profile
+        tStmp[i] = (cFirstDayMeanTemp * (cDampingDepth - depth) + cAVT * depth) / cDampingDepth
 
     return tStmp, tStmpRate, tz
 
 
-def process(cSoilLayerDepth,
-            cAVT,
-            cABD,
-            iSoilWaterContent,
-            iSoilSurfaceTemperature,
-            SoilTempArray,
-            rSoilTempArrayRate,
-            pSoilLayerDepth,
-            iDoInitialize,
-            cFirstDayMeanTemp,
-            cDampingDepth):
+def _compute_damping_depth(
+    cABD: float,
+    iSoilWaterContent: float,
+    profile_depth: float,
+) -> float:
     """
-    Update soil temperature profile for one time step.
+    Compute damping depth (DD) based on bulk density and water content.
 
     Inputs:
-    - cSoilLayerDepth: list of depths to the bottom of each native soil layer (m)
-    - cAVT: long-term average annual air temperature (degC)
-    - cABD: average soil bulk density (t m-3)
-    - iSoilWaterContent: water stored in the soil profile (mm)
-    - iSoilSurfaceTemperature: soil surface temperature (degC)
-    - SoilTempArray: current soil temperature profile (degC)
-    - rSoilTempArrayRate: current rates of change (degC/day)
-    - pSoilLayerDepth: list of depths to the bottom of each (possibly extended) soil layer (m)
-    - iDoInitialize: boolean flag to re-initialize before processing
-    - cFirstDayMeanTemp: mean air temperature on first day (degC), used for re-initialization
-    - cDampingDepth: damping depth (m), used for re-initialization
+    - cABD: float - Average soil bulk density of profile (t m^-3).
+    - iSoilWaterContent: float - Water stored in the profile (mm).
+    - profile_depth: float - Depth to the bottom of the last original soil layer (m).
 
     Returns:
-    - SoilTempArray: updated soil temperature profile (degC)
-    - rSoilTempArrayRate: updated rates of change (degC/day)
-    - pSoilLayerDepth: possibly updated layer depths (m) if re-initialized
+    - DD: float - Damping depth (m).
     """
-    # Optionally re-initialize state
+    DP = 1.0 + 2.5 * cABD / (cABD + math.exp(6.53 - 5.63 * cABD))
+    WC = 0.001 * iSoilWaterContent / ((0.356 - 0.144 * cABD) * profile_depth)
+    DD = math.exp(math.log(0.5 / DP) * ((1.0 - WC) / (1.0 + WC)) * 2.0) * DP
+    return DD
+
+
+def STMPsimCalculator_process(
+    iDoInitialize: bool,
+    iSoilWaterContent: float,
+    iSoilSurfaceTemperature: float,
+    cSoilLayerDepth: List[float],
+    cAVT: float,
+    cABD: float,
+    SoilTempArray: List[float],
+    rSoilTempArrayRate: List[float],
+    pSoilLayerDepth: List[float],
+    cFirstDayMeanTemp: float,
+    cDampingDepth: float,
+) -> Tuple[List[float], List[float], List[float]]:
+    """
+    Update daily soil temperatures across layers.
+
+    Inputs:
+    - iDoInitialize: bool - If True, re-initialize state before processing.
+    - iSoilWaterContent: float - Water content of the whole soil profile (mm).
+    - iSoilSurfaceTemperature: float - Soil surface temperature (°C).
+    - cSoilLayerDepth: List[float] - Original depth to bottom of each soil layer (m).
+    - cAVT: float - Long-term average annual air temperature (°C).
+    - cABD: float - Average soil bulk density of the profile (t m^-3).
+    - SoilTempArray: List[float] - Current soil temperature per layer (°C).
+    - rSoilTempArrayRate: List[float] - Current daily soil temperature change per layer (°C/day).
+    - pSoilLayerDepth: List[float] - Depth to bottom of each (including added) soil layer (m).
+    - cFirstDayMeanTemp: float - Mean air temperature on first day (°C) for re-initialization.
+    - cDampingDepth: float - Damping depth for initialization (m).
+
+    Returns:
+    - SoilTempArray: List[float] - Updated soil temperatures (°C).
+    - rSoilTempArrayRate: List[float] - Updated daily temperature change per layer (°C/day).
+    - pSoilLayerDepth: List[float] - (Potentially re-initialized) depths of layers (m).
+    """
     if iDoInitialize:
-        SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth = init(
+        SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth = STMPsimCalculator_init(
             cSoilLayerDepth=cSoilLayerDepth,
             cFirstDayMeanTemp=cFirstDayMeanTemp,
             cDampingDepth=cDampingDepth,
-            cAVT=cAVT
+            cAVT=cAVT,
         )
 
-    tZp = pSoilLayerDepth
-    tZc = cSoilLayerDepth
+    # Ensure rate array matches current number of layers
+    if len(rSoilTempArrayRate) != len(SoilTempArray):
+        rSoilTempArrayRate = [0.0] * len(SoilTempArray)
 
-    # Parameters and derived variables
-    XLAG = 0.8  # lag coefficient
+    # Parameters
+    XLAG = 0.8
     XLG1 = 1.0 - XLAG
-    DP = 1.0 + 2.5 * cABD / (cABD + exp(6.53 - 5.63 * cABD))  # maximum damping depth (m)
-    WC = 0.001 * iSoilWaterContent / ((0.356 - 0.144 * cABD) * tZc[-1])
-    DD = exp(log(0.5 / DP) * ((1.0 - WC) / (1.0 + WC)) * 2.0) * DP  # damping depth (m)
 
-    Z1 = 0.0  # depth of bottom of previous soil layer
+    # Damping depth based on current conditions
+    DD = _compute_damping_depth(
+        cABD=cABD,
+        iSoilWaterContent=iSoilWaterContent,
+        profile_depth=cSoilLayerDepth[-1],
+    )
+
+    Z1 = 0.0
     for i in range(len(SoilTempArray)):
-        ZD = 0.5 * (Z1 + tZp[i]) / DD  # depth factor
-        RATE = ZD / (ZD + exp(-0.8669 - 2.0775 * ZD)) * (cAVT - iSoilSurfaceTemperature)
-        RATE = XLG1 * (RATE + iSoilSurfaceTemperature - SoilTempArray[i])  # rate of change of temperature at layer i
-
-        Z1 = tZp[i]
+        ZD = 0.5 * (Z1 + pSoilLayerDepth[i]) / DD
+        FZ = ZD / (ZD + math.exp(-0.8669 - 2.0775 * ZD))
+        RATE = FZ * (cAVT - iSoilSurfaceTemperature)
+        RATE = XLG1 * (RATE + iSoilSurfaceTemperature - SoilTempArray[i])
+        Z1 = pSoilLayerDepth[i]
         rSoilTempArrayRate[i] = RATE
         SoilTempArray[i] = SoilTempArray[i] + RATE
 
     return SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth
 
 
-# Tests derived from STMPsimCalculator.fillTestVariables
-def test_STMPsimCalculator_case0():
-    # Define inputs (from STMPsimCalculator.fillTestVariables, aTestIndex = 0)
+def test_STMPsimCalculator_case0() -> None:
+    """
+    Derived test from STMPsimCalculator.fillTestVariables(aTestIndex=0).
+    Initializes then processes one day and checks SoilTempArray against expected values.
+    """
     cSoilLayerDepth = [0.1, 0.5, 1.5]
     cFirstDayMeanTemp = 15.0
     cAVT = 9.0
@@ -113,43 +148,29 @@ def test_STMPsimCalculator_case0():
     cDampingDepth = 6.0
     iSoilWaterContent = 0.3
     iSoilSurfaceTemperature = 6.0
-    iDoInitialize = False  # no re-initialization before process
 
-    # Initialize
-    SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth = init(
+    SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth = STMPsimCalculator_init(
         cSoilLayerDepth=cSoilLayerDepth,
         cFirstDayMeanTemp=cFirstDayMeanTemp,
         cDampingDepth=cDampingDepth,
-        cAVT=cAVT
+        cAVT=cAVT,
     )
 
-    # Process one step
-    SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth = process(
+    SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth = STMPsimCalculator_process(
+        iDoInitialize=False,
+        iSoilWaterContent=iSoilWaterContent,
+        iSoilSurfaceTemperature=iSoilSurfaceTemperature,
         cSoilLayerDepth=cSoilLayerDepth,
         cAVT=cAVT,
         cABD=cABD,
-        iSoilWaterContent=iSoilWaterContent,
-        iSoilSurfaceTemperature=iSoilSurfaceTemperature,
         SoilTempArray=SoilTempArray,
         rSoilTempArrayRate=rSoilTempArrayRate,
         pSoilLayerDepth=pSoilLayerDepth,
-        iDoInitialize=iDoInitialize,
         cFirstDayMeanTemp=cFirstDayMeanTemp,
-        cDampingDepth=cDampingDepth
+        cDampingDepth=cDampingDepth,
     )
 
-    # Expected output after one process call
-    expected_SoilTempArray = [
-        13.624360856350041,
-        13.399968504634286,
-        12.599999999999845,
-        12.2,
-        11.4,
-        10.6,
-        9.799999999999999,
-        9.0
-    ]
-
-    assert len(SoilTempArray) == len(expected_SoilTempArray)
-    for a, b in zip(SoilTempArray, expected_SoilTempArray):
-        assert abs(a - b) < 1e-9, f"Mismatch: got {a}, expected {b}"
+    expected = [13.624360856350041, 13.399968504634286, 12.599999999999845, 12.2, 11.4, 10.6, 9.799999999999999, 9.0]
+    assert len(SoilTempArray) == len(expected)
+    for a, b in zip(SoilTempArray, expected):
+        assert abs(a - b) < 1e-9, f"Got {a}, expected {b}"

@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "STMP Soil Temperature (SIMPLACE STMPsimCalculator)",
+        "Authors": "Andreas Enders; Gunther Krauss",
+        "Institution": "Crop Science Group, University of Bonn, Germany",
+        "URI": "http://www.simplace.net",
+        "DOI": "-",
+        "Extended description": "STMPsimCalculator is a SIMPLACE component that simulates daily soil temperature by layer using the APEX-based STMP formulation. It updates each layer’s temperature via a lagged combination of the previous day and a depth-weighted approach: STMP = LAG * STMP0 + (1−LAG) * (FZ * (AVT − DST0) + DST0), where FZ depends on layer midpoint depth relative to a dynamically computed damping depth (DD). DD is estimated from average soil bulk density (ABD) and soil water content, following APEX equations. The surface temperature (DST0) is provided by the coupled SnowCoverCalculator, which accounts for residue/snow insulation. Initialization linearly interpolates temperatures from a first-day mean air temperature at the surface to the long-term average air temperature (AVT) at the damping depth, adding virtual layers down to DD. Reference: Williams & Izaurralde (2005), The APEX model.",
+        "Short description": "APEX-based multi-layer soil temperature module for SIMPLACE, using damping depth and surface temperature (with snow/residue effects) to update daily temperatures by depth.",
+        "Model version": "-"
+    }
+}

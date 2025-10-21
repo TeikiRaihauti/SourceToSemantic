@@ -1,6 +1,6 @@
 Inputs stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-7;15;7;8;0;0.4666666666666667;1.0;0.6363636363636364
+7;7;7;0;0;1.0;1.0;1.0
 
 True positive
 Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
@@ -9,19 +9,11 @@ deepLayerT;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
 maxTAir;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
 meanTAir;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
 minTAir;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
-heatFlux;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
-lambda_;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+heatFlux;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+lambda_;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
 
 False positive
 Name;inputtype;variablecategory;datatype
-weatherMaxTemp;variable;exogenous;DOUBLE
-weatherMeanTemp;variable;exogenous;DOUBLE
-weatherMinTemp;variable;exogenous;DOUBLE
-soilHeatFlux;variable;exogenous;DOUBLE
-deepTemperature;variable;state;DOUBLE
-minSoilTemp;variable;auxiliary;DOUBLE
-maxSoilTemp;variable;auxiliary;DOUBLE
-Temperature;variable;state;DOUBLE
 
 False negative
 Name;inputtype;variablecategory;datatype
@@ -46,7 +38,7 @@ Name;inputtype;variablecategory;datatype
 
 Functions stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-3;7;3;4;0;0.42857142857142855;1.0;0.6
+3;5;3;2;0;0.6;1.0;0.7499999999999999
 
 True positive
 Name
@@ -56,8 +48,6 @@ UpdateTemperature
 
 False positive
 Name
-Init
-Estimate
 SoilTempA
 SoilTempB
 

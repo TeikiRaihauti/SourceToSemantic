@@ -3,29 +3,35 @@
 	<Description>
 		<Title>SoilTemperatureSWAT</Title>
 		<Authors>Simone Bregaglio; Nicolò Frasso</Authors>
-		<Institution>University Of Milan</Institution>
+		<Institution>University of Milan</Institution>
 		<URI>http://bioma.jrc.ec.europa.eu/ontology/JRC_MARS_biophysical_domain.owl</URI>
 		<Reference>-</Reference>
-		<ExtendedDescription>Strategy for the calculation of soil temperature with SWAT method. Reference: Neitsch, S.L., Arnold, J.G., Kiniry, J.R., Williams, J.R., King, K.W. Soil and Water Assessment Tool. Theoretical documentation. Version 2000. http://swatmodel.tamu.edu/media/1290/swat2000theory.pdf</ExtendedDescription>
-		<ShortDescription>Strategy for the calculation of soil temperature with SWAT method.</ShortDescription>
+		<ExtendedDescription>Daily, multi-layer soil temperature model implementing the SWAT method (Neitsch et al., 2000). It computes a maximum damping depth as a function of bulk density, scales it by the total soil water content and soil profile depth to obtain an effective damping depth, and derives a depth factor for each layer center. Layer temperatures are updated using a first-order lag: T_i(t) = LagCoefficient * T_i(t-1) + (1 - LagCoefficient) * [DepthFactor * (T_air,annual - T_surface) + T_surface]. Inputs include soil profile depth, surface soil temperature (from a companion surface model), annual average air temperature, layer thickness, volumetric water content, and bulk density. Output is soil temperature by layers.</ExtendedDescription>
+		<ShortDescription>SWAT-based daily soil temperature by layers using damping depth and a lag coefficient.</ShortDescription>
 	</Description>
 	<Inputs>
-		<Input name="states_LayerThickness" description="Soil layer thicknesses by layer" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="m" uri="-"/>
-		<Input name="LagCoefficient" description="Lag coefficient controlling previous day's influence" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="1.0" min="0.0" default="-" unit="-" uri="-"/>
+		<Input name="states_LayerThickness" description="Soil layer thicknesses" inputtype="variable" variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" default="-" unit="m" uri="-"/>
+		<Input name="initial_temperature" description="Initial temperature for all layers" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="15.0" unit="degC" uri="-"/>
+		<Input name="LagCoefficient" description="Lag coefficient" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
 		<Input name="states_SoilProfileDepth" description="Soil profile depth" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="m" uri="-"/>
-		<Input name="states_SurfaceSoilTemperature" description="Average surface soil temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
-		<Input name="exogenous_AirTemperatureAnnualAverage" description="Annual average air temperature" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
-		<Input name="states_SoilTemperatureByLayers" description="Current soil temperatures by layer" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
-		<Input name="states_BulkDensity" description="Bulk density by layer" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" default="-" unit="t m-3" uri="-"/>
-		<Input name="states_VolumetricWaterContent" description="Volumetric soil water content by layer" inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="-" max="1.0" min="0.0" default="-" unit="m3 m-3" uri="-"/>
+		<Input name="states_SurfaceSoilTemperature" description="Surface soil temperature" inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="exogenous_AirTemperatureAnnualAverage" description="Air temperature annual average" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="states_SoilTemperatureByLayers" description="Previous day's soil temperature by layer" inputtype="variable" variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="states_BulkDensity" description="Bulk density by layer" inputtype="variable" variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" default="-" unit="t m-3" uri="-"/>
+		<Input name="states_VolumetricWaterContent" description="Volumetric water content by layer" inputtype="variable" variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" default="-" unit="m3 m-3" uri="-"/>
 	</Inputs>
 	<Outputs>
-		<Output name="updated_states_SoilTemperatureByLayers" description="Updated soil temperatures by layer" variablecategory="state" datatype="DOUBLELIST" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="states_SoilTemperatureByLayers" description="Updated soil temperature by layers" variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" unit="degC" uri="-"/>
 	</Outputs>
 	<Initialization name="Init" language="cyml" filename="algo/pyx/Init.pyx"/>
-	<Function name="Init" description="Initializes states_SoilTemperatureByLayers to 15 degC for each soil layer." language="cyml" type="external" filename="algo/pyx/Init.pyx"/>
-	<Function name="Estimate" description="Updates soil temperature by layer using SWAT damping depth formulation and a lag approach." language="cyml" type="external" filename="algo/pyx/Estimate.pyx"/>
+	<Function name="-" description="-" language="cyml" type="external" filename="algo/pyx/-.pyx"/>
 	<Algorithm language="cyml" platform="" filename="algo/pyx/Estimate.pyx"/>
 	<Parametersets/>
-	<Testsets/>
+	<Testsets>
+		<Testset name="t_-" description="-">
+			<Test name="t_-">
+				<OutputValue name="-">-</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
 </ModelUnit>

@@ -1,124 +1,315 @@
-import math
-
-def YR_DOY(YRDOY):
+def YR_DOY(YRDOY: int) -> tuple:
     """
-    Converts YRDOY (YYYYDDD) to (YR, DOY).
+    Convert YYYYDOY integer to (year, day-of-year).
+    Inputs:
+      - YRDOY: int
+    Returns:
+      - (YR, DOY): tuple of ints
     """
-    YR = int(YRDOY // 1000)
-    DOY = int(YRDOY - YR * 1000)
+    YR = YRDOY // 1000
+    DOY = YRDOY - YR * 1000
     return YR, DOY
 
 
-def _nint(x):
+def _nint(x: float) -> int:
     """
     Fortran-like NINT: nearest integer, halves away from zero.
     """
     if x >= 0.0:
-        return int(math.floor(x + 0.5))
+        return int(x + 0.5)
     else:
-        return int(math.ceil(x - 0.5))
+        return -int(abs(x) + 0.5)
+
+
+def _round_nint_decimals(x: float, decimals: int) -> float:
+    """
+    Fortran-like rounding using NINT at specified decimals.
+    """
+    factor = 10.0 ** decimals
+    return _nint(x * factor) / factor
 
 
 def SOILT(
-    ALBEDO,  # Input (unused in core equations, kept for interface consistency)
-    B,       # Input
-    CUMDPT,  # Input (mm)
-    DOY,     # Input (day of year)
-    DP,      # Input (mm)
-    HDAY,    # Input
-    NLAYR,   # Input
-    PESW,    # Input (cm)
-    SRAD,    # Input (unused in core equations, kept for interface consistency)
-    TAMP,    # Input (degC)
-    TAV,     # Input (degC)
-    TAVG,    # Input (degC)
-    TMAX,    # Input (degC, unused here)
-    WW,      # Input (dimensionless)
-    DSMID,   # Input array (mm), length NLAYR
-    ATOT,    # InOut (sum of last 5 days of average soil temperatures)
-    TMA,     # InOut array (5) of previous 5 days of average soil temperatures
-    ST       # Output array (NLAYR) soil temperature by layer (degC)
-):
+    ALBEDO: float,
+    B: float,
+    CUMDPT: float,
+    DOY: int,
+    DP: float,
+    HDAY: float,
+    NLAYR: int,
+    PESW: float,
+    SRAD: float,
+    TAMP: float,
+    TAV: float,
+    TAVG: float,
+    TMAX: float,
+    WW: float,
+    DSMID: list,
+    ATOT: float,
+    TMA: list,
+    SRFTEMP: float,
+    ST: list,
+) -> tuple:
     """
-    Determines soil temperature by layer.
-    Returns updated (ATOT, TMA, SRFTEMP, ST).
+    Soil temperature by layer (daily).
+    Inputs:
+      - ALBEDO: float (not used in algorithm, kept for interface fidelity)
+      - B: float
+      - CUMDPT: float
+      - DOY: int
+      - DP: float
+      - HDAY: float
+      - NLAYR: int
+      - PESW: float
+      - SRAD: float (not used in algorithm)
+      - TAMP: float
+      - TAV: float
+      - TAVG: float
+      - TMAX: float (not used in algorithm)
+      - WW: float
+      - DSMID: list[float]
+      - ATOT: float
+      - TMA: list[float] length 5
+      - SRFTEMP: float
+      - ST: list[float] length >= NLAYR
+    Returns (updated):
+      - ATOT: float
+      - TMA: list[float] length 5
+      - SRFTEMP: float
+      - ST: list[float] length NLAYR
     """
-    # Copy inputs to avoid side-effects
-    TMA_out = list(TMA) if TMA is not None and len(TMA) >= 5 else [0.0] * 5
-    ST_out = list(ST) if ST is not None and len(ST) >= NLAYR else [0.0] * NLAYR
+    import math
 
-    # Seasonal phase angle
+    # Phase offset by day of year
     ALX = (float(DOY) - HDAY) * 0.0174
 
-    # Update moving average array and sum
-    ATOT_out = ATOT - TMA_out[4]
+    # Update moving average accumulator and queue
+    ATOT = ATOT - TMA[4]
+    # Shift TMA (5->2)
     for k in range(4, 0, -1):
-        TMA_out[k] = TMA_out[k - 1]
-    TMA_out[0] = TAVG
-    # Keep only 4 decimals (debug vs release fix)
-    TMA_out[0] = _nint(TMA_out[0] * 10000.0) / 10000.0
-    ATOT_out = ATOT_out + TMA_out[0]
+        TMA[k] = TMA[k - 1]
+    # Insert today's mean temp with 4-decimal NINT rounding
+    TMA[0] = _round_nint_decimals(TAVG, 4)
+    ATOT = ATOT + TMA[0]
 
-    # Water content function (corrected equation)
-    # WC (ratio) = max(0.01, PESW) / (WW * CUMDPT) * 10
-    denom = WW * CUMDPT
-    if denom <= 0.0:
-        WC = 0.01  # fallback to minimum to avoid divide-by-zero
-    else:
-        WC = max(0.01, PESW) / denom * 10.0
+    # Corrected water content effect (EPIC corrected)
+    # WC is dimensionless ratio
+    WC = max(0.01, PESW) / (WW * CUMDPT) * 10.0
 
     FX = math.exp(B * ((1.0 - WC) / (1.0 + WC)) ** 2)
-
-    DD = FX * DP  # damping depth in mm
+    DD = FX * DP  # damping depth (mm)
 
     TA = TAV + TAMP * math.cos(ALX) / 2.0
-    DT = ATOT_out / 5.0 - TA
+    DT = ATOT / 5.0 - TA
 
-    for L in range(NLAYR):
-        ZD = -DSMID[L] / DD if DD != 0.0 else 0.0
-        ST_val = TAV + (TAMP / 2.0 * math.cos(ALX + ZD) + DT) * math.exp(ZD)
-        # Keep only 3 decimals (debug vs release fix)
-        ST_out[L] = _nint(ST_val * 1000.0) / 1000.0
+    # Layer temperatures
+    st_out = list(ST[:NLAYR])
+    for l in range(NLAYR):
+        ZD = -DSMID[l] / DD
+        st_val = TAV + (TAMP / 2.0 * math.cos(ALX + ZD) + DT) * math.exp(ZD)
+        st_out[l] = _round_nint_decimals(st_val, 3)
 
-    # Surface litter layer temperature
+    # Surface temperature (litter/soil surface)
     SRFTEMP = TAV + (TAMP / 2.0 * math.cos(ALX) + DT)
 
-    return ATOT_out, TMA_out, SRFTEMP, ST_out
+    return ATOT, TMA, SRFTEMP, st_out
+
+
+def STEMP_Initialize(
+    ISWITCH_ISWWAT: str,
+    SOILPROP_BD: list,
+    SOILPROP_DS: list,
+    SOILPROP_DUL: list,
+    SOILPROP_LL: list,
+    SOILPROP_NLAYR: int,
+    SOILPROP_MSALB: float,
+    SRAD: float,
+    SW: list,
+    TAVG: float,
+    TMAX: float,
+    XLAT: float,
+    TAV: float,
+    TAMP: float,
+    CONTROL_YRDOY: int,
+) -> tuple:
+    """
+    Seasonal initialization for soil temperature state.
+    Inputs:
+      - ISWITCH_ISWWAT: str ('Y' if soil water simulated, else not)
+      - SOILPROP_BD: list[float], bulk density by layer
+      - SOILPROP_DS: list[float], cumulative depth to layer bottom (cm)
+      - SOILPROP_DUL: list[float], drained upper limit (vol. frac.) by layer
+      - SOILPROP_LL: list[float], lower limit (vol. frac.) by layer
+      - SOILPROP_NLAYR: int, number of soil layers
+      - SOILPROP_MSALB: float, albedo including mulch/soil water effects
+      - SRAD: float, solar radiation (MJ/m2/d) [not used directly]
+      - SW: list[float], initial soil water content (vol. frac.) by layer
+      - TAVG: float, daily average air temperature (C)
+      - TMAX: float, daily max air temperature (C) [not used directly]
+      - XLAT: float, latitude (deg); sign used to set hottest day
+      - TAV: float, annual average air temperature (C)
+      - TAMP: float, annual temperature amplitude (C)
+      - CONTROL_YRDOY: int, YYYYDOY date
+    Returns (state):
+      - CUMDPT: float, cumulative profile depth (mm)
+      - DSMID: list[float], depth to mid-point of each layer (mm)
+      - TDL: float, profile sum of DUL*layer_thickness (cm)
+      - TMA: list[float] length 5, moving average queue of TAVG
+      - ATOT: float, sum of TMA queue
+      - SRFTEMP: float, surface temperature (C)
+      - ST: list[float], soil temperature by layer (C)
+      - HDAY: float, day-of-year of hottest day (phase anchor)
+    """
+    # Day-of-year for initialization/spin-up
+    _, DOY = YR_DOY(CONTROL_YRDOY)
+
+    NLAYR = int(SOILPROP_NLAYR)
+    BD = list(SOILPROP_BD[:NLAYR])
+    DS = list(SOILPROP_DS[:NLAYR])
+    DUL = list(SOILPROP_DUL[:NLAYR])
+    LL = list(SOILPROP_LL[:NLAYR])
+    SWI = list(SW[:NLAYR])  # initial soil water by layer
+    MSALB = float(SOILPROP_MSALB)
+
+    # Hemisphere-dependent hottest day
+    HDAY = 20.0 if XLAT < 0.0 else 200.0
+
+    # Initialize accumulators
+    TBD = 0.0
+    TLL = 0.0
+    TSW = 0.0
+    TDL = 0.0
+    CUMDPT = 0.0
+
+    # Compute layer thickness (cm) from cumulative DS and DSMID (mm)
+    DLI = [0.0] * NLAYR
+    DSMID = [0.0] * NLAYR
+    for l in range(NLAYR):
+        if l == 0:
+            DLI[l] = DS[l]
+        else:
+            DLI[l] = DS[l] - DS[l - 1]
+        DSMID[l] = CUMDPT + DLI[l] * 5.0  # mm to layer midpoint
+        CUMDPT = CUMDPT + DLI[l] * 10.0   # mm cumulative depth
+
+        TBD += BD[l] * DLI[l]
+        TLL += LL[l] * DLI[l]
+        TSW += SWI[l] * DLI[l]
+        TDL += DUL[l] * DLI[l]
+
+    # Plant-available water in profile (cm)
+    if ISWITCH_ISWWAT == 'Y':
+        PESW = max(0.0, TSW - TLL)
+    else:
+        # If water not simulated, use DUL as water content
+        PESW = max(0.0, TDL - TLL)
+
+    ABD = TBD / DS[NLAYR - 1]  # bulk density averaged over profile
+    FX = ABD / (ABD + 686.0 * __import__("math").exp(-5.63 * ABD))
+    DP = 1000.0 + 2500.0 * FX  # damping depth (mm)
+    WW = 0.356 - 0.144 * ABD   # water capacity (vol. fraction)
+    B = __import__("math").log(500.0 / DP)
+    ALBEDO = MSALB
+
+    # Initialize moving average of TAVG (rounded to 4 decimals)
+    TMA = [_round_nint_decimals(TAVG, 4) for _ in range(5)]
+    ATOT = TMA[0] * 5.0
+
+    # Initialize soil temperatures by layer
+    ST = [float(TAVG) for _ in range(NLAYR)]
+    SRFTEMP = float(TAVG)
+
+    # Spin-up SOILT 8 times to stabilize temperatures
+    for _ in range(8):
+        ATOT, TMA, SRFTEMP, ST = SOILT(
+            ALBEDO=ALBEDO,
+            B=B,
+            CUMDPT=CUMDPT,
+            DOY=int(DOY),
+            DP=DP,
+            HDAY=HDAY,
+            NLAYR=NLAYR,
+            PESW=PESW,
+            SRAD=SRAD,
+            TAMP=TAMP,
+            TAV=TAV,
+            TAVG=TAVG,
+            TMAX=TMAX,
+            WW=WW,
+            DSMID=DSMID,
+            ATOT=ATOT,
+            TMA=TMA,
+            SRFTEMP=SRFTEMP,
+            ST=ST,
+        )
+
+    return CUMDPT, DSMID, TDL, TMA, ATOT, SRFTEMP, ST, HDAY
 
 
 def STEMP(
-    CONTROL_DYNAMIC,  # integer dynamic flag (e.g., 2=SEASINIT, 3=RATE)
-    CONTROL_YRDOY,    # YYYYDDD
-    CONTROL_RUN,      # integer RUN number
-    CONTROL_RNMODE,   # character RNMODE
-    ISWITCH_ISWWAT,   # 'Y' or 'N'
-    SOILPROP_BD,      # array, bulk density (g/cm3), length NLAYR
-    SOILPROP_DLAYR,   # array, layer thickness (cm), length NLAYR
-    SOILPROP_DS,      # array, cumulative depth (cm), length NLAYR
-    SOILPROP_DUL,     # array, DUL (cm3/cm3), length NLAYR
-    SOILPROP_LL,      # array, LL (cm3/cm3), length NLAYR
-    SOILPROP_NLAYR,   # integer, number of layers
-    SOILPROP_MSALB,   # float, soil/mulch albedo
-    SRAD,             # float, solar radiation (MJ/m2-d)
-    SW,               # array, volumetric soil water content (cm3/cm3), length NLAYR
-    TAVG,             # float, average daily air temperature (degC)
-    TMAX,             # float, maximum daily air temperature (degC)
-    XLAT,             # float, latitude (deg)
-    TAV,              # float, average annual soil temperature (degC)
-    TAMP,             # float, amplitude of temperature function (degC)
-    CUMDPT,           # InOut float (mm), cumulative depth of soil profile
-    DSMID,            # InOut array (mm), depth to midpoint of soil layer, length NLAYR
-    TDL,              # InOut float (cm), total water at DUL
-    TMA,              # InOut array (5), previous 5 days avg soil temps
-    ATOT,             # InOut float, sum of TMA
-    SRFTEMP,          # InOut float, soil surface temperature
-    ST                # InOut array (degC), soil temperature by layer (NLAYR)
-):
+    CONTROL_YRDOY: int,
+    ISWITCH_ISWWAT: str,
+    SOILPROP_BD: list,
+    SOILPROP_DLAYR: list,
+    SOILPROP_DS: list,
+    SOILPROP_DUL: list,
+    SOILPROP_LL: list,
+    SOILPROP_NLAYR: int,
+    SOILPROP_MSALB: float,
+    SRAD: float,
+    SW: list,
+    TAVG: float,
+    TMAX: float,
+    XLAT: float,
+    TAV: float,
+    TAMP: float,
+    CUMDPT: float,
+    DSMID: list,
+    TDL: float,
+    TMA: list,
+    ATOT: float,
+    SRFTEMP: float,
+    ST: list,
+    HDAY: float,
+) -> tuple:
     """
-    Determines soil temperature by layer across dynamic phases.
-    Returns updated (CUMDPT, DSMID, TDL, TMA, ATOT, SRFTEMP, ST).
+    Daily soil temperature process (RATE).
+    Inputs:
+      - CONTROL_YRDOY: int, YYYYDOY
+      - ISWITCH_ISWWAT: str, 'Y' if simulating water, else other
+      - SOILPROP_BD: list[float], bulk density by layer
+      - SOILPROP_DLAYR: list[float], layer thickness (same length as layers)
+      - SOILPROP_DS: list[float], cumulative depth to layer bottom (cm)
+      - SOILPROP_DUL: list[float], DUL by layer (vol. frac.)
+      - SOILPROP_LL: list[float], LL by layer (vol. frac.)
+      - SOILPROP_NLAYR: int, number of layers
+      - SOILPROP_MSALB: float, albedo incl. mulch/soil water
+      - SRAD: float, solar radiation (not used by core equations)
+      - SW: list[float], soil water content by layer (vol. frac.)
+      - TAVG: float, average air temperature (C)
+      - TMAX: float, max air temperature (C) [not used directly]
+      - XLAT: float, latitude (deg) [not used directly here]
+      - TAV: float, annual average temperature (C)
+      - TAMP: float, annual temperature amplitude (C)
+      - CUMDPT: float, cumulative profile depth (mm)
+      - DSMID: list[float], depth to mid-point of each layer (mm)
+      - TDL: float, previous day's TDL (cm); recalculated daily here
+      - TMA: list[float] length 5, moving average queue of TAVG
+      - ATOT: float, sum of TMA queue
+      - SRFTEMP: float, previous surface temperature
+      - ST: list[float], previous soil temperature by layer
+      - HDAY: float, hottest-day phase anchor
+    Returns (updated):
+      - TDL: float, profile sum of DUL*layer_thickness (cm) for the day
+      - TMA: list[float] length 5
+      - ATOT: float
+      - SRFTEMP: float
+      - ST: list[float]
     """
-    # Copy inputs to avoid mutating caller state
+    import math
+
+    _, DOY = YR_DOY(CONTROL_YRDOY)
+
     NLAYR = int(SOILPROP_NLAYR)
     BD = list(SOILPROP_BD[:NLAYR])
     DLAYR = list(SOILPROP_DLAYR[:NLAYR])
@@ -126,111 +317,52 @@ def STEMP(
     DUL = list(SOILPROP_DUL[:NLAYR])
     LL = list(SOILPROP_LL[:NLAYR])
     MSALB = float(SOILPROP_MSALB)
-    SW_arr = list(SW[:NLAYR])
+    SW_in = list(SW[:NLAYR])
 
-    DSMID_out = list(DSMID[:NLAYR]) if DSMID is not None and len(DSMID) >= NLAYR else [0.0] * NLAYR
-    TMA_out = list(TMA[:5]) if TMA is not None and len(TMA) >= 5 else [0.0] * 5
-    ST_out = list(ST[:NLAYR]) if ST is not None and len(ST) >= NLAYR else [0.0] * NLAYR
+    # Aggregates over profile
+    TBD = 0.0
+    TLL = 0.0
+    TSW = 0.0
+    TDL_local = 0.0  # recompute daily
 
-    ATOT_out = float(ATOT)
-    CUMDPT_out = float(CUMDPT)
-    TDL_out = float(TDL)
-    SRFTEMP_out = float(SRFTEMP)
+    for l in range(NLAYR):
+        TBD += BD[l] * DLAYR[l]
+        TDL_local += DUL[l] * DLAYR[l]
+        TLL += LL[l] * DLAYR[l]
+        TSW += SW_in[l] * DLAYR[l]
 
-    # Compute DOY from YRDOY
-    _, DOY = YR_DOY(CONTROL_YRDOY)
+    ABD = TBD / DS[NLAYR - 1]
+    FX = ABD / (ABD + 686.0 * math.exp(-5.63 * ABD))
+    DP = 1000.0 + 2500.0 * FX  # mm
+    WW = 0.356 - 0.144 * ABD
+    B = math.log(500.0 / DP)
+    ALBEDO = MSALB
 
-    # Latitude based hottest day (HDAY)
-    HDAY = 20.0 if XLAT < 0.0 else 200.0
+    if ISWITCH_ISWWAT == 'Y':
+        PESW = max(0.0, TSW - TLL)  # cm
+    else:
+        PESW = max(0.0, TDL_local - TLL)  # cm
 
-    if CONTROL_DYNAMIC == 2:
-        # SEASINIT
-        # Gating to avoid re-initialization for certain run modes
-        do_init = (CONTROL_RUN == 1) or (CONTROL_RNMODE not in ('Q', 'F'))
-        if do_init:
-            SWI = SW_arr[:]  # Initial soil water content per layer
-            DSI = DS[:]      # Cumulative depth (cm)
+    ATOT, TMA, SRFTEMP, ST_out = SOILT(
+        ALBEDO=ALBEDO,
+        B=B,
+        CUMDPT=CUMDPT,
+        DOY=int(DOY),
+        DP=DP,
+        HDAY=HDAY,
+        NLAYR=NLAYR,
+        PESW=PESW,
+        SRAD=SRAD,
+        TAMP=TAMP,
+        TAV=TAV,
+        TAVG=TAVG,
+        TMAX=TMAX,
+        WW=WW,
+        DSMID=DSMID,
+        ATOT=ATOT,
+        TMA=TMA,
+        SRFTEMP=SRFTEMP,
+        ST=ST,
+    )
 
-            TBD = 0.0
-            TLL = 0.0
-            TSW = 0.0
-            TDL_out = 0.0
-            CUMDPT_out = 0.0
-
-            for L in range(NLAYR):
-                if L == 0:
-                    DLI = DSI[L]
-                else:
-                    DLI = DSI[L] - DSI[L - 1]
-                # Depth to midpoint of layer (mm)
-                DSMID_out[L] = CUMDPT_out + DLI * 5.0
-                # Update total profile depth (mm)
-                CUMDPT_out = CUMDPT_out + DLI * 10.0
-
-                TBD += BD[L] * DLI
-                TLL += LL[L] * DLI
-                TSW += SWI[L] * DLI
-                TDL_out += DUL[L] * DLI
-
-            if ISWITCH_ISWWAT == 'Y':
-                PESW = max(0.0, TSW - TLL)  # cm
-            else:
-                PESW = max(0.0, TDL_out - TLL)  # cm
-
-            ABD = TBD / DSI[NLAYR - 1] if DSI[NLAYR - 1] != 0.0 else 0.0
-            FX = ABD / (ABD + 686.0 * math.exp(-5.63 * ABD)) if (ABD + 686.0 * math.exp(-5.63 * ABD)) != 0.0 else 0.0
-            DP = 1000.0 + 2500.0 * FX
-            WW = 0.356 - 0.144 * ABD
-            B = math.log(500.0 / DP) if DP != 0.0 else 0.0
-            ALBEDO = MSALB
-
-            # Initialize TMA with TAVG, four-decimal rounding
-            for i in range(5):
-                TMA_out[i] = _nint(TAVG * 10000.0) / 10000.0
-            ATOT_out = TMA_out[0] * 5.0
-
-            # Initialize ST with TAVG
-            for L in range(NLAYR):
-                ST_out[L] = TAVG
-
-            # Spin-up SOILT 8 times
-            for _ in range(8):
-                ATOT_out, TMA_out, SRFTEMP_out, ST_out = SOILT(
-                    ALBEDO, B, CUMDPT_out, DOY, DP, HDAY, NLAYR,
-                    PESW, SRAD, TAMP, TAV, TAVG, TMAX, WW, DSMID_out,
-                    ATOT_out, TMA_out, ST_out
-                )
-
-    elif CONTROL_DYNAMIC == 3:
-        # RATE (daily calculation)
-        TBD = 0.0
-        TLL = 0.0
-        TSW = 0.0
-        for L in range(NLAYR):
-            TBD += BD[L] * DLAYR[L]
-            TDL_out += DUL[L] * DLAYR[L]  # Note: No reset per original code
-            TLL += LL[L] * DLAYR[L]
-            TSW += SW_arr[L] * DLAYR[L]
-
-        total_depth_cm = DS[NLAYR - 1] if NLAYR > 0 else 0.0
-        ABD = TBD / total_depth_cm if total_depth_cm != 0.0 else 0.0
-        FX = ABD / (ABD + 686.0 * math.exp(-5.63 * ABD)) if (ABD + 686.0 * math.exp(-5.63 * ABD)) != 0.0 else 0.0
-        DP = 1000.0 + 2500.0 * FX  # mm
-        WW = 0.356 - 0.144 * ABD   # vol. fraction
-        B = math.log(500.0 / DP) if DP != 0.0 else 0.0
-        ALBEDO = MSALB
-
-        if ISWITCH_ISWWAT == 'Y':
-            PESW = max(0.0, TSW - TLL)  # cm
-        else:
-            PESW = max(0.0, TDL_out - TLL)  # cm
-
-        ATOT_out, TMA_out, SRFTEMP_out, ST_out = SOILT(
-            ALBEDO, B, CUMDPT_out, DOY, DP, HDAY, NLAYR,
-            PESW, SRAD, TAMP, TAV, TAVG, TMAX, WW, DSMID_out,
-            ATOT_out, TMA_out, ST_out
-        )
-
-    # OUTPUT and SEASEND branches (and any printing) are intentionally omitted.
-
-    return CUMDPT_out, DSMID_out, TDL_out, TMA_out, ATOT_out, SRFTEMP_out, ST_out
+    return TDL_local, TMA, ATOT, SRFTEMP, ST_out

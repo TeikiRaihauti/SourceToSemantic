@@ -1,18 +1,19 @@
 Inputs stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-10;10;9;1;1;0.9;0.9;0.9
+10;11;10;1;0;0.9090909090909091;1.0;0.9523809523809523
 
 True positive
 Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
-cSoilLayerDepth;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;OK
-cFirstDayMeanTemp;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;OK
-cDampingDepth;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK
-cAVT;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;OK
-cABD;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK
-iSoilWaterContent;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK
-iSoilSurfaceTemperature;OK;WRONG;OK;OK;WRONG;WRONG;OK;WRONG;OK
-SoilTempArray;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;OK
-pSoilLayerDepth;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;OK
+cSoilLayerDepth;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+cFirstDayMeanTemp;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+cDampingDepth;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+cAVT;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+SoilTempArray;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+rSoilTempArrayRate;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+pSoilLayerDepth;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG;WRONG
+cABD;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+iSoilWaterContent;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+iSoilSurfaceTemperature;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
 
 False positive
 Name;inputtype;variablecategory;datatype
@@ -20,35 +21,35 @@ iDoInitialize;variable;exogenous;INT
 
 False negative
 Name;inputtype;variablecategory;datatype
-rSoilTempArrayRate;variable;state;DOUBLEARRAY
 
 
 Outputs stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-2;1;0;1;2;0.0;0.0;0
+2;3;2;1;0;0.6666666666666666;1.0;0.8
 
 True positive
 Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+SoilTempArray;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;WRONG
+rSoilTempArrayRate;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;WRONG
 
 False positive
 Name;inputtype;variablecategory;datatype
-pSoilLayerDepth_new;;state;DOUBLELIST
+pSoilLayerDepth;;state;DOUBLELIST
 
 False negative
 Name;inputtype;variablecategory;datatype
-SoilTempArray;;state;DOUBLEARRAY
-rSoilTempArrayRate;;state;DOUBLEARRAY
 
 
 Functions stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-0;0;0;0;0;0;0;0
+0;1;0;1;0;0.0;0;0
 
 True positive
 Name
 
 False positive
 Name
+-
 
 False negative
 Name

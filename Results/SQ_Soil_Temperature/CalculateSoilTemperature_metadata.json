@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SiriusQuality Soil Temperature (CalculateSoilTemperature)",
+        "Authors": "Loic Manceau",
+        "Institution": "INRA (Institut National de la Recherche Agronomique)",
+        "URI": "http://biomamodelling.org",
+        "DOI": "-",
+        "Extended description": "This component computes daily minimum and maximum soil surface temperatures and updates a deep soil layer temperature state for use by other crop model components. The daily min/max soil temperatures are derived from two sub-functions: SoilTempA uses the day's maximum air temperature, mean air temperature, soil heat flux, and the latent heat of vaporization (lambda_) to estimate a surface temperature response; SoilTempB averages the day's minimum air temperature with the deep soil temperature. The daily minimum soil temperature is the minimum of these two, while the daily maximum is the maximum of these two. The deep soil temperature (DeepLayerStates.deepLayerT) is initialized to the annual mean air temperature and subsequently updated each day by an exponential smoothing of the current day’s mean soil temperature and the previous deep soil temperature (Temperature = (9*prev + mean)/10). Sentinel values are propagated when weather max/min air temperatures are set to -999/999. Optionally, the component generates hourly soil temperature using the Parton & Logan (1981) diurnal method, parameterized by a (delay after sunset to Tmax), b (nighttime decay rate), and c (delay after sunrise to Tmin). Inputs: deepLayerT (state), maxTAir, meanTAir, minTAir, meanAnnualAirTemp (exogenous), heatFlux (rate). Parameters: lambda_ (MJ kg-1, default 2.454). Outputs: minTSoil, maxTSoil (states), updated deepLayerT; and hourlySoilT if enabled. Assemblies: SiriusQuality-SoilTemperatureStrategies and SiriusQuality-SoilTemperatureDomainClasses; generated with CRA.ModelLayer ACC.",
+        "Short description": "Calculates daily min/max soil temperature and updates deep soil temperature; optionally produces hourly soil temperatures using Parton & Logan (1981).",
+        "Model version": "1.0.0.0"
+    }
+}

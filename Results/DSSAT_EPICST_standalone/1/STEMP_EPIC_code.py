@@ -1,43 +1,63 @@
-import math
-
-
-def _nint(x):
-    if x >= 0:
-        return int(math.floor(x + 0.5))
-    else:
-        return int(math.ceil(x - 0.5))
+from typing import List, Tuple
 
 
 def SOILT_EPIC(
-    B,
-    BCV,
-    CUMDPT,
-    DP,
-    DSMID,
-    NLAYR,
-    PESW,
-    TAV,
-    TAVG,
-    TMAX,
-    TMIN,
-    WetDay,
-    WFT,
-    WW,
-    TMA,
-    ST,
-    X2_PREV,
-):
-    # Copy arrays to avoid mutating inputs
-    DSMID_loc = list(DSMID)
-    TMA_loc = list(TMA)
-    ST_loc = list(ST)
+    B: float,
+    BCV: float,
+    CUMDPT: float,
+    DP: float,
+    DSMID: List[float],
+    NLAYR: int,
+    PESW: float,
+    TAV: float,
+    TAVG: float,
+    TMAX: float,
+    TMIN: float,
+    WetDay: int,
+    WFT: float,
+    WW: float,
+    TMA: List[float],
+    ST: List[float],
+    X2_PREV: float,
+) -> Tuple[List[float], float, List[float], float, float]:
+    """
+    SOILT_EPIC
+    Determines soil temperature by layer (EPIC method).
 
-    denom = WW * CUMDPT
-    if denom <= 0.0:
-        denom = 1.0e-6
-    WC = max(0.01, PESW) / denom * 10.0
+    Inputs:
+    - B: float
+    - BCV: float
+    - CUMDPT: float
+    - DP: float
+    - DSMID: List[float] (mm)
+    - NLAYR: int
+    - PESW: float (cm)
+    - TAV: float
+    - TAVG: float
+    - TMAX: float
+    - TMIN: float
+    - WetDay: int (0/1)
+    - WFT: float
+    - WW: float
+    - TMA: List[float] (length 5), in/out
+    - ST: List[float] (length NLAYR), in/out
+    - X2_PREV: float, in/out
 
-    FX = math.exp(B * ((1.0 - WC) / (1.0 + WC)) ** 2)
+    Returns:
+    - TMA: updated List[float] (length 5)
+    - SRFTEMP: float
+    - ST: updated List[float] (length NLAYR)
+    - X2_AVG: float
+    - X2_PREV: updated float
+    """
+    # Ensure copies for purity
+    TMA_local = [float(v) for v in TMA]
+    ST_local = [float(v) for v in ST]
+
+    LAG = 0.5
+
+    WC = max(0.01, PESW) / (WW * CUMDPT) * 10.0
+    FX = pow(2.718281828459045, B * ((1.0 - WC) / (1.0 + WC)) ** 2)
     DD = FX * DP
 
     if WetDay > 0:
@@ -45,242 +65,266 @@ def SOILT_EPIC(
     else:
         X2 = WFT * (TMAX - TAVG) + TAVG + 2.0
 
-    # Note the original Fortran assigns TMA(1)=X2 and then shifts,
-    # which results in duplicating X2 into TMA(2).
-    TMA_loc[0] = X2
+    # Update 5-day temperature memory (preserving original order/behavior)
+    TMA_local[0] = X2
     for K in range(4, 0, -1):
-        TMA_loc[K] = TMA_loc[K - 1]
+        TMA_local[K] = TMA_local[K - 1]
+    X2_AVG = sum(TMA_local) / 5.0
 
-    X2_AVG = sum(TMA_loc) / 5.0
     X3 = (1.0 - BCV) * X2_AVG + BCV * X2_PREV
     SRFTEMP = min(X2_AVG, X3)
     X1 = TAV - X3
 
-    LAG = 0.5
     for L in range(NLAYR):
-        ZD = DSMID_loc[L] / DD
-        F = ZD / (ZD + math.exp(-0.8669 - 2.0775 * ZD))
-        ST_loc[L] = LAG * ST_loc[L] + (1.0 - LAG) * (F * X1 + X3)
+        ZD = DSMID[L] / DD
+        F = ZD / (ZD + pow(2.718281828459045, -0.8669 - 2.0775 * ZD))
+        ST_local[L] = LAG * ST_local[L] + (1.0 - LAG) * (F * X1 + X3)
 
-    X2_PREV_new = X2_AVG
+    X2_PREV_out = X2_AVG
 
-    return TMA_loc, SRFTEMP, ST_loc, X2_PREV_new
+    return TMA_local, SRFTEMP, ST_local, X2_AVG, X2_PREV_out
 
 
-def STEMP_EPIC(
-    CONTROL_DYNAMIC,
-    ISWITCH_ISWWAT,
-    SOILPROP_BD,
-    SOILPROP_DLAYR,
-    SOILPROP_DS,
-    SOILPROP_DUL,
-    SOILPROP_LL,
-    SOILPROP_NLAYR,
-    SW,
-    TAVG,
-    TMAX,
-    TMIN,
-    TAV,
-    WEATHER_RAIN,
-    CUMDPT,
-    DSMID,
-    TDL,
-    TMA,
-    NDays,
-    WetDay,
-    X2_PREV,
-    SRFTEMP,
-    ST,
-    ORGC_MULCHMASS,
-    WATER_SNOW,
-    MGMT_DEPIR,
-    PLANT_BIOMAS,
-):
-    NLAYR = int(SOILPROP_NLAYR)
+def STEMP_EPIC_initialize(
+    ISWWAT: str,
+    BD: List[float],
+    DLAYR: List[float],
+    DS: List[float],
+    DUL: List[float],
+    LL: List[float],
+    NLAYR: int,
+    SW: List[float],
+    TAVG: float,
+    TMAX: float,
+    TMIN: float,
+    TAV: float,
+    MULCHMASS: float,
+    SNOW: float,
+) -> Tuple[
+    float, List[float], float, List[float], int, List[int], float, float, List[float]
+]:
+    """
+    Seasonal initialization for EPIC soil temperature.
 
-    BD = list(SOILPROP_BD)
-    DLAYR = list(SOILPROP_DLAYR)
-    DS = list(SOILPROP_DS)
-    DUL = list(SOILPROP_DUL)
-    LL = list(SOILPROP_LL)
-    SW_arr = list(SW)
-    DSMID_loc = list(DSMID)
-    TMA_loc = list(TMA)
-    ST_loc = list(ST)
-    WetDay_loc = list(WetDay)
+    Inputs:
+    - ISWWAT: str ('Y' if water simulated)
+    - BD: List[float], bulk density by layer
+    - DLAYR: List[float], layer thickness (cm)
+    - DS: List[float], cumulative depth to bottom of each layer (cm)
+    - DUL: List[float], drained upper limit by layer
+    - LL: List[float], lower limit by layer
+    - NLAYR: int, number of layers
+    - SW: List[float], soil water by layer
+    - TAVG: float, daily average air temperature
+    - TMAX: float, daily max air temperature
+    - TMIN: float, daily min air temperature
+    - TAV: float, annual average air temperature
+    - MULCHMASS: float, surface mulch mass (kg/ha)
+    - SNOW: float, snow water equivalent (mm)
 
-    if CONTROL_DYNAMIC == 2:
-        # Seasonal initialization
-        SWI = list(SW_arr)
+    Returns:
+    - CUMDPT: float, cumulative profile depth (mm)
+    - DSMID: List[float], depth to mid-point of each layer (mm)
+    - TDL: float, sum(DUL*DLAYR)
+    - TMA: List[float] length 5, temperature memory
+    - NDays: int, initialized to 0
+    - WetDay: List[int] length 30, initialized to zeros
+    - X2_PREV: float
+    - SRFTEMP: float
+    - ST: List[float], soil temperature by layer
+    """
+    SWI = [float(v) for v in SW]
 
-        TBD = 0.0
-        TLL = 0.0
-        TSW = 0.0
-        TDL_loc = 0.0
-        CUMDPT_loc = 0.0
-        for L in range(NLAYR):
-            DSMID_loc[L] = CUMDPT_loc + DLAYR[L] * 5.0
-            CUMDPT_loc = CUMDPT_loc + DLAYR[L] * 10.0
-            TBD = TBD + BD[L] * DLAYR[L]
-            TLL = TLL + LL[L] * DLAYR[L]
-            TSW = TSW + SWI[L] * DLAYR[L]
-            TDL_loc = TDL_loc + DUL[L] * DLAYR[L]
+    TBD = 0.0
+    TLL = 0.0
+    TSW = 0.0
+    TDL = 0.0
+    CUMDPT = 0.0
+    DSMID = [0.0 for _ in range(NLAYR)]
+    for L in range(NLAYR):
+        DSMID[L] = CUMDPT + DLAYR[L] * 5.0
+        CUMDPT = CUMDPT + DLAYR[L] * 10.0
+        TBD += BD[L] * DLAYR[L]
+        TLL += LL[L] * DLAYR[L]
+        TSW += SWI[L] * DLAYR[L]
+        TDL += DUL[L] * DLAYR[L]
 
-        if ISWITCH_ISWWAT == "Y":
-            PESW = max(0.0, TSW - TLL)
-        else:
-            PESW = max(0.0, TDL_loc - TLL)
+    if ISWWAT == "Y":
+        PESW = max(0.0, TSW - TLL)
+    else:
+        PESW = max(0.0, TDL - TLL)
 
-        ABD = TBD / DS[NLAYR - 1]
-        FX = ABD / (ABD + 686.0 * math.exp(-5.63 * ABD))
-        DP = 1000.0 + 2500.0 * FX
-        WW = 0.356 - 0.144 * ABD
-        B = math.log(500.0 / DP)
+    ABD = TBD / DS[NLAYR - 1]
+    FX = ABD / (ABD + 686.0 * pow(2.718281828459045, -5.63 * ABD))
+    DP = 1000.0 + 2500.0 * FX
+    WW = 0.356 - 0.144 * ABD
+    B = 1.0
+    if DP != 0.0:
+        B = 1.6094379124341003 - (1.0) * (DP / 500.0)  # placeholder
+    # Fortran uses natural log: B = ALOG(500.0/DP)
+    # Implement directly to avoid precision issues:
+    import math
 
-        for I in range(5):
-            TMA_loc[I] = _nint(TAVG * 10000.0) / 10000.0
-        X2_AVG = TMA_loc[0] * 5.0
+    B = math.log(500.0 / DP)
 
-        for L in range(NLAYR):
-            ST_loc[L] = TAVG
+    TMA = [round(TAVG, 4) for _ in range(5)]
+    X2_AVG = TMA[0] * 5.0
+    ST = [TAVG for _ in range(NLAYR)]
 
-        WFT = 0.1
-        WetDay_loc = [0 for _ in range(len(WetDay_loc))]
-        NDays_loc = 0
+    WFT = 0.1
+    WetDay = [0 for _ in range(30)]
+    NDays = 0
 
-        CV = (ORGC_MULCHMASS) / 1000.0
-        BCV1 = CV / (CV + math.exp(5.3396 - 2.3951 * CV)) if (CV + math.exp(5.3396 - 2.3951 * CV)) != 0 else 0.0
-        SNOW = WATER_SNOW
-        BCV2 = SNOW / (SNOW + math.exp(2.303 - 0.2197 * SNOW)) if (SNOW + math.exp(2.303 - 0.2197 * SNOW)) != 0 else 0.0
-        BCV = max(BCV1, BCV2)
+    CV = (MULCHMASS) / 1000.0
+    BCV1 = CV / (CV + pow(2.718281828459045, 5.3396 - 2.3951 * CV)) if (CV + pow(2.718281828459045, 5.3396 - 2.3951 * CV)) != 0 else 0.0
+    BCV2 = SNOW / (SNOW + pow(2.718281828459045, 2.303 - 0.2197 * SNOW)) if (SNOW + pow(2.718281828459045, 2.303 - 0.2197 * SNOW)) != 0 else 0.0
+    BCV = max(BCV1, BCV2)
 
-        for _ in range(8):
-            TMA_loc, SRFTEMP, ST_loc, X2_PREV = SOILT_EPIC(
-                B=B,
-                BCV=BCV,
-                CUMDPT=CUMDPT_loc,
-                DP=DP,
-                DSMID=DSMID_loc,
-                NLAYR=NLAYR,
-                PESW=PESW,
-                TAV=TAV,
-                TAVG=TAVG,
-                TMAX=TMAX,
-                TMIN=TMIN,
-                WetDay=0,
-                WFT=WFT,
-                WW=WW,
-                TMA=TMA_loc,
-                ST=ST_loc,
-                X2_PREV=X2_PREV,
-            )
-
-        return (
-            CUMDPT_loc,
-            DSMID_loc,
-            TDL_loc,
-            TMA_loc,
-            NDays_loc,
-            WetDay_loc,
-            X2_PREV,
-            SRFTEMP,
-            ST_loc,
-        )
-
-    elif CONTROL_DYNAMIC == 3:
-        # Daily rate calculations
-        TBD = 0.0
-        TLL = 0.0
-        TSW = 0.0
-        TDL_loc = TDL
-        for L in range(NLAYR):
-            TBD = TBD + BD[L] * DLAYR[L]
-            TDL_loc = TDL_loc + DUL[L] * DLAYR[L]
-            TLL = TLL + LL[L] * DLAYR[L]
-            TSW = TSW + SW_arr[L] * DLAYR[L]
-
-        ABD = TBD / DS[NLAYR - 1]
-        FX = ABD / (ABD + 686.0 * math.exp(-5.63 * ABD))
-        DP = 1000.0 + 2500.0 * FX
-        WW = 0.356 - 0.144 * ABD
-        B = math.log(500.0 / DP)
-
-        if ISWITCH_ISWWAT == "Y":
-            PESW = max(0.0, TSW - TLL)
-        else:
-            PESW = max(0.0, TDL_loc - TLL)
-
-        RAIN = WEATHER_RAIN
-        DEPIR = MGMT_DEPIR
-
-        if int(NDays) == 30:
-            # shift left (keep list length)
-            WetDay_loc = WetDay_loc[1:] + [0]
-            NDays_loc = 30
-        else:
-            NDays_loc = int(NDays) + 1
-            if len(WetDay_loc) < 30:
-                WetDay_loc = WetDay_loc + [0] * (30 - len(WetDay_loc))
-
-        if RAIN + DEPIR > 1.0e-6:
-            WetDay_loc[NDays_loc - 1] = 1
-        else:
-            WetDay_loc[NDays_loc - 1] = 0
-
-        NWetDays = sum(WetDay_loc)
-        WFT = float(NWetDays) / float(NDays_loc if NDays_loc > 0 else 1)
-
-        BIOMAS = PLANT_BIOMAS
-        MULCHMASS = ORGC_MULCHMASS
-        SNOW = WATER_SNOW
-
-        CV = (BIOMAS + MULCHMASS) / 1000.0
-        BCV1 = CV / (CV + math.exp(5.3396 - 2.3951 * CV)) if (CV + math.exp(5.3396 - 2.3951 * CV)) != 0 else 0.0
-        BCV2 = SNOW / (SNOW + math.exp(2.303 - 0.2197 * SNOW)) if (SNOW + math.exp(2.303 - 0.2197 * SNOW)) != 0 else 0.0
-        BCV = max(BCV1, BCV2)
-
-        TMA_loc, SRFTEMP, ST_loc, X2_PREV = SOILT_EPIC(
+    SRFTEMP = TAVG
+    X2_PREV = 0.0
+    for _ in range(8):
+        TMA, SRFTEMP, ST, X2_AVG, X2_PREV = SOILT_EPIC(
             B=B,
             BCV=BCV,
             CUMDPT=CUMDPT,
             DP=DP,
-            DSMID=DSMID_loc,
+            DSMID=DSMID,
             NLAYR=NLAYR,
             PESW=PESW,
             TAV=TAV,
             TAVG=TAVG,
             TMAX=TMAX,
             TMIN=TMIN,
-            WetDay=WetDay_loc[NDays_loc - 1],
+            WetDay=0,
             WFT=WFT,
             WW=WW,
-            TMA=TMA_loc,
-            ST=ST_loc,
+            TMA=TMA,
+            ST=ST,
             X2_PREV=X2_PREV,
         )
 
-        return (
-            CUMDPT,
-            DSMID_loc,
-            TDL_loc,
-            TMA_loc,
-            NDays_loc,
-            WetDay_loc,
-            X2_PREV,
-            SRFTEMP,
-            ST_loc,
-        )
+    return CUMDPT, DSMID, TDL, TMA, NDays, WetDay, X2_PREV, SRFTEMP, ST
 
+
+def STEMP_EPIC(
+    ISWWAT: str,
+    BD: List[float],
+    DLAYR: List[float],
+    DS: List[float],
+    DUL: List[float],
+    LL: List[float],
+    NLAYR: int,
+    SW: List[float],
+    TAVG: float,
+    TMAX: float,
+    TMIN: float,
+    TAV: float,
+    RAIN: float,
+    DEPIR: float,
+    BIOMAS: float,
+    MULCHMASS: float,
+    SNOW: float,
+    CUMDPT: float,
+    DSMID: List[float],
+    TDL: float,
+    TMA: List[float],
+    NDays: int,
+    WetDay: List[int],
+    X2_PREV: float,
+    ST: List[float],
+) -> Tuple[float, List[float], int, List[int], float, float, List[float], float, float, float]:
+    """
+    Daily soil temperature update (EPIC method).
+
+    Inputs:
+    - ISWWAT: str ('Y' if water simulated)
+    - BD, DLAYR, DS, DUL, LL: List[float] by layer
+    - NLAYR: int
+    - SW: List[float] soil water by layer
+    - TAVG, TMAX, TMIN, TAV: float temperatures
+    - RAIN: float (mm)
+    - DEPIR: float (mm), irrigation depth
+    - BIOMAS: float (kg/ha)
+    - MULCHMASS: float (kg/ha)
+    - SNOW: float (mm)
+    - CUMDPT: float (mm), from initialization
+    - DSMID: List[float] (mm), from initialization
+    - TDL: float, in/out (accumulates per original code)
+    - TMA: List[float] length 5, in/out
+    - NDays: int, in/out
+    - WetDay: List[int] length 30, in/out
+    - X2_PREV: float, in/out
+    - ST: List[float] soil temperature by layer, in/out
+
+    Returns (updated):
+    - TDL: float
+    - TMA: List[float]
+    - NDays: int
+    - WetDay: List[int]
+    - X2_PREV: float
+    - SRFTEMP: float
+    - ST: List[float]
+    - ABD: float
+    - DP: float
+    - WW: float
+    """
+    TBD = 0.0
+    TLL = 0.0
+    TSW = 0.0
+    for L in range(NLAYR):
+        TBD += BD[L] * DLAYR[L]
+        TDL += DUL[L] * DLAYR[L]  # preserves original behavior
+        TLL += LL[L] * DLAYR[L]
+        TSW += SW[L] * DLAYR[L]
+
+    ABD = TBD / DS[NLAYR - 1]
+    FX = ABD / (ABD + 686.0 * pow(2.718281828459045, -5.63 * ABD))
+    DP = 1000.0 + 2500.0 * FX
+    WW = 0.356 - 0.144 * ABD
+    import math
+
+    B = math.log(500.0 / DP)
+
+    if ISWWAT == "Y":
+        PESW = max(0.0, TSW - TLL)
     else:
-        # For phases not performing computations here, return inputs unchanged
-        return (
-            CUMDPT,
-            DSMID_loc,
-            TDL,
-            TMA_loc,
-            NDays,
-            WetDay_loc,
-            X2_PREV,
-            SRFTEMP,
-            ST_loc,
-        )
+        PESW = max(0.0, TDL - TLL)
+
+    if NDays == 30:
+        for i in range(29):
+            WetDay[i] = WetDay[i + 1]
+    else:
+        NDays += 1
+    WetDay_today = 1 if (RAIN + DEPIR) > 1.0e-6 else 0
+    WetDay_index = min(NDays, 30) - 1
+    if WetDay_index >= 0:
+        WetDay[WetDay_index] = WetDay_today
+    NWetDays = sum(WetDay[:NDays])
+    WFT = float(NWetDays) / float(NDays) if NDays > 0 else 0.0
+
+    CV = (BIOMAS + MULCHMASS) / 1000.0
+    BCV1 = CV / (CV + pow(2.718281828459045, 5.3396 - 2.3951 * CV)) if (CV + pow(2.718281828459045, 5.3396 - 2.3951 * CV)) != 0 else 0.0
+    BCV2 = SNOW / (SNOW + pow(2.718281828459045, 2.303 - 0.2197 * SNOW)) if (SNOW + pow(2.718281828459045, 2.303 - 0.2197 * SNOW)) != 0 else 0.0
+    BCV = max(BCV1, BCV2)
+
+    TMA_out, SRFTEMP, ST_out, _, X2_PREV_out = SOILT_EPIC(
+        B=B,
+        BCV=BCV,
+        CUMDPT=CUMDPT,
+        DP=DP,
+        DSMID=DSMID,
+        NLAYR=NLAYR,
+        PESW=PESW,
+        TAV=TAV,
+        TAVG=TAVG,
+        TMAX=TMAX,
+        TMIN=TMIN,
+        WetDay=WetDay_today,
+        WFT=WFT,
+        WW=WW,
+        TMA=TMA,
+        ST=ST,
+        X2_PREV=X2_PREV,
+    )
+
+    return TDL, TMA_out, NDays, WetDay, X2_PREV_out, SRFTEMP, ST_out, ABD, DP, WW

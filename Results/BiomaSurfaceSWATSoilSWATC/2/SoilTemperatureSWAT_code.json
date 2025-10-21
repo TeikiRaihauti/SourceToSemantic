@@ -4,27 +4,27 @@
     },
     "process": {
         "name": "Estimate",
-        "description": "Main biophysical process function: SoilTemperatureSWAT. Updates the soil temperature by layers using the SWAT method."
+        "description": "Update soil temperature by layers using SWAT method."
     },
     "inputs": [
         {
-            "name": "LagCoefficient",
-            "description": "Lag coefficient (dimensionless)",
-            "inputtype": "parameter",
-            "category": "constant",
-            "datatype": "DOUBLE",
+            "name": "states_LayerThickness",
+            "description": "Soil layer thicknesses by layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
             "len": "-",
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "-",
+            "unit": "m",
             "uri": "-"
         },
         {
             "name": "states_SoilProfileDepth",
             "description": "Soil profile depth",
-            "inputtype": "parameter",
-            "category": "constant",
+            "inputtype": "variable",
+            "category": "state",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "-",
@@ -35,9 +35,9 @@
         },
         {
             "name": "states_SurfaceSoilTemperature",
-            "description": "Average surface soil temperature",
+            "description": "Surface soil temperature",
             "inputtype": "variable",
-            "category": "exogenous",
+            "category": "state",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "-",
@@ -61,7 +61,7 @@
         },
         {
             "name": "states_SoilTemperatureByLayers",
-            "description": "Previous soil temperature by layer",
+            "description": "Soil temperature by layers (previous values; updated in-place)",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLELIST",
@@ -75,8 +75,8 @@
         {
             "name": "states_BulkDensity",
             "description": "Bulk density by layer",
-            "inputtype": "parameter",
-            "category": "constant",
+            "inputtype": "variable",
+            "category": "state",
             "datatype": "DOUBLELIST",
             "len": "-",
             "min": "-",
@@ -89,7 +89,7 @@
             "name": "states_VolumetricWaterContent",
             "description": "Volumetric water content by layer",
             "inputtype": "variable",
-            "category": "exogenous",
+            "category": "state",
             "datatype": "DOUBLELIST",
             "len": "-",
             "min": "-",
@@ -99,23 +99,23 @@
             "uri": "-"
         },
         {
-            "name": "states_LayerThickness",
-            "description": "Layer thickness by layer",
+            "name": "LagCoefficient",
+            "description": "Lag coefficient controlling update weighting (dimensionless; typically 0.8)",
             "inputtype": "parameter",
             "category": "constant",
-            "datatype": "DOUBLELIST",
+            "datatype": "DOUBLE",
             "len": "-",
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "m",
+            "unit": "-",
             "uri": "-"
         }
     ],
     "outputs": [
         {
             "name": "states_SoilTemperatureByLayers",
-            "description": "Updated soil temperature by layer",
+            "description": "Updated soil temperature by layers",
             "datatype": "DOUBLELIST",
             "category": "state",
             "len": "-",
@@ -126,6 +126,35 @@
             "uri": "-"
         }
     ],
-    "functions": [],
-    "tests": "-"
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [],
+            "outputs": []
+        }
+    ],
+    "comments": [
+        {
+            "comment": "Estimate is treated as the major process; Init provides the initial state for states_SoilTemperatureByLayers (set to 15 degC per layer)."
+        },
+        {
+            "comment": "Variables prefixed with 'states_' are classified as state inputs for this component even if not updated here."
+        },
+        {
+            "comment": "LagCoefficient has no explicit default in code; 'typically 0.8' from docstring is not treated as a default."
+        },
+        {
+            "comment": "states_SoilTemperatureByLayers is both read and written (in-place) and returned; it is listed as both input and output."
+        },
+        {
+            "comment": "List lengths are not fixed in the code; len fields are left as '-'."
+        }
+    ]
 }

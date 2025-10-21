@@ -1,0 +1,168 @@
+{
+    "init": {
+        "name": "Init"
+    },
+    "process": {
+        "name": "Estimate",
+        "description": "Update soil temperature by layers using the SWAT method."
+    },
+    "inputs": [
+        {
+            "name": "SoilProfileDepth",
+            "description": "Soil profile depth",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "50",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "SurfaceSoilTemperature",
+            "description": "Average surface soil temperature",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-60",
+            "max": "60",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "AirTemperatureAnnualAverage",
+            "description": "Annual average air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-40",
+            "max": "50",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "SoilTemperatureByLayers",
+            "description": "Soil temperature of each layer (previous values; updated in-place)",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLEARRAY",
+            "len": "SOILPROP_NLAYR",
+            "min": "-60",
+            "max": "60",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "BulkDensity",
+            "description": "Bulk density by layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLEARRAY",
+            "len": "SOILPROP_NLAYR",
+            "min": "0.9",
+            "max": "1.8",
+            "default": "-",
+            "unit": "t m-3",
+            "uri": "-"
+        },
+        {
+            "name": "VolumetricWaterContent",
+            "description": "Volumetric soil water content by layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLEARRAY",
+            "len": "SOILPROP_NLAYR",
+            "min": "0",
+            "max": "0.8",
+            "default": "-",
+            "unit": "m3 m-3",
+            "uri": "-"
+        },
+        {
+            "name": "LayerThickness",
+            "description": "Soil layer thickness",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLEARRAY",
+            "len": "SOILPROP_NLAYR",
+            "min": "0.005",
+            "max": "3",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "LagCoefficient",
+            "description": "Lag coefficient that controls the influence of the previous day's temperature on the current day's temperature",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "1",
+            "default": "0.8",
+            "unit": "dimensionless",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "SoilTemperatureByLayers",
+            "description": "Updated soil temperature of each layer",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "SOILPROP_NLAYR",
+            "min": "-60",
+            "max": "60",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "Init",
+            "description": "Initialize SoilTemperatureByLayers to 15 degC for each layer."
+        },
+        {
+            "name": "Estimate",
+            "description": "Compute daily soil temperature by layer using SWAT formulation with lagging."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "Roles follow code: all listed state variables are inputs; LagCoefficient is a parameter; AirTemperatureAnnualAverage is exogenous."
+        },
+        {
+            "comment": "SoilTemperatureByLayers is a state carryover (input) and is updated (output)."
+        },
+        {
+            "comment": "Array variables use len SOILPROP_NLAYR; actual size at runtime equals the number of soil layers (LayerThickness.Length)."
+        }
+    ]
+}

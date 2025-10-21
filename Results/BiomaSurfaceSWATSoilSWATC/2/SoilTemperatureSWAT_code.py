@@ -1,63 +1,53 @@
-def Init(states_LayerThickness):
+def Init(states_LayerThickness: list[float]) -> list[float]:
     """
-    Initialization function for SoilTemperatureSWAT.
-    Creates and returns the initial SoilTemperatureByLayers array, with each layer set to 15 degC.
+    Initialize soil temperature by layers.
 
     Inputs:
-    - states_LayerThickness: list or sequence of layer thicknesses (m)
+    - states_LayerThickness: list[float] (m)
 
     Returns:
-    - states_SoilTemperatureByLayers: list of soil temperatures by layer (degC)
+    - states_SoilTemperatureByLayers: list[float] (degC)
     """
-    if states_LayerThickness is None:
-        return []
-    return [15.0 for _ in range(len(states_LayerThickness))]
+    # Initialize each layer temperature to 15 degC
+    states_SoilTemperatureByLayers = [15.0 for _ in states_LayerThickness]
+    return states_SoilTemperatureByLayers
 
 
-def Estimate(LagCoefficient,
-             states_SoilProfileDepth,
-             states_SurfaceSoilTemperature,
-             exogenous_AirTemperatureAnnualAverage,
-             states_SoilTemperatureByLayers,
-             states_BulkDensity,
-             states_VolumetricWaterContent,
-             states_LayerThickness):
+def Estimate(
+    states_SoilProfileDepth: float,
+    states_SurfaceSoilTemperature: float,
+    exogenous_AirTemperatureAnnualAverage: float,
+    states_SoilTemperatureByLayers: list[float],
+    states_BulkDensity: list[float],
+    states_VolumetricWaterContent: list[float],
+    states_LayerThickness: list[float],
+    LagCoefficient: float,
+) -> list[float]:
     """
-    Main biophysical process function: SoilTemperatureSWAT.
-    Updates the soil temperature by layers using the SWAT method.
+    Update soil temperature by layers using SWAT method.
 
     Inputs:
-    - LagCoefficient: float, lag coefficient (dimensionless)
-    - states_SoilProfileDepth: float, soil profile depth (m)
-    - states_SurfaceSoilTemperature: float, average surface soil temperature (degC)
-    - exogenous_AirTemperatureAnnualAverage: float, annual average air temperature (degC)
-    - states_SoilTemperatureByLayers: list of float, previous day's soil temperature by layer (degC)
-    - states_BulkDensity: list of float, bulk density by layer (t m-3)
-    - states_VolumetricWaterContent: list of float, volumetric water content by layer (m3 m-3)
-    - states_LayerThickness: list of float, layer thickness by layer (m)
+    - states_SoilProfileDepth: float (m)
+    - states_SurfaceSoilTemperature: float (degC)
+    - exogenous_AirTemperatureAnnualAverage: float (degC)
+    - states_SoilTemperatureByLayers: list[float] (degC) [previous day values, updated in-place]
+    - states_BulkDensity: list[float] (t m-3)
+    - states_VolumetricWaterContent: list[float] (m3 m-3)
+    - states_LayerThickness: list[float] (m)
+    - LagCoefficient: float (dimensionless, typically 0.8)
 
     Returns:
-    - states_SoilTemperatureByLayers: list of float, updated soil temperature by layer (degC)
+    - states_SoilTemperatureByLayers: list[float] (degC) [updated]
     """
     import math
-
-    n_layers = 0 if states_LayerThickness is None else len(states_LayerThickness)
-    if n_layers == 0:
-        return []
-
-    # Use copies to avoid mutating inputs
-    SoilTemperatureByLayers_prev = list(states_SoilTemperatureByLayers) if states_SoilTemperatureByLayers is not None else [15.0] * n_layers
-    BulkDensity = list(states_BulkDensity)
-    VolumetricWaterContent = list(states_VolumetricWaterContent)
-    LayerThickness = list(states_LayerThickness)
 
     # Conversion to mm
     _SoilProfileDepthmm = states_SoilProfileDepth * 1000.0
 
-    # Total water content in mm
+    # Total water content (mm)
     _TotalWaterContentmm = 0.0
-    for i in range(n_layers):
-        _TotalWaterContentmm += VolumetricWaterContent[i] * LayerThickness[i]
+    for i in range(len(states_LayerThickness)):
+        _TotalWaterContentmm += states_VolumetricWaterContent[i] * states_LayerThickness[i]
     _TotalWaterContentmm *= 1000.0
 
     # Internal variables
@@ -68,42 +58,66 @@ def Estimate(LagCoefficient,
     _RatioCenter = 0.0
     _DepthFactor = 0.0
 
-    # Output temperatures
-    SoilTemperatureByLayers_new = [0.0] * n_layers
-
     # First layer
-    _DepthCenterLayer = LayerThickness[0] * 1000.0 / 2.0
+    _DepthCenterLayer = states_LayerThickness[0] * 1000.0 / 2.0
 
-    _MaximumDumpingDepth = 1000.0 + (2500.0 * BulkDensity[0]) / (BulkDensity[0] + 686.0 * math.exp(-5.63 * BulkDensity[0]))
-    _ScalingFactor = _TotalWaterContentmm / ((0.356 - 0.144 * BulkDensity[0]) * _SoilProfileDepthmm)
-    _DumpingDepth = _MaximumDumpingDepth * math.exp((math.log(500.0 / _MaximumDumpingDepth)) * ((1.0 - _ScalingFactor) / (1.0 + _ScalingFactor)) ** 2.0)
+    _MaximumDumpingDepth = 1000.0 + (2500.0 * states_BulkDensity[0]) / (
+        states_BulkDensity[0] + 686.0 * math.exp(-5.63 * states_BulkDensity[0])
+    )
+    _ScalingFactor = _TotalWaterContentmm / (
+        (0.356 - 0.144 * states_BulkDensity[0]) * _SoilProfileDepthmm
+    )
+    _DumpingDepth = _MaximumDumpingDepth * math.exp(
+        (math.log(500.0 / _MaximumDumpingDepth))
+        * ((1.0 - _ScalingFactor) / (1.0 + _ScalingFactor)) ** 2
+    )
     _RatioCenter = _DepthCenterLayer / _DumpingDepth
     _DepthFactor = _RatioCenter / (_RatioCenter + math.exp(-0.867 - 2.078 * _RatioCenter))
 
-    SoilTemperatureByLayers_new[0] = (
-        LagCoefficient * SoilTemperatureByLayers_prev[0] +
-        (1.0 - LagCoefficient) * (
-            _DepthFactor * (exogenous_AirTemperatureAnnualAverage - states_SurfaceSoilTemperature) +
-            states_SurfaceSoilTemperature
+    states_SoilTemperatureByLayers[0] = (
+        LagCoefficient * states_SoilTemperatureByLayers[0]
+        + (1.0 - LagCoefficient)
+        * (
+            _DepthFactor
+            * (
+                exogenous_AirTemperatureAnnualAverage
+                - states_SurfaceSoilTemperature
+            )
+            + states_SurfaceSoilTemperature
         )
     )
 
     # Other layers
-    for i in range(1, n_layers):
-        _DepthBottom = _DepthBottom + LayerThickness[i - 1] * 1000.0
-        _DepthCenterLayer = _DepthBottom + LayerThickness[i] * 1000.0 / 2.0
-        _MaximumDumpingDepth = 1000.0 + (2500.0 * BulkDensity[i]) / (BulkDensity[i] + 686.0 * math.exp(-5.63 * BulkDensity[i]))
-        _ScalingFactor = _TotalWaterContentmm / ((0.356 - 0.144 * BulkDensity[i]) * _SoilProfileDepthmm)
-        _DumpingDepth = _MaximumDumpingDepth * math.exp((math.log(500.0 / _MaximumDumpingDepth)) * ((1.0 - _ScalingFactor) / (1.0 + _ScalingFactor)) ** 2.0)
-        _RatioCenter = _DepthCenterLayer / _DumpingDepth
-        _DepthFactor = _RatioCenter / (_RatioCenter + math.exp(-0.867 - 2.078 * _RatioCenter))
+    for i in range(1, len(states_LayerThickness)):
+        _DepthBottom = _DepthBottom + states_LayerThickness[i - 1] * 1000.0
+        _DepthCenterLayer = _DepthBottom + states_LayerThickness[i] * 1000.0 / 2.0
 
-        SoilTemperatureByLayers_new[i] = (
-            LagCoefficient * SoilTemperatureByLayers_prev[i] +
-            (1.0 - LagCoefficient) * (
-                _DepthFactor * (exogenous_AirTemperatureAnnualAverage - states_SurfaceSoilTemperature) +
-                states_SurfaceSoilTemperature
+        _MaximumDumpingDepth = 1000.0 + (2500.0 * states_BulkDensity[i]) / (
+            states_BulkDensity[i] + 686.0 * math.exp(-5.63 * states_BulkDensity[i])
+        )
+        _ScalingFactor = _TotalWaterContentmm / (
+            (0.356 - 0.144 * states_BulkDensity[i]) * _SoilProfileDepthmm
+        )
+        _DumpingDepth = _MaximumDumpingDepth * math.exp(
+            (math.log(500.0 / _MaximumDumpingDepth))
+            * ((1.0 - _ScalingFactor) / (1.0 + _ScalingFactor)) ** 2
+        )
+        _RatioCenter = _DepthCenterLayer / _DumpingDepth
+        _DepthFactor = _RatioCenter / (
+            _RatioCenter + math.exp(-0.867 - 2.078 * _RatioCenter)
+        )
+
+        states_SoilTemperatureByLayers[i] = (
+            LagCoefficient * states_SoilTemperatureByLayers[i]
+            + (1.0 - LagCoefficient)
+            * (
+                _DepthFactor
+                * (
+                    exogenous_AirTemperatureAnnualAverage
+                    - states_SurfaceSoilTemperature
+                )
+                + states_SurfaceSoilTemperature
             )
         )
 
-    return SoilTemperatureByLayers_new
+    return states_SoilTemperatureByLayers

@@ -4,34 +4,34 @@
     },
     "process": {
         "name": "Estimate",
-        "description": "Estimate soil temperature by layers using the SWAT method."
+        "description": "Compute soil temperature by layers using the SWAT method."
     },
     "inputs": [
         {
             "name": "states_LayerThickness",
-            "description": "List of soil layer thicknesses",
+            "description": "Soil layer thickness for each layer",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "DOUBLELIST",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "None",
             "unit": "m",
-            "uri": "-"
+            "uri": ""
         },
         {
             "name": "LagCoefficient",
-            "description": "Lag coefficient controlling influence of previous day's temperature",
+            "description": "Lag coefficient controlling influence of previous day temperature",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "DOUBLE",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "0.8",
             "unit": "-",
-            "uri": "-"
+            "uri": ""
         },
         {
             "name": "states_SoilProfileDepth",
@@ -40,11 +40,11 @@
             "category": "constant",
             "datatype": "DOUBLE",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "0.0",
             "unit": "m",
-            "uri": "-"
+            "uri": ""
         },
         {
             "name": "states_SurfaceSoilTemperature",
@@ -53,11 +53,11 @@
             "category": "exogenous",
             "datatype": "DOUBLE",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "0.0",
             "unit": "degC",
-            "uri": "-"
+            "uri": ""
         },
         {
             "name": "exogenous_AirTemperatureAnnualAverage",
@@ -66,75 +66,106 @@
             "category": "exogenous",
             "datatype": "DOUBLE",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "0.0",
             "unit": "degC",
-            "uri": "-"
+            "uri": ""
         },
         {
             "name": "states_SoilTemperatureByLayers",
-            "description": "Previous soil temperatures by layer",
+            "description": "Soil temperature of each layer from previous day",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLELIST",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "None",
             "unit": "degC",
-            "uri": "-"
+            "uri": ""
         },
         {
             "name": "states_BulkDensity",
-            "description": "Bulk density by layer",
+            "description": "Bulk density of each layer",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "DOUBLELIST",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "None",
             "unit": "t m-3",
-            "uri": "-"
+            "uri": ""
         },
         {
             "name": "states_VolumetricWaterContent",
-            "description": "Volumetric soil water content by layer",
+            "description": "Volumetric soil water content of each layer",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLELIST",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "None",
             "unit": "m3 m-3",
-            "uri": "-"
+            "uri": ""
         }
     ],
     "outputs": [
         {
-            "name": "states_SoilTemperatureByLayers",
-            "description": "Updated soil temperatures by layer",
+            "name": "states_SoilTemperatureByLayers_new",
+            "description": "Updated soil temperature of each layer",
             "datatype": "DOUBLELIST",
             "category": "state",
             "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
+            "min": "",
+            "max": "",
+            "default": "",
             "unit": "degC",
-            "uri": "-"
+            "uri": ""
         }
     ],
     "functions": [
         {
             "name": "Init",
-            "description": "Initialize the soil temperature profile by layers."
+            "description": "Initialize soil temperature by layers to 15 degC for all layers."
         },
         {
             "name": "Estimate",
-            "description": "Estimate soil temperature by layers using the SWAT method."
+            "description": "Compute soil temperature by layers using the SWAT method."
         }
     ],
-    "tests": "-"
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "",
+                    "value": ""
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "value": ""
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "states_SoilTemperatureByLayers is treated as the component state (input and updated as output via states_SoilTemperatureByLayers_new)."
+        },
+        {
+            "comment": "states_LayerThickness and states_BulkDensity are treated as constant parameters for this component; they are not updated here."
+        },
+        {
+            "comment": "states_SurfaceSoilTemperature and states_VolumetricWaterContent are treated as exogenous drivers from other components."
+        },
+        {
+            "comment": "LagCoefficient default is 0.8; no bounds are enforced by the code."
+        }
+    ]
 }

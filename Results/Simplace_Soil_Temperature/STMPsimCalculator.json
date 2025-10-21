@@ -1,0 +1,274 @@
+{
+    "init": {
+        "name": "init"
+    },
+    "process": {
+        "name": "process",
+        "description": "Advance soil temperature profile by one time step."
+    },
+    "inputs": [
+        {
+            "name": "cSoilLayerDepth",
+            "description": "Depth of soil layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0.03",
+            "max": "20",
+            "default": "-",
+            "unit": "m",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/metre"
+        },
+        {
+            "name": "cFirstDayMeanTemp",
+            "description": "Mean air temperature on first day",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-40",
+            "max": "50",
+            "default": "-",
+            "unit": "degC",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/degree_Celsius"
+        },
+        {
+            "name": "cAVT",
+            "description": "Constant temperature of deepest soil layer (use long-term mean air temperature)",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-10",
+            "max": "20",
+            "default": "-",
+            "unit": "degC",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/degree_Celsius"
+        },
+        {
+            "name": "cABD",
+            "description": "Mean bulk density",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "1",
+            "max": "4",
+            "default": "2",
+            "unit": "t m-3",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/tonne_per_cubic_metre"
+        },
+        {
+            "name": "cDampingDepth",
+            "description": "Initial value for damping depth of soil",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "1.5",
+            "max": "20",
+            "default": "6",
+            "unit": "m",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/metre"
+        },
+        {
+            "name": "iDoInitialize",
+            "description": "Switch to re-initialize the model with initial values (0/1)",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "INT",
+            "len": "-",
+            "min": "0",
+            "max": "1",
+            "default": "0",
+            "unit": "-",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/one"
+        },
+        {
+            "name": "iSoilWaterContent",
+            "description": "Water content, sum of whole soil profile",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "1.5",
+            "max": "20",
+            "default": "5",
+            "unit": "mm",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/millimetre"
+        },
+        {
+            "name": "iSoilSurfaceTemperature",
+            "description": "Temperature at soil surface",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "1.5",
+            "max": "20",
+            "default": "-",
+            "unit": "degC",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/degree_Celsius"
+        },
+        {
+            "name": "SoilTempArray",
+            "description": "Array of soil temperatures in layers",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "-40",
+            "max": "50",
+            "default": "-",
+            "unit": "degC",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/degree_Celsius"
+        },
+        {
+            "name": "rSoilTempArrayRate",
+            "description": "Array of daily temperature change",
+            "inputtype": "variable",
+            "category": "auxiliary",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "-20",
+            "max": "20",
+            "default": "-",
+            "unit": "degC d-1",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/degree_Celsius_per_day"
+        },
+        {
+            "name": "pSoilLayerDepth",
+            "description": "Depth of soil layer plus additional depth",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "0.03",
+            "max": "20",
+            "default": "-",
+            "unit": "m",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/metre"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "SoilTempArray",
+            "description": "Updated soil temperature per layer",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-40",
+            "max": "50",
+            "default": "-",
+            "unit": "degC",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/degree_Celsius"
+        },
+        {
+            "name": "rSoilTempArrayRate",
+            "description": "Updated daily soil temperature change per layer",
+            "datatype": "DOUBLEARRAY",
+            "category": "auxiliary",
+            "len": "-",
+            "min": "-20",
+            "max": "20",
+            "default": "-",
+            "unit": "degC d-1",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/degree_Celsius_per_day"
+        },
+        {
+            "name": "pSoilLayerDepth",
+            "description": "Depth to bottom of each (including added) soil layer",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "0.03",
+            "max": "20",
+            "default": "-",
+            "unit": "m",
+            "uri": "http://www.wurvoc.org/vocabularies/om-1.8/metre"
+        }
+    ],
+    "functions": [
+        {
+            "name": "reInitialize",
+            "description": "Re-initialize state by calling init() when requested."
+        }
+    ],
+    "tests": [
+        {
+            "name": "test_STMPsimCalculator_case0",
+            "description": "Initializes then processes one day and checks SoilTempArray against expected values.",
+            "inputs": [
+                {
+                    "name": "cSoilLayerDepth",
+                    "value": [
+                        0.1,
+                        0.5,
+                        1.5
+                    ]
+                },
+                {
+                    "name": "cFirstDayMeanTemp",
+                    "value": 15.0
+                },
+                {
+                    "name": "cAVT",
+                    "value": 9.0
+                },
+                {
+                    "name": "cABD",
+                    "value": 1.4
+                },
+                {
+                    "name": "cDampingDepth",
+                    "value": 6.0
+                },
+                {
+                    "name": "iSoilWaterContent",
+                    "value": 0.3
+                },
+                {
+                    "name": "iSoilSurfaceTemperature",
+                    "value": 6.0
+                },
+                {
+                    "name": "iDoInitialize",
+                    "value": 0
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "SoilTempArray",
+                    "value": [
+                        13.624360856350041,
+                        13.399968504634286,
+                        12.599999999999845,
+                        12.2,
+                        11.4,
+                        10.6,
+                        9.799999999999999,
+                        9.0
+                    ]
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "Function and variable names follow the Java source. Boolean iDoInitialize is represented as INT (0/1) due to allowed datatypes."
+        },
+        {
+            "comment": "rSoilTempArrayRate has content type 'rate' in code; mapped to category 'auxiliary'."
+        },
+        {
+            "comment": "pSoilLayerDepth is created with content type 'privat' but is included as a persisted state since it is produced in init() and used in process()."
+        },
+        {
+            "comment": "Array lengths are dynamic and depend on cSoilLayerDepth and cDampingDepth."
+        },
+        {
+            "comment": "Min/max/default values are taken from createVariables() in the source; they are not enforced here."
+        }
+    ]
+}

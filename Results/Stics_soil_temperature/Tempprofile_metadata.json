@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "Soil temperature profile model (temp_profile)",
+        "Authors": "STICS",
+        "Institution": "INRAE",
+        "URI": "-",
+        "DOI": "http://dx.doi.org/10.1016/j.agrformet.2014.05.002",
+        "Extended description": "Computes the daily soil temperature profile at 1 cm resolution using an exponentially damped response to canopy–air thermal forcing, based on fixed thermal diffusivity (5.37e-3 m2 h-1) and diurnal frequency (7.272e-5 s-1 converted contextually). For each depth z, an attenuation factor vexp(z)=exp(-z*sqrt(temp_freq/(2*therm_diff))) is applied. The new profile blends: (i) persistence from the previous profile, (ii) an exponentially attenuated adjustment driven by the difference between previous canopy temperature and current minimum air temperature, (iii) a relaxation term toward the canopy temperature (weight 0.1), and (iv) half the current temperature amplitude scaled by the attenuation factor. Inputs: temperature amplitude, previous soil temperature profile, previous canopy temperature, and current minimum air temperature. Output: updated soil temperature profile.",
+        "Short description": "STICS-based exponential damping update of daily soil temperature profile from canopy and air thermal forcing.",
+        "Model version": "1.0"
+    }
+}

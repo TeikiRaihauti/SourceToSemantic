@@ -4,64 +4,12 @@
     },
     "process": {
         "name": "model_temp_profile",
-        "description": "Calculates soil temperature profile for 1 cm layers using exponential decay with depth."
+        "description": "Compute soil temperature profile."
     },
     "inputs": [
         {
-            "name": "temp_amp",
-            "description": "Current temperature amplitude",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "degC",
-            "uri": "-"
-        },
-        {
-            "name": "prev_temp_profile",
-            "description": "Previous soil temperature profile for 1 cm layers",
-            "inputtype": "variable",
-            "category": "state",
-            "datatype": "DOUBLELIST",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "degC",
-            "uri": "-"
-        },
-        {
-            "name": "prev_canopy_temp",
-            "description": "Previous crop canopy temperature",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "degC",
-            "uri": "-"
-        },
-        {
-            "name": "min_air_temp",
-            "description": "Current minimum air temperature",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "degC",
-            "uri": "-"
-        },
-        {
             "name": "air_temp_day1",
-            "description": "Mean air temperature on first day for initialization",
+            "description": "Air temperature on day 1 (degC).",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -74,7 +22,7 @@
         },
         {
             "name": "layer_thick",
-            "description": "Soil layer thicknesses",
+            "description": "Soil layer thicknesses (cm).",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "INTARRAY",
@@ -84,13 +32,77 @@
             "default": "-",
             "unit": "cm",
             "uri": "-"
+        },
+        {
+            "name": "temp_amp",
+            "description": "Current temperature amplitude (degC).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "prev_temp_profile",
+            "description": "Previous soil temperature profile (1 cm layers, degC).",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "prev_canopy_temp",
+            "description": "Previous canopy temperature (degC).",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "min_air_temp",
+            "description": "Current minimum air temperature (degC).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
         }
     ],
     "outputs": [
         {
             "name": "temp_profile",
-            "description": "Current soil temperature profile for 1 cm layers",
-            "datatype": "DOUBLELIST",
+            "description": "Updated soil temperature profile (1 cm layers, degC).",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "prev_canopy_temp",
+            "description": "Previous canopy temperature carried forward as state (degC).",
+            "datatype": "DOUBLE",
             "category": "state",
             "len": "-",
             "min": "-",
@@ -100,15 +112,34 @@
             "uri": "-"
         }
     ],
-    "functions": [
+    "functions": [],
+    "tests": [
         {
-            "name": "model_temp_profile",
-            "description": "Calculates soil temperature profile for 1 cm layers using exponential decay with depth."
-        },
-        {
-            "name": "init_temp_profile",
-            "description": "Initializes soil temperature profile and previous canopy temperature from first-day mean air temperature and layer thickness."
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
         }
     ],
-    "tests": "-"
+    "comments": [
+        {
+            "comment": "init_temp_profile initializes the state using 1-cm discretization with length equal to sum(layer_thick)."
+        },
+        {
+            "comment": "model_temp_profile computes the new soil temperature profile; internal constants (therm_diff, temp_freq) are not treated as inputs."
+        },
+        {
+            "comment": "prev_canopy_temp is included as a state output per the rule that state variables are always inputs and outputs, although it is not modified by the process in this module."
+        }
+    ]
 }

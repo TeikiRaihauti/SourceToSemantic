@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".Soil temperature profile model (temp_profile)" name="Soil temperature profile model (temp_profile)" timestep="1" version="1.0">
+	<Description>
+		<Title>Soil temperature profile model (temp_profile)</Title>
+		<Authors>STICS</Authors>
+		<Institution>INRAE</Institution>
+		<URI>-</URI>
+		<Reference>http://dx.doi.org/10.1016/j.agrformet.2014.05.002</Reference>
+		<ExtendedDescription>Computes the daily soil temperature profile at 1 cm resolution using an exponentially damped response to canopy–air thermal forcing, based on fixed thermal diffusivity (5.37e-3 m2 h-1) and diurnal frequency (7.272e-5 s-1 converted contextually). For each depth z, an attenuation factor vexp(z)=exp(-z*sqrt(temp_freq/(2*therm_diff))) is applied. The new profile blends: (i) persistence from the previous profile, (ii) an exponentially attenuated adjustment driven by the difference between previous canopy temperature and current minimum air temperature, (iii) a relaxation term toward the canopy temperature (weight 0.1), and (iv) half the current temperature amplitude scaled by the attenuation factor. Inputs: temperature amplitude, previous soil temperature profile, previous canopy temperature, and current minimum air temperature. Output: updated soil temperature profile.</ExtendedDescription>
+		<ShortDescription>STICS-based exponential damping update of daily soil temperature profile from canopy and air thermal forcing.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="air_temp_day1" description="Air temperature used to initialize the profile (degC)." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="layer_thick" description="Soil layer thicknesses (cm). Sum defines soil depth in cm." inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="-" default="-" unit="cm" uri="-"/>
+		<Input name="temp_amp" description="Daily temperature amplitude (degC)." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="prev_temp_profile" description="Previous day soil temperature profile at 1 cm resolution (degC)." inputtype="variable" variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="prev_canopy_temp" description="Previous day's canopy temperature (degC)." inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="min_air_temp" description="Current day's minimum air temperature (degC)." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="temp_profile" description="Current soil temperature profile at 1 cm resolution (degC)." variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="prev_canopy_temp" description="Previous canopy temperature carried forward as state (degC)." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+	</Outputs>
+	<Initialization name="init_temp_profile" language="cyml" filename="algo/pyx/init_temp_profile.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/model_temp_profile.pyx"/>
+	<Parametersets/>
+	<Testsets>
+		<Testset name="t_-" description="-">
+			<Test name="t_-">
+				<OutputValue name="-">-</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

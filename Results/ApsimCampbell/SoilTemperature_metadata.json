@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "Soil Temperature model (APSIM Next Generation)",
+        "Authors": "APSIM Initiative",
+        "Institution": "APSIM Initiative",
+        "URI": "https://github.com/APSIMInitiative/ApsimX/blob/master/Models/Soils/SoilTemp/SoilTemperature.cs",
+        "DOI": "-",
+        "Extended description": "A 1D soil temperature component in APSIM Next Generation which simulates heat flow through a soil profile using a finite-difference approach solved with the Thomas algorithm. The profile is represented by nodes for air (aboveground), the soil surface, layer centers, and several phantom nodes below the profile to enforce a lower boundary condition. Thermal properties (volumetric heat capacity and thermal conductivity) are derived from soil constituents, water content, and bulk density. Atmospheric boundary layer conductance and net radiation are computed following formulations from Campbell (1985), with sub-daily time-stepping to produce daily minimum, maximum, and average soil and surface temperatures.",
+        "Short description": "APSIM Next Gen component for simulating soil temperature profiles and surface energy exchange based on Campbell (1985).",
+        "Model version": "-"
+    }
+}

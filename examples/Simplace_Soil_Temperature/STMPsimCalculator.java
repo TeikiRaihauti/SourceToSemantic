@@ -195,11 +195,9 @@ public class STMPsimCalculator extends FWSimComponent
 				CONTENT_TYPE.constant, "http://www.wurvoc.org/vocabularies/om-1.8/tonne_per_cubic_metre", 1d, 4d, 2d, this));
 		addVariable(FWSimVariable.createSimVariable("cDampingDepth", "Initial value for damping depth of soil", DATA_TYPE.DOUBLE,
 				CONTENT_TYPE.constant, "http://www.wurvoc.org/vocabularies/om-1.8/metre", 1.5, 20d, 6d, this));
-		//%%CyML Ignore Begin%%
 
 		addVariable(FWSimVariable.createSimVariable("iDoInitialize", "Switch to re-initialize the model with initial values.",
 				DATA_TYPE.BOOLEAN, CONTENT_TYPE.input, "http://www.wurvoc.org/vocabularies/om-1.8/one", null, null, false, this));
-		//%%CyML Ignore End%%
 
 		addVariable(FWSimVariable.createSimVariable("iSoilWaterContent", "Water content, sum of whole soil profile", DATA_TYPE.DOUBLE,
 				CONTENT_TYPE.input, "http://www.wurvoc.org/vocabularies/om-1.8/millimetre", 1.5, 20d, 5d, this));
@@ -282,12 +280,10 @@ public class STMPsimCalculator extends FWSimComponent
 	@Override
 	protected void process()
 	{
-		//%%CyML Ignore Begin%%
 		if(iDoInitialize.getValue())
 		{
 		    reInitialize();
 		}
-		//%%CyML Ignore End%%
 
 		Double[] tZp = pSoilLayerDepth.getValue();
 		Double[] tZc = cSoilLayerDepth.getValue();

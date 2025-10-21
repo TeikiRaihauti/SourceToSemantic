@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SoilTemperatureSWAT",
+        "Authors": "Simone Bregaglio; Nicolò Frasso",
+        "Institution": "University of Milan",
+        "URI": "http://bioma.jrc.ec.europa.eu/ontology/JRC_MARS_biophysical_domain.owl",
+        "DOI": "-",
+        "Extended description": "Daily, multi-layer soil temperature model implementing the SWAT method (Neitsch et al., 2000). It computes a maximum damping depth as a function of bulk density, scales it by the total soil water content and soil profile depth to obtain an effective damping depth, and derives a depth factor for each layer center. Layer temperatures are updated using a first-order lag: T_i(t) = LagCoefficient * T_i(t-1) + (1 - LagCoefficient) * [DepthFactor * (T_air,annual - T_surface) + T_surface]. Inputs include soil profile depth, surface soil temperature (from a companion surface model), annual average air temperature, layer thickness, volumetric water content, and bulk density. Output is soil temperature by layers.",
+        "Short description": "SWAT-based daily soil temperature by layers using damping depth and a lag coefficient.",
+        "Model version": "001"
+    }
+}

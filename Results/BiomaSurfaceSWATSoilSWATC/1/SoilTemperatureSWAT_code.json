@@ -4,15 +4,15 @@
     },
     "process": {
         "name": "Estimate",
-        "description": "Computes updated SoilTemperatureByLayers using the SWAT method based on lag, surface soil temperature, annual average air temperature, soil profile depth, bulk density, volumetric water content, and layer thickness."
+        "description": "SWAT soil temperature by layers update."
     },
     "inputs": [
         {
             "name": "states_LayerThickness",
-            "description": "Soil layer thicknesses by layer",
+            "description": "Soil layer thicknesses",
             "inputtype": "variable",
             "category": "state",
-            "datatype": "DOUBLELIST",
+            "datatype": "DOUBLEARRAY",
             "len": "-",
             "min": "-",
             "max": "-",
@@ -21,14 +21,27 @@
             "uri": "-"
         },
         {
-            "name": "LagCoefficient",
-            "description": "Lag coefficient controlling previous day's influence",
+            "name": "initial_temperature",
+            "description": "Initial temperature for all layers",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "DOUBLE",
             "len": "-",
-            "min": "0.0",
-            "max": "1.0",
+            "min": "-",
+            "max": "-",
+            "default": "15.0",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "LagCoefficient",
+            "description": "Lag coefficient",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
             "default": "-",
             "unit": "-",
             "uri": "-"
@@ -48,7 +61,7 @@
         },
         {
             "name": "states_SurfaceSoilTemperature",
-            "description": "Average surface soil temperature",
+            "description": "Surface soil temperature",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLE",
@@ -61,7 +74,7 @@
         },
         {
             "name": "exogenous_AirTemperatureAnnualAverage",
-            "description": "Annual average air temperature",
+            "description": "Air temperature annual average",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -74,10 +87,10 @@
         },
         {
             "name": "states_SoilTemperatureByLayers",
-            "description": "Current soil temperatures by layer",
+            "description": "Previous day's soil temperature by layer",
             "inputtype": "variable",
             "category": "state",
-            "datatype": "DOUBLELIST",
+            "datatype": "DOUBLEARRAY",
             "len": "-",
             "min": "-",
             "max": "-",
@@ -90,7 +103,7 @@
             "description": "Bulk density by layer",
             "inputtype": "variable",
             "category": "state",
-            "datatype": "DOUBLELIST",
+            "datatype": "DOUBLEARRAY",
             "len": "-",
             "min": "-",
             "max": "-",
@@ -100,13 +113,13 @@
         },
         {
             "name": "states_VolumetricWaterContent",
-            "description": "Volumetric soil water content by layer",
+            "description": "Volumetric water content by layer",
             "inputtype": "variable",
             "category": "state",
-            "datatype": "DOUBLELIST",
+            "datatype": "DOUBLEARRAY",
             "len": "-",
-            "min": "0.0",
-            "max": "1.0",
+            "min": "-",
+            "max": "-",
             "default": "-",
             "unit": "m3 m-3",
             "uri": "-"
@@ -114,9 +127,9 @@
     ],
     "outputs": [
         {
-            "name": "updated_states_SoilTemperatureByLayers",
-            "description": "Updated soil temperatures by layer",
-            "datatype": "DOUBLELIST",
+            "name": "states_SoilTemperatureByLayers",
+            "description": "Updated soil temperature by layers",
+            "datatype": "DOUBLEARRAY",
             "category": "state",
             "len": "-",
             "min": "-",
@@ -128,13 +141,37 @@
     ],
     "functions": [
         {
-            "name": "Init",
-            "description": "Initializes states_SoilTemperatureByLayers to 15 degC for each soil layer."
-        },
-        {
-            "name": "Estimate",
-            "description": "Updates soil temperature by layer using SWAT damping depth formulation and a lag approach."
+            "name": "-",
+            "description": "-"
         }
     ],
-    "tests": "-"
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "Only states_SoilTemperatureByLayers is updated by the process and thus listed as an output; other 'states_' inputs are consumed but not modified in this component."
+        },
+        {
+            "comment": "Array lengths are unspecified and depend on the number of soil layers provided."
+        },
+        {
+            "comment": "Units are taken from function docstrings; no explicit bounds are enforced in code (e.g., LagCoefficient typical range not specified)."
+        }
+    ]
 }

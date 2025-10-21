@@ -4,12 +4,12 @@
     },
     "process": {
         "name": "Estimate",
-        "description": "Computes daily minimum and maximum soil temperature and updates the deep soil layer temperature."
+        "description": "Main biophysical process: calculate daily minimum and maximum soil temperature and update deep soil layer temperature."
     },
     "inputs": [
         {
             "name": "exogenous_meanAnnualAirTemp",
-            "description": "Annual mean air temperature",
+            "description": "Annual Mean Air Temperature",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -35,7 +35,7 @@
         },
         {
             "name": "exogenous_maxTAir",
-            "description": "Maximum air temperature",
+            "description": "Maximum Air Temperature",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -48,7 +48,7 @@
         },
         {
             "name": "exogenous_meanTAir",
-            "description": "Mean air temperature",
+            "description": "Mean Air Temperature",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -61,7 +61,7 @@
         },
         {
             "name": "exogenous_minTAir",
-            "description": "Minimum air temperature",
+            "description": "Minimum Air Temperature",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -74,9 +74,9 @@
         },
         {
             "name": "ratesexternal_heatFlux",
-            "description": "Soil heat flux",
+            "description": "Soil Heat Flux",
             "inputtype": "variable",
-            "category": "exogenous",
+            "category": "rate",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "-",
@@ -94,119 +94,15 @@
             "len": "-",
             "min": "-",
             "max": "-",
-            "default": "-",
+            "default": "2.454",
             "unit": "MJ kg-1",
-            "uri": "-"
-        },
-        {
-            "name": "weatherMaxTemp",
-            "description": "Maximum air temperature",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "°C",
-            "uri": "-"
-        },
-        {
-            "name": "weatherMeanTemp",
-            "description": "Mean air temperature",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "°C",
-            "uri": "-"
-        },
-        {
-            "name": "weatherMinTemp",
-            "description": "Minimum air temperature",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "°C",
-            "uri": "-"
-        },
-        {
-            "name": "soilHeatFlux",
-            "description": "Soil heat flux",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "g m-2 d-1",
-            "uri": "-"
-        },
-        {
-            "name": "deepTemperature",
-            "description": "Deep soil layer temperature",
-            "inputtype": "variable",
-            "category": "state",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "°C",
-            "uri": "-"
-        },
-        {
-            "name": "minSoilTemp",
-            "description": "Minimum soil temperature",
-            "inputtype": "variable",
-            "category": "auxiliary",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "°C",
-            "uri": "-"
-        },
-        {
-            "name": "maxSoilTemp",
-            "description": "Maximum soil temperature",
-            "inputtype": "variable",
-            "category": "auxiliary",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "°C",
-            "uri": "-"
-        },
-        {
-            "name": "Temperature",
-            "description": "Previous deep soil layer temperature",
-            "inputtype": "variable",
-            "category": "state",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "°C",
             "uri": "-"
         }
     ],
     "outputs": [
         {
             "name": "states_minTSoil",
-            "description": "Minimum soil temperature",
+            "description": "Minimum Soil Temperature",
             "datatype": "DOUBLE",
             "category": "state",
             "len": "-",
@@ -218,7 +114,7 @@
         },
         {
             "name": "states_maxTSoil",
-            "description": "Maximum soil temperature",
+            "description": "Maximum Soil Temperature",
             "datatype": "DOUBLE",
             "category": "state",
             "len": "-",
@@ -243,33 +139,56 @@
     ],
     "functions": [
         {
-            "name": "Init",
-            "description": "Initialization function. Sets the deep soil layer temperature to the annual mean air temperature."
-        },
-        {
-            "name": "Estimate",
-            "description": "Main process. Computes daily minimum and maximum soil temperature and updates the deep soil layer temperature."
-        },
-        {
             "name": "SoilMinimumTemperature",
-            "description": "Computes daily minimum soil temperature as the minimum of SoilTempA and SoilTempB."
+            "description": "Compute daily minimum soil temperature."
         },
         {
             "name": "SoilMaximumTemperature",
-            "description": "Computes daily maximum soil temperature as the maximum of SoilTempA and SoilTempB."
+            "description": "Compute daily maximum soil temperature."
         },
         {
             "name": "SoilTempA",
-            "description": "Soil temperature component A using air temperatures, soil heat flux, and latent heat."
+            "description": "Soil temperature component A."
         },
         {
             "name": "SoilTempB",
-            "description": "Soil temperature component B using minimum air temperature and deep soil temperature."
+            "description": "Soil temperature component B."
         },
         {
             "name": "UpdateTemperature",
-            "description": "Updates the deep soil layer temperature from minimum and maximum soil temperatures."
+            "description": "Update deep soil temperature using exponential smoothing."
         }
     ],
-    "tests": "-"
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "deeplayerstates_deepLayerT is treated as a state variable (input and output). states_minTSoil and states_maxTSoil are returned by the process and documented as state outputs per the rules, though persistence is not explicit in code."
+        },
+        {
+            "comment": "ratesexternal_heatFlux is classified as a rate input based on its semantic name and docstring (external soil heat flux)."
+        },
+        {
+            "comment": "Estimate applies a sentinel check: if exogenous_maxTAir == -999 and exogenous_minTAir == 999, outputs are set to 999.0, -999.0, and 0.0 respectively."
+        },
+        {
+            "comment": "Units are taken from docstrings; no explicit ranges are defined in code."
+        }
+    ]
 }

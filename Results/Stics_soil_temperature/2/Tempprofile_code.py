@@ -1,16 +1,25 @@
-def model_temp_profile(temp_amp, prev_temp_profile, prev_canopy_temp, min_air_temp):
+def model_temp_profile(
+    temp_amp: float,
+    prev_temp_profile: list[float],
+    prev_canopy_temp: float,
+    min_air_temp: float,
+) -> list[float]:
     """
-    tempprofile model
-    Calculates soil temperature profile for 1 cm layers.
+    Compute soil temperature profile.
 
-    Inputs:
-    - temp_amp: current temperature amplitude (degC)
-    - prev_temp_profile: previous soil temperature profile (list of degC for 1 cm layers)
-    - prev_canopy_temp: previous crop temperature (degC)
-    - min_air_temp: current minimum air temperature (degC)
+    Parameters:
+    - temp_amp: float
+        Current temperature amplitude (degC).
+    - prev_temp_profile: list[float]
+        Previous soil temperature profile (1 cm layers, degC).
+    - prev_canopy_temp: float
+        Previous canopy temperature (degC).
+    - min_air_temp: float
+        Current minimum air temperature (degC).
 
     Returns:
-    - temp_profile: current soil profile temperature (list of degC for 1 cm layers)
+    - temp_profile: list[float]
+        Updated soil temperature profile (1 cm layers, degC).
     """
     from math import sqrt, exp
 
@@ -20,33 +29,40 @@ def model_temp_profile(temp_amp, prev_temp_profile, prev_canopy_temp, min_air_te
     temp_freq = 7.272e-5
     therm_amp = sqrt(temp_freq / 2.0 / therm_diff)
 
-    # Exponential decay with depth (1 cm indexed)
-    vexp = [exp(-(z) * therm_amp) for z in range(1, n + 1)]
+    temp_profile = [0.0] * n
 
-    temp_profile = []
-    for i in range(n):
-        tp = (
-            prev_temp_profile[i]
-            - vexp[i] * (prev_canopy_temp - min_air_temp)
-            + 0.1 * (prev_canopy_temp - prev_temp_profile[i])
-            + (temp_amp * vexp[i]) / 2.0
+    # Fortran loops are 1-based; preserve the exact formulation with z starting at 1
+    for z in range(1, n + 1):
+        vexp = exp(-z * therm_amp)
+        pprev = prev_temp_profile[z - 1]
+        temp_profile[z - 1] = (
+            pprev
+            - vexp * (prev_canopy_temp - min_air_temp)
+            + 0.1 * (prev_canopy_temp - pprev)
+            + (temp_amp * vexp) / 2.0
         )
-        temp_profile.append(tp)
 
     return temp_profile
 
 
-def init_temp_profile(air_temp_day1, layer_thick):
+def init_temp_profile(
+    air_temp_day1: float,
+    layer_thick: list[int],
+) -> tuple[list[float], float]:
     """
-    Initialization for soil temperature profile.
+    Initialize soil temperature profile and canopy temperature.
 
-    Inputs:
-    - air_temp_day1: Mean temperature on first day (degC)
-    - layer_thick: layers thickness (list of cm)
+    Parameters:
+    - air_temp_day1: float
+        Air temperature on day 1 (degC).
+    - layer_thick: list[int]
+        Soil layer thicknesses (cm).
 
     Returns:
-    - prev_temp_profile: initialized previous soil temperature profile (list of degC for 1 cm layers)
-    - prev_canopy_temp: initialized previous canopy temperature (degC)
+    - prev_temp_profile: list[float]
+        Initialized previous soil temperature profile (1 cm layers, degC).
+    - prev_canopy_temp: float
+        Initialized previous canopy temperature (degC).
     """
     soil_depth = sum(layer_thick)
     prev_temp_profile = [air_temp_day1] * soil_depth

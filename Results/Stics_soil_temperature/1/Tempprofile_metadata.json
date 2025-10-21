@@ -1,12 +1,12 @@
 {
     "metadata": {
-        "Title": "soil temperature model",
+        "Title": "tempprofile model",
         "Authors": "STICS",
         "Institution": "INRAE",
         "URI": "-",
-        "DOI": "http://dx.doi.org/10.1016/j.agrformet.2014.05.002",
-        "Extended description": "Single-component soil temperature model computing a daily temperature profile at 1 cm resolution and mean temperature per user-defined layers. It derives the canopy temperature amplitude from daily min/max canopy temperatures, then updates each depth using an exponentially damped signal (based on fixed thermal diffusivity and diurnal frequency), a relaxation toward canopy temperature, and the effect of minimum air temperature; it also computes canopy mean temperature and updates previous state variables. Initialization sets the soil profile and canopy temperature to the first-day air temperature.",
-        "Short description": "Calculates soil temperature profile and layer-mean temperatures and updates previous states.",
+        "DOI": "10.1016/j.agrformet.2014.05.002",
+        "Extended description": "STICS-based soil temperature component that computes a daily 1 cm-resolution soil temperature profile and layer-averaged temperatures. The model derives canopy temperature amplitude (max − min) and mean, then updates each depth using an exponentially damped signal with a thermal damping coefficient computed as sqrt(temp_freq/(2*therm_diff)) where temp_freq = 7.272e-5 and therm_diff = 5.37e-3. For depth index z, vexp(z) = exp(−z*therm_amp) and the profile update is: T(z) = T_prev(z) − vexp(z)*(T_canopy_prev − Tmin_air) + 0.1*(T_canopy_prev − T_prev(z)) + 0.5*temp_amp*vexp(z). Layer means are computed by averaging 1 cm values within each user-defined layer thickness. Initialization sets the profile (length equal to sum of layer thicknesses) and canopy temperature to the first-day air temperature. The component aggregates sub-models: temp_amp, canopy_temp_avg, temp_profile, layers_temp, and update.",
+        "Short description": "Daily soil temperature profile and layer means using an exponential damping STICS approach.",
         "Model version": "1.0"
     }
 }

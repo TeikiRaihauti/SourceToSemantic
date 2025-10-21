@@ -1,15 +1,15 @@
 {
     "init": {
-        "name": "STEMP_EPIC_Initialize"
+        "name": "STEMP_EPIC_initialize"
     },
     "process": {
         "name": "STEMP_EPIC",
-        "description": "Daily main biophysical process for EPIC soil temperature routine."
+        "description": "Daily soil temperature update with wet-day memory and surface cover effects; wraps SOILT_EPIC per step."
     },
     "inputs": [
         {
-            "name": "iswitch_ISWWAT",
-            "description": "Water balance switch ('Y' or 'N')",
+            "name": "ISWWAT",
+            "description": "Flag indicating if soil water is simulated",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "CHAR",
@@ -21,38 +21,25 @@
             "uri": "-"
         },
         {
-            "name": "soilprop_BD",
-            "description": "Bulk density per layer",
+            "name": "BD",
+            "description": "Bulk density by soil layer",
             "inputtype": "parameter",
             "category": "constant",
-            "datatype": "DOUBLELIST",
-            "len": "-",
+            "datatype": "DOUBLEARRAY",
+            "len": "NLAYR",
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "g/cm3",
+            "unit": "-",
             "uri": "-"
         },
         {
-            "name": "soilprop_DLAYR",
-            "description": "Layer thickness",
+            "name": "DLAYR",
+            "description": "Soil layer thickness",
             "inputtype": "parameter",
             "category": "constant",
-            "datatype": "DOUBLELIST",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "cm",
-            "uri": "-"
-        },
-        {
-            "name": "soilprop_DS",
-            "description": "Cumulative depth by layer",
-            "inputtype": "parameter",
-            "category": "constant",
-            "datatype": "DOUBLELIST",
-            "len": "-",
+            "datatype": "DOUBLEARRAY",
+            "len": "NLAYR",
             "min": "-",
             "max": "-",
             "default": "-",
@@ -60,33 +47,46 @@
             "uri": "-"
         },
         {
-            "name": "soilprop_DUL",
-            "description": "Drained upper limit per layer",
+            "name": "DS",
+            "description": "Depth to bottom of each soil layer",
             "inputtype": "parameter",
             "category": "constant",
-            "datatype": "DOUBLELIST",
-            "len": "-",
+            "datatype": "DOUBLEARRAY",
+            "len": "NLAYR",
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "cm3/cm3",
+            "unit": "cm",
             "uri": "-"
         },
         {
-            "name": "soilprop_LL",
-            "description": "Lower limit per layer",
+            "name": "DUL",
+            "description": "Drained upper limit by layer",
             "inputtype": "parameter",
             "category": "constant",
-            "datatype": "DOUBLELIST",
-            "len": "-",
+            "datatype": "DOUBLEARRAY",
+            "len": "NLAYR",
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "cm3/cm3",
+            "unit": "-",
             "uri": "-"
         },
         {
-            "name": "soilprop_NLAYR",
+            "name": "LL",
+            "description": "Lower limit by layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLEARRAY",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "NLAYR",
             "description": "Number of soil layers",
             "inputtype": "parameter",
             "category": "constant",
@@ -100,20 +100,20 @@
         },
         {
             "name": "SW",
-            "description": "Soil water content by layer",
+            "description": "Soil water content by layer (current day)",
             "inputtype": "variable",
             "category": "exogenous",
-            "datatype": "DOUBLELIST",
-            "len": "-",
+            "datatype": "DOUBLEARRAY",
+            "len": "NLAYR",
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "cm3/cm3",
+            "unit": "-",
             "uri": "-"
         },
         {
             "name": "TAVG",
-            "description": "Average daily temperature",
+            "description": "Mean daily air temperature",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -126,7 +126,7 @@
         },
         {
             "name": "TMAX",
-            "description": "Maximum daily temperature",
+            "description": "Maximum daily air temperature",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -139,7 +139,7 @@
         },
         {
             "name": "TMIN",
-            "description": "Minimum daily temperature",
+            "description": "Minimum daily air temperature",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -152,9 +152,9 @@
         },
         {
             "name": "TAV",
-            "description": "Average annual air/soil temperature",
-            "inputtype": "parameter",
-            "category": "constant",
+            "description": "Long-term average air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "-",
@@ -164,8 +164,47 @@
             "uri": "-"
         },
         {
-            "name": "orgc_MULCHMASS",
-            "description": "Surface mulch mass",
+            "name": "RAIN",
+            "description": "Daily precipitation",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "DEPIR",
+            "description": "Daily irrigation amount",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "BIOMAS",
+            "description": "Aboveground biomass",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "MULCHMASS",
+            "description": "Surface mulch/residue mass",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -177,8 +216,8 @@
             "uri": "-"
         },
         {
-            "name": "water_SNOW",
-            "description": "Snow cover",
+            "name": "SNOW",
+            "description": "Snow water equivalent on surface",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -187,65 +226,13 @@
             "max": "-",
             "default": "-",
             "unit": "mm",
-            "uri": "-"
-        },
-        {
-            "name": "X2_PREV",
-            "description": "Previous surface temperature memory",
-            "inputtype": "variable",
-            "category": "state",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "degC",
-            "uri": "-"
-        },
-        {
-            "name": "weather_RAIN",
-            "description": "Daily rainfall",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "mm",
-            "uri": "-"
-        },
-        {
-            "name": "mgmt_DEPIR",
-            "description": "Daily irrigation depth",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "mm",
-            "uri": "-"
-        },
-        {
-            "name": "plant_BIOMAS",
-            "description": "Above-ground biomass",
-            "inputtype": "variable",
-            "category": "exogenous",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "kg/ha",
             "uri": "-"
         },
         {
             "name": "CUMDPT",
-            "description": "Cumulative profile depth",
-            "inputtype": "variable",
-            "category": "state",
+            "description": "Cumulative soil profile depth",
+            "inputtype": "parameter",
+            "category": "constant",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "-",
@@ -257,10 +244,10 @@
         {
             "name": "DSMID",
             "description": "Depth to midpoint of each layer",
-            "inputtype": "variable",
-            "category": "state",
-            "datatype": "DOUBLELIST",
-            "len": "-",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLEARRAY",
+            "len": "NLAYR",
             "min": "-",
             "max": "-",
             "default": "-",
@@ -269,7 +256,7 @@
         },
         {
             "name": "TDL",
-            "description": "Total water content at DUL integrated across layers",
+            "description": "Cumulative drained upper limit memory used when water is not simulated",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLE",
@@ -277,15 +264,15 @@
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "cm",
+            "unit": "-",
             "uri": "-"
         },
         {
             "name": "TMA",
-            "description": "Previous 5-day X2 memory",
+            "description": "5-value memory vector of surface temperature driver",
             "inputtype": "variable",
             "category": "state",
-            "datatype": "DOUBLELIST",
+            "datatype": "DOUBLEARRAY",
             "len": "5",
             "min": "-",
             "max": "-",
@@ -295,28 +282,41 @@
         },
         {
             "name": "NDays",
-            "description": "Number of days tracked for wet day memory",
+            "description": "Number of days tracked in wet-day memory (up to 30)",
             "inputtype": "variable",
             "category": "state",
             "datatype": "INT",
             "len": "-",
             "min": "-",
-            "max": "-",
+            "max": "30",
             "default": "-",
             "unit": "-",
             "uri": "-"
         },
         {
             "name": "WetDay",
-            "description": "Last 30 days 0/1 wet day flags",
+            "description": "30-day wet day indicator array (1=wet, 0=dry)",
             "inputtype": "variable",
             "category": "state",
             "datatype": "INTARRAY",
             "len": "30",
-            "min": "-",
-            "max": "-",
+            "min": "0",
+            "max": "1",
             "default": "-",
             "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "X2_PREV",
+            "description": "Previous 5-day average of surface temperature driver",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "0.0",
+            "unit": "degC",
             "uri": "-"
         },
         {
@@ -337,123 +337,32 @@
             "description": "Soil temperature by layer",
             "inputtype": "variable",
             "category": "state",
-            "datatype": "DOUBLELIST",
-            "len": "-",
+            "datatype": "DOUBLEARRAY",
+            "len": "NLAYR",
             "min": "-",
             "max": "-",
             "default": "-",
             "unit": "degC",
-            "uri": "-"
-        },
-        {
-            "name": "B",
-            "description": "Exponential decay factor (ln(500/DP))",
-            "inputtype": "variable",
-            "category": "auxiliary",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "-",
-            "uri": "-"
-        },
-        {
-            "name": "BCV",
-            "description": "Soil cover function",
-            "inputtype": "variable",
-            "category": "auxiliary",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "fraction",
-            "uri": "-"
-        },
-        {
-            "name": "DP",
-            "description": "Damping depth",
-            "inputtype": "variable",
-            "category": "auxiliary",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "mm",
-            "uri": "-"
-        },
-        {
-            "name": "NLAYR",
-            "description": "Number of soil layers (alias passed to supporting function)",
-            "inputtype": "parameter",
-            "category": "constant",
-            "datatype": "INT",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "-",
-            "uri": "-"
-        },
-        {
-            "name": "PESW",
-            "description": "Potential extractable soil water over profile",
-            "inputtype": "variable",
-            "category": "auxiliary",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "cm",
-            "uri": "-"
-        },
-        {
-            "name": "WFT",
-            "description": "Fraction wet days over last 30 days",
-            "inputtype": "variable",
-            "category": "auxiliary",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "-",
-            "uri": "-"
-        },
-        {
-            "name": "WW",
-            "description": "Soil water content at saturation (function of BD)",
-            "inputtype": "variable",
-            "category": "auxiliary",
-            "datatype": "DOUBLE",
-            "len": "-",
-            "min": "-",
-            "max": "-",
-            "default": "-",
-            "unit": "fraction",
             "uri": "-"
         }
     ],
     "outputs": [
         {
             "name": "TDL",
-            "description": "Total water content at DUL integrated across layers after update",
+            "description": "Updated cumulative drained upper limit memory",
             "datatype": "DOUBLE",
             "category": "state",
             "len": "-",
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "cm",
+            "unit": "-",
             "uri": "-"
         },
         {
             "name": "TMA",
-            "description": "Updated previous 5-day X2 memory",
-            "datatype": "DOUBLELIST",
+            "description": "Updated 5-value surface temperature memory",
+            "datatype": "DOUBLEARRAY",
             "category": "state",
             "len": "5",
             "min": "-",
@@ -464,31 +373,31 @@
         },
         {
             "name": "NDays",
-            "description": "Updated number of days tracked for wet day memory",
+            "description": "Updated number of days tracked in wet-day memory",
             "datatype": "INT",
             "category": "state",
             "len": "-",
             "min": "-",
-            "max": "-",
+            "max": "30",
             "default": "-",
             "unit": "-",
             "uri": "-"
         },
         {
             "name": "WetDay",
-            "description": "Updated last 30 days 0/1 wet day flags",
+            "description": "Updated 30-day wet day indicator array",
             "datatype": "INTARRAY",
             "category": "state",
             "len": "30",
-            "min": "-",
-            "max": "-",
+            "min": "0",
+            "max": "1",
             "default": "-",
             "unit": "-",
             "uri": "-"
         },
         {
             "name": "X2_PREV",
-            "description": "Updated previous surface temperature memory",
+            "description": "Updated previous 5-day average of surface temperature driver",
             "datatype": "DOUBLE",
             "category": "state",
             "len": "-",
@@ -513,9 +422,9 @@
         {
             "name": "ST",
             "description": "Updated soil temperature by layer",
-            "datatype": "DOUBLELIST",
+            "datatype": "DOUBLEARRAY",
             "category": "state",
-            "len": "-",
+            "len": "NLAYR",
             "min": "-",
             "max": "-",
             "default": "-",
@@ -525,17 +434,126 @@
     ],
     "functions": [
         {
-            "name": "STEMP_EPIC_Initialize",
-            "description": "Seasonal initialization for EPIC soil temperature routine."
-        },
-        {
-            "name": "STEMP_EPIC",
-            "description": "Daily main biophysical process for EPIC soil temperature routine."
-        },
-        {
             "name": "SOILT_EPIC",
-            "description": "EPIC soil temperature calculation by layer."
+            "description": "Layer-by-layer soil temperature computation with water content and surface cover effects; updates TMA, SRFTEMP, ST, and X2_PREV."
         }
     ],
-    "tests": "-"
+    "tests": [
+        {
+            "name": "test_STEMP_EPIC_basic",
+            "description": "Initializes model and executes five daily updates; verifies array lengths and types.",
+            "inputs": [
+                {
+                    "name": "ISWWAT",
+                    "value": "Y"
+                },
+                {
+                    "name": "NLAYR",
+                    "value": "4"
+                },
+                {
+                    "name": "BD",
+                    "value": "[1.6, 1.6, 1.6, 1.6]"
+                },
+                {
+                    "name": "DLAYR",
+                    "value": "[10.0, 10.0, 10.0, 10.0]"
+                },
+                {
+                    "name": "DS",
+                    "value": "[10.0, 20.0, 30.0, 40.0]"
+                },
+                {
+                    "name": "DUL",
+                    "value": "[0.3, 0.3, 0.3, 0.3]"
+                },
+                {
+                    "name": "LL",
+                    "value": "[0.2, 0.2, 0.2, 0.2]"
+                },
+                {
+                    "name": "SW",
+                    "value": "[0.2, 0.2, 0.2, 0.2]"
+                },
+                {
+                    "name": "TAVG",
+                    "value": "25.0"
+                },
+                {
+                    "name": "TMAX",
+                    "value": "30.0"
+                },
+                {
+                    "name": "TMIN",
+                    "value": "20.0"
+                },
+                {
+                    "name": "TAV",
+                    "value": "20.0"
+                },
+                {
+                    "name": "RAIN",
+                    "value": "0.0"
+                },
+                {
+                    "name": "DEPIR",
+                    "value": "0.0"
+                },
+                {
+                    "name": "BIOMAS",
+                    "value": "0.0"
+                },
+                {
+                    "name": "MULCHMASS",
+                    "value": "0.0"
+                },
+                {
+                    "name": "SNOW",
+                    "value": "0.0"
+                },
+                {
+                    "name": "X2_PREV",
+                    "value": "0.0"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "DSMID",
+                    "value": "len==4"
+                },
+                {
+                    "name": "TMA",
+                    "value": "len==5"
+                },
+                {
+                    "name": "WetDay",
+                    "value": "len==30"
+                },
+                {
+                    "name": "ST",
+                    "value": "len==4"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "STEMP_EPIC is treated as the major per-step process; SOILT_EPIC performs the core soil temperature calculations within it."
+        },
+        {
+            "comment": "Variables CUMDPT and DSMID are computed during initialization and treated as constant parameters during subsequent daily updates."
+        },
+        {
+            "comment": "TDL is updated cumulatively in STEMP_EPIC as in the provided code; this mirrors the original behavior noted in comments."
+        },
+        {
+            "comment": "Units for BD, DUL, LL, and TDL are not explicit in the code; kept as '-'. Temperature units assumed degC; depths in cm (DLAYR, DS) and mm (CUMDPT, DSMID)."
+        },
+        {
+            "comment": "SOILT_EPIC includes guards against divide-by-zero (e.g., denom<=0) and uses an internal large WC fallback."
+        },
+        {
+            "comment": "X2_AVG is internal to SOILT_EPIC calls; not exposed by STEMP_EPIC and therefore omitted from inputs/outputs."
+        }
+    ]
 }
