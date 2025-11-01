@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "CanopyTemperature (EnergyBalance component)",
+        "Authors": "Peter D. Jamieson; Glen S. Francis; Derick R. Wilson; Robert J. Martin",
+        "Institution": "New Zealand Institute for Crop and Food Research Ltd.",
+        "URI": "-",
+        "DOI": "-",
+        "Extended description": "The CanopyTemperature strategy computes minimum and maximum canopy temperature from air temperature, crop heat flux, and boundary layer conductance. It adds an advective heating term to min/max air temperature based on the ratio of crop heat flux to the bulk aerodynamic heat capacity term, using parameters for latent heat of vaporization (lambdaV), air density (rhoDensityAir), and specific heat capacity of air (specificHeatCapacityAir).",
+        "Short description": "Computes min/max canopy temperature from crop heat flux and conductance.",
+        "Model version": "-"
+    }
+}

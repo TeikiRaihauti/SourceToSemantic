@@ -1,0 +1,80 @@
+{
+    "init": {
+        "name": "-"
+    },
+    "process": {
+        "name": "Estimate",
+        "description": "Main biophysical process function for NetRadiationEquivalentEvaporation."
+    },
+    "inputs": [
+        {
+            "name": "s_netRadiation",
+            "description": "net radiation at canopy surface",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "MJ m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "lambdaV",
+            "description": "latent heat of vaporization of water",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "2.454",
+            "unit": "MJ kg-1",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "netRadiationEquivalentEvaporation",
+            "description": "net radiation equivalent evaporation",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "CalculateModel",
+            "description": "Compute netRadiationEquivalentEvaporation from netRadiation and lambdaV."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "No explicit initialization function; output returned by Estimate is treated as state to comply with schema. s_netRadiation is classified as exogenous; lambdaV as a constant parameter."
+        }
+    ]
+}

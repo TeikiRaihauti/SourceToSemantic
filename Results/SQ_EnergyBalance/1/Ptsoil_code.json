@@ -1,0 +1,106 @@
+{
+    "init": {
+        "name": "-"
+    },
+    "process": {
+        "name": "CalculateModel",
+        "description": "Calculate energy-limited soil evaporation (PtSoil)."
+    },
+    "inputs": [
+        {
+            "name": "r_evapoTranspirationPriestlyTaylor",
+            "description": "Evapotranspiration from Priestly-Taylor",
+            "inputtype": "variable",
+            "category": "rate",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "Alpha",
+            "description": "Priestley-Taylor evapotranspiration proportionality constant",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "1.5",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "tau",
+            "description": "Plant cover factor",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "0.9983",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "tauAlpha",
+            "description": "Fraction of the total net radiation exchanged at the soil surface when AlphaE = 1",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "0.3",
+            "unit": "-",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "energyLimitedEvaporation",
+            "description": "Energy-limited soil evaporation",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "No explicit initialization function present. r_evapoTranspirationPriestlyTaylor classified as a rate input; tau treated as exogenous; Alpha and tauAlpha as parameters. The returned value is treated as a state output to comply with the schema. No unit tests found."
+        }
+    ]
+}

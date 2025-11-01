@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".SoilEvaporation (EnergyBalance component)" name="SoilEvaporation (EnergyBalance component)" timestep="1" version="-">
+	<Description>
+		<Title>SoilEvaporation (EnergyBalance component)</Title>
+		<Authors>Peter D. Jamieson; Glen S. Francis; Derick R. Wilson; Robert J. Martin</Authors>
+		<Institution>New Zealand Institute for Crop and Food Research Ltd.</Institution>
+		<URI>EnergyBalance.Strategies.SoilEvaporation</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>Starting from a soil at field capacity, soil evaporation is assumed to be energy-limited during the first phase and diffusion-limited thereafter. This component computes the soil evaporation rate as the minimum of the energy-limited evaporation (from the Priestley–Taylor/PtSoil pathway) and the diffusion-limited evaporation (driven by the soil diffusion constant and the water deficit of the top layers). It forms part of the EnergyBalance suite that also includes NetRadiation, NetRadiationEquivalentEvaporation, PriestlyTaylor, Penman, PtSoil, DiffusionLimitedEvaporation, SoilHeatFlux, PotentialTranspiration, CropHeatFlux, and CanopyTemperature.</ExtendedDescription>
+		<ShortDescription>Computes soil evaporation as min(energy-limited, diffusion-limited evaporation).</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="diffusionLimitedEvaporation" description="Evaporation rate limited by diffusion from soil (e.g., g m-2 d-1)." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="g m-2 d-1" uri="-"/>
+		<Input name="energyLimitedEvaporation" description="Evaporation rate limited by available energy (e.g., g m-2 d-1)." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="g m-2 d-1" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="soilEvaporation" description="Soil evaporation (e.g., g m-2 d-1)." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="g m-2 d-1" uri="-"/>
+	</Outputs>
+	<Function name="-" description="-" language="cyml" type="external" filename="algo/pyx/-.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/CalculateModel.pyx"/>
+	<Parametersets/>
+	<Testsets>
+		<Testset name="t_-" description="-">
+			<Test name="t_-">
+				<OutputValue name="-">-</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

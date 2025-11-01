@@ -1,0 +1,80 @@
+{
+    "init": {
+        "name": "-"
+    },
+    "process": {
+        "name": "CalculateModel",
+        "description": "Compute soil evaporation as the minimum of diffusion-limited and energy-limited evaporation."
+    },
+    "inputs": [
+        {
+            "name": "diffusionLimitedEvaporation",
+            "description": "Evaporation rate limited by diffusion from soil (e.g., g m-2 d-1).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "energyLimitedEvaporation",
+            "description": "Evaporation rate limited by available energy (e.g., g m-2 d-1).",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "soilEvaporation",
+            "description": "Soil evaporation (e.g., g m-2 d-1).",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "No initialization function is present. The single process computes soil evaporation as min of two exogenous inputs and returns it; no persistent state is maintained. Units are inferred from the docstring. No bounds/defaults/tests provided in the source."
+        }
+    ]
+}

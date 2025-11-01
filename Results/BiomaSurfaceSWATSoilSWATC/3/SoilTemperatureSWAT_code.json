@@ -1,0 +1,158 @@
+{
+    "init": {
+        "name": "Init"
+    },
+    "process": {
+        "name": "Estimate",
+        "description": "Soil temperature by layers using SWAT method (Neitsch et al., 2000)."
+    },
+    "inputs": [
+        {
+            "name": "states_LayerThickness",
+            "description": "Soil layer thickness for each layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "states_SoilProfileDepth",
+            "description": "Soil profile depth",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "states_SurfaceSoilTemperature",
+            "description": "Average surface soil temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_AirTemperatureAnnualAverage",
+            "description": "Annual average air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "states_SoilTemperatureByLayers",
+            "description": "Previous day's soil temperature of each layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "states_BulkDensity",
+            "description": "Bulk density for each layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "t m-3",
+            "uri": "-"
+        },
+        {
+            "name": "states_VolumetricWaterContent",
+            "description": "Volumetric soil water content for each layer",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLEARRAY",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m3 m-3",
+            "uri": "-"
+        },
+        {
+            "name": "LagCoefficient",
+            "description": "Lag coefficient controlling influence of previous day's temperature",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "0.8",
+            "unit": "-",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "updated_states_SoilTemperatureByLayers",
+            "description": "Updated soil temperature for each layer",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "Estimate is treated as the main process; Init initializes the soil temperature profile. Only updated_states_SoilTemperatureByLayers is written by the process and thus listed as the state output. Although several inputs are prefixed with 'states_', they are classified here as parameters or exogenous variables since they are not updated by this component. No explicit bounds are specified in code for inputs (e.g., LagCoefficient), so min/max are left as '-'. Array lengths depend on the number of layers and are unspecified."
+        }
+    ]
+}

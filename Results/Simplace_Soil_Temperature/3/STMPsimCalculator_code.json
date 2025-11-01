@@ -1,0 +1,254 @@
+{
+    "init": {
+        "name": "STMPsimCalculator_initialize"
+    },
+    "process": {
+        "name": "STMPsimCalculator_process",
+        "description": "Main daily process for STMP soil temperature component."
+    },
+    "inputs": [
+        {
+            "name": "SoilTempArray",
+            "description": "Current soil temperatures per layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "rSoilTempArrayRate",
+            "description": "Current daily soil temperature change rates",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC/day",
+            "uri": "-"
+        },
+        {
+            "name": "pSoilLayerDepth",
+            "description": "Depth to the bottom of each (possibly extended) soil layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "cSoilLayerDepth",
+            "description": "Depth to the bottom of each original soil layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "cABD",
+            "description": "Mean bulk density",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "t m-3",
+            "uri": "-"
+        },
+        {
+            "name": "iSoilWaterContent",
+            "description": "Water content of the whole soil profile",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "iSoilSurfaceTemperature",
+            "description": "Soil surface temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "cAVT",
+            "description": "Long-term average annual air temperature",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "iDoInitialize",
+            "description": "If 1, re-initialize state using cFirstDayMeanTemp and cDampingDepth before processing",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "INT",
+            "len": "-",
+            "min": "0",
+            "max": "1",
+            "default": "0",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "cFirstDayMeanTemp",
+            "description": "Mean air temperature on first day (used when initializing)",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "0.0",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "cDampingDepth",
+            "description": "Damping depth of soil (used when initializing)",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "0.0",
+            "unit": "m",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "SoilTempArray",
+            "description": "Updated soil temperatures per layer after the process step",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "rSoilTempArrayRate",
+            "description": "Updated daily soil temperature change rates after the process step",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC/day",
+            "uri": "-"
+        },
+        {
+            "name": "pSoilLayerDepth",
+            "description": "Potentially updated layer depths if re-initialized",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "_compute_damping_depth",
+            "description": "Compute soil damping depth (DD) from bulk density, water content, and profile depth."
+        }
+    ],
+    "tests": [
+        {
+            "name": "test_STMPsimCalculator_case0",
+            "description": "Single daily step after initialization; verifies SoilTempArray values.",
+            "inputs": [
+                {
+                    "name": "cSoilLayerDepth",
+                    "value": "[0.1, 0.5, 1.5]"
+                },
+                {
+                    "name": "cFirstDayMeanTemp",
+                    "value": "15.0"
+                },
+                {
+                    "name": "cAVT",
+                    "value": "9.0"
+                },
+                {
+                    "name": "cABD",
+                    "value": "1.4"
+                },
+                {
+                    "name": "cDampingDepth",
+                    "value": "6.0"
+                },
+                {
+                    "name": "iSoilWaterContent",
+                    "value": "0.3"
+                },
+                {
+                    "name": "iSoilSurfaceTemperature",
+                    "value": "6.0"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "SoilTempArray",
+                    "value": "[13.624360856350041, 13.399968504634286, 12.599999999999845, 12.2, 11.4, 10.6, 9.799999999999999, 9.0]"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "rSoilTempArrayRate and pSoilLayerDepth are treated as state variables (persisted and returned each step) per the rules."
+        },
+        {
+            "comment": "Boolean input iDoInitialize is represented as INT (0/1) due to available datatype options."
+        },
+        {
+            "comment": "Units: temperatures in degC, rate in degC/day, depths in m, water content in mm, bulk density in t m-3."
+        },
+        {
+            "comment": "Initialization may extend the soil profile to the damping depth by adding extra layers; those depths and initial temperatures are returned as state."
+        }
+    ]
+}

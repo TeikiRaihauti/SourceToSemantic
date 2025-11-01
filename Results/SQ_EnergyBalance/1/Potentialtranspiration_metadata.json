@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "PotentialTranspiration (EnergyBalance component)",
+        "Authors": "Peter D. Jamieson; Glen S. Francis; Derick R. Wilson; Robert J. Martin",
+        "Institution": "New Zealand Institute for Crop and Food Research Ltd.",
+        "URI": "EnergyBalance.Strategies.PotentialTranspiration",
+        "DOI": "-",
+        "Extended description": "This component computes potential transpiration as a fixed fraction of the daily evapotranspiration using a plant cover factor (tau). It reads evapoTranspiration from EnergyBalanceRate and sets potentialTranspiration = evapoTranspiration * (1 − tau), where tau ∈ [0,1] (default 0.9983). The strategy follows the SiriusQuality2 energy-balance formulation within the CRA.ModelLayer framework.",
+        "Short description": "Calculates potential transpiration as evapotranspiration scaled by (1 − tau), a plant cover factor.",
+        "Model version": "-"
+    }
+}

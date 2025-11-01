@@ -4,12 +4,12 @@
     },
     "process": {
         "name": "STEMP",
-        "description": "Determines soil temperature by layer; performs seasonal initialization and daily updates by calling SOILT."
+        "description": "Determines soil temperature by layer; performs seasonal initialization (SEASINIT) and daily updates (RATE) using SOILT."
     },
     "inputs": [
         {
             "name": "CONTROL_DYNAMIC",
-            "description": "Dynamic phase selector (e.g., SEASINIT, RATE).",
+            "description": "Dynamic phase selector (e.g., 2=SEASINIT, 3=RATE).",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "INT",
@@ -22,7 +22,7 @@
         },
         {
             "name": "CONTROL_YRDOY",
-            "description": "Composite year-day-of-year (YYYYDOY).",
+            "description": "Composite year-day-of-year (YYYYDDD) used to compute DOY.",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "INT",
@@ -30,17 +30,17 @@
             "min": "-",
             "max": "-",
             "default": "-",
-            "unit": "YYYYDOY",
+            "unit": "YYYYDDD",
             "uri": "-"
         },
         {
             "name": "CONTROL_RUN",
-            "description": "Run number (used to gate seasonal initialization).",
+            "description": "Run number used during seasonal initialization logic.",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "INT",
             "len": "-",
-            "min": "1",
+            "min": "-",
             "max": "-",
             "default": "-",
             "unit": "-",
@@ -48,7 +48,7 @@
         },
         {
             "name": "CONTROL_RNMODE",
-            "description": "Run mode flag (used to gate seasonal initialization).",
+            "description": "Run mode flag used during seasonal initialization logic.",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "CHAR",
@@ -61,7 +61,7 @@
         },
         {
             "name": "ISWITCH_ISWWAT",
-            "description": "Water simulation switch ('Y' use simulated water; 'N' use DUL).",
+            "description": "Water simulation switch ('Y' uses actual soil water SW; 'N' uses DUL).",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "CHAR",
@@ -79,7 +79,7 @@
             "category": "constant",
             "datatype": "DOUBLEARRAY",
             "len": "SOILPROP_NLAYR",
-            "min": "-",
+            "min": "0",
             "max": "-",
             "default": "-",
             "unit": "g/cm3",
@@ -113,7 +113,7 @@
         },
         {
             "name": "SOILPROP_DUL",
-            "description": "Drained upper limit (volumetric) by layer.",
+            "description": "Drained upper limit (volumetric water content) by layer.",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "DOUBLEARRAY",
@@ -126,7 +126,7 @@
         },
         {
             "name": "SOILPROP_LL",
-            "description": "Lower limit (volumetric) by layer.",
+            "description": "Lower limit (volumetric water content) by layer.",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "DOUBLEARRAY",
@@ -165,7 +165,7 @@
         },
         {
             "name": "SRAD",
-            "description": "Daily solar radiation.",
+            "description": "Daily solar radiation (passed to SOILT; not used by the equations).",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -204,7 +204,7 @@
         },
         {
             "name": "TMAX",
-            "description": "Daily maximum air temperature (passed through).",
+            "description": "Daily maximum air temperature (passed to SOILT; not used by the equations).",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -217,7 +217,7 @@
         },
         {
             "name": "XLAT",
-            "description": "Latitude (sign sets hottest day in initialization).",
+            "description": "Latitude; sign determines hemisphere for initialization.",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "DOUBLE",
@@ -256,20 +256,20 @@
         },
         {
             "name": "CUMDPT",
-            "description": "Cumulative profile depth (computed at initialization).",
+            "description": "Cumulative profile depth used in temperature calculations (set during initialization).",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "0",
             "max": "-",
-            "default": "0",
+            "default": "-",
             "unit": "mm",
             "uri": "-"
         },
         {
             "name": "DSMID",
-            "description": "Depth to mid-point of each layer (computed at initialization).",
+            "description": "Depth to midpoint of each soil layer (set during initialization).",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLEARRAY",
@@ -282,59 +282,59 @@
         },
         {
             "name": "TDL",
-            "description": "Profile sum of DUL*layer_thickness.",
+            "description": "Profile sum of DUL*layer_thickness (state).",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "0",
             "max": "-",
-            "default": "0",
+            "default": "-",
             "unit": "cm",
             "uri": "-"
         },
         {
             "name": "TMA",
-            "description": "5-day moving average queue of TAVG (most recent first).",
+            "description": "5-day moving average memory of TAVG (most recent first).",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLEARRAY",
             "len": "5",
             "min": "-",
             "max": "-",
-            "default": "[0,0,0,0,0]",
+            "default": "-",
             "unit": "degC",
             "uri": "-"
         },
         {
             "name": "ATOT",
-            "description": "Sum of TMA elements.",
+            "description": "Sum of TMA elements (degC).",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "-",
             "max": "-",
-            "default": "0",
+            "default": "-",
             "unit": "degC",
             "uri": "-"
         },
         {
             "name": "SRFTEMP",
-            "description": "Surface temperature (previous value).",
+            "description": "Surface temperature.",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "-",
             "max": "-",
-            "default": "0",
+            "default": "-",
             "unit": "degC",
             "uri": "-"
         },
         {
             "name": "ST",
-            "description": "Soil temperature by layer (previous values).",
+            "description": "Soil temperature by layer.",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLEARRAY",
@@ -349,7 +349,7 @@
     "outputs": [
         {
             "name": "CUMDPT",
-            "description": "Cumulative profile depth (set at seasonal initialization).",
+            "description": "Cumulative profile depth (updated during initialization).",
             "datatype": "DOUBLE",
             "category": "state",
             "len": "-",
@@ -361,7 +361,7 @@
         },
         {
             "name": "DSMID",
-            "description": "Depth to mid-point of each layer (set at seasonal initialization).",
+            "description": "Depth to midpoint of each soil layer (updated during initialization).",
             "datatype": "DOUBLEARRAY",
             "category": "state",
             "len": "SOILPROP_NLAYR",
@@ -385,7 +385,7 @@
         },
         {
             "name": "TMA",
-            "description": "5-day moving average queue (updated).",
+            "description": "5-day moving average memory (updated).",
             "datatype": "DOUBLEARRAY",
             "category": "state",
             "len": "5",
@@ -435,24 +435,24 @@
     "functions": [
         {
             "name": "YR_DOY",
-            "description": "Converts YYYYDOY integer to (year, day-of-year)."
+            "description": "Computes (YEAR, DOY) from an integer YRDOY code."
         },
         {
             "name": "SOILT",
-            "description": "Core soil-temperature computation by layer and surface; updates TMA and ATOT."
+            "description": "Computes soil temperature by layer and surface temperature; updates TMA and ATOT."
         },
         {
             "name": "OPSTEMP",
-            "description": "Writes soil temperature outputs."
+            "description": "Outputs soil temperature diagnostics for reporting."
         }
     ],
     "tests": [
         {
             "name": "test_STEMP_basic",
-            "description": "Smoke test for seasonal initialization followed by one daily update.",
+            "description": "Seasonal initialization followed by one daily update (no numeric assertions).",
             "inputs": [
                 {
-                    "name": "CONTROL_DYNAMIC",
+                    "name": "CONTROL_DYNAMIC (call 1)",
                     "value": "2"
                 },
                 {
@@ -558,11 +558,11 @@
                     "value": "10.0"
                 },
                 {
-                    "name": "CUMDPT",
+                    "name": "CUMDPT (init)",
                     "value": "0.0"
                 },
                 {
-                    "name": "DSMID",
+                    "name": "DSMID (init)",
                     "value": [
                         0.0,
                         0.0,
@@ -571,11 +571,11 @@
                     ]
                 },
                 {
-                    "name": "TDL",
+                    "name": "TDL (init)",
                     "value": "0.0"
                 },
                 {
-                    "name": "TMA",
+                    "name": "TMA (init)",
                     "value": [
                         0.0,
                         0.0,
@@ -585,15 +585,15 @@
                     ]
                 },
                 {
-                    "name": "ATOT",
+                    "name": "ATOT (init)",
                     "value": "0.0"
                 },
                 {
-                    "name": "SRFTEMP",
+                    "name": "SRFTEMP (init)",
                     "value": "0.0"
                 },
                 {
-                    "name": "ST",
+                    "name": "ST (init)",
                     "value": [
                         0.0,
                         0.0,
@@ -602,7 +602,7 @@
                     ]
                 },
                 {
-                    "name": "CONTROL_DYNAMIC",
+                    "name": "CONTROL_DYNAMIC (call 2)",
                     "value": "3"
                 }
             ],
@@ -616,13 +616,19 @@
     ],
     "comments": [
         {
-            "comment": "DLAYR and DS are treated in cm to keep TDL (sum of volumetric water × thickness) in cm as used by the equations; DSMID and CUMDPT are in mm."
+            "comment": "STEMP serves as both initializer (SEASINIT) and daily process (RATE); no separate init routine exists."
         },
         {
-            "comment": "CUMDPT and DSMID are computed at seasonal initialization but carried as state variables; TDL, TMA, ATOT, SRFTEMP, and ST are updated daily."
+            "comment": "Units: DS and DLAYR are in cm; CUMDPT and DSMID are in mm; volumetric water contents (SW, DUL, LL) are cm3/cm3; BD is g/cm3; temperatures are degC."
         },
         {
-            "comment": "SRAD and TMAX are passed through to SOILT but not used in the current implementation."
+            "comment": "TDL is computed in cm and, per the source, is incremented each RATE call (accumulating); PESW uses TSW−TLL (or TDL−TLL if ISWWAT='N')."
+        },
+        {
+            "comment": "SRAD, TMAX, and MSALB (albedo) are passed to SOILT but are not used by the current equations."
+        },
+        {
+            "comment": "Array lengths for per-layer variables reference SOILPROP_NLAYR; TMA length is 5."
         }
     ]
 }

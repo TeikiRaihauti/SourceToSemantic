@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".PotentialTranspiration (EnergyBalance component)" name="PotentialTranspiration (EnergyBalance component)" timestep="1" version="-">
+	<Description>
+		<Title>PotentialTranspiration (EnergyBalance component)</Title>
+		<Authors>Peter D. Jamieson; Glen S. Francis; Derick R. Wilson; Robert J. Martin</Authors>
+		<Institution>New Zealand Institute for Crop and Food Research Ltd.</Institution>
+		<URI>EnergyBalance.Strategies.PotentialTranspiration</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>This component computes potential transpiration as a fixed fraction of the daily evapotranspiration using a plant cover factor (tau). It reads evapoTranspiration from EnergyBalanceRate and sets potentialTranspiration = evapoTranspiration * (1 − tau), where tau ∈ [0,1] (default 0.9983). The strategy follows the SiriusQuality2 energy-balance formulation within the CRA.ModelLayer framework.</ExtendedDescription>
+		<ShortDescription>Calculates potential transpiration as evapotranspiration scaled by (1 − tau), a plant cover factor.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="r_evapoTranspiration" description="evapotranspiration rate." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="tau" description="plant cover factor (0-1)." inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="1" min="0" default="0.9983" unit="-" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="potentialTranspiration" description="computed potential transpiration." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="-" uri="-"/>
+	</Outputs>
+	<Function name="-" description="-" language="cyml" type="external" filename="algo/pyx/-.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/CalculateModel.pyx"/>
+	<Parametersets/>
+	<Testsets>
+		<Testset name="t_-" description="-">
+			<Test name="t_-">
+				<OutputValue name="-">-</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

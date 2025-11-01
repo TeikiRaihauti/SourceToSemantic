@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SiriusQuality-SoilTemperature",
+        "Authors": "Loic Manceau",
+        "Institution": "INRA",
+        "URI": "http://biomamodelling.org",
+        "DOI": "-",
+        "Extended description": "Component for estimating soil surface temperature. It computes daily minimum and maximum soil temperatures from daily air temperatures and soil heat flux using an empirical energy-based approach, and can optionally generate an hourly soil temperature profile following Parton & Logan (1981). A deep soil layer temperature state is maintained via an exponential smoothing update initialized with the annual mean air temperature. Key parameters include the latent heat of vaporization (lambda_) and diurnal curve shape parameters (a, b, c). Outputs are daily min/max soil temperatures and, if enabled, 24 hourly soil temperatures.",
+        "Short description": "Calculates daily min/max and optional hourly soil temperatures, maintaining a deep-layer temperature state.",
+        "Model version": "1.0.0.0"
+    }
+}

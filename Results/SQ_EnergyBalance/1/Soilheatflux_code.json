@@ -1,0 +1,93 @@
+{
+    "init": {
+        "name": "-"
+    },
+    "process": {
+        "name": "Estimate",
+        "description": "Main biophysical process function for SoilHeatFlux."
+    },
+    "inputs": [
+        {
+            "name": "tau",
+            "description": "plant cover factor (dimensionless)",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "s_netRadiationEquivalentEvaporation",
+            "description": "net radiation in equivalent evaporation (g m-2 d-1)",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "s_soilEvaporation",
+            "description": "soil evaporation (g m-2 d-1)",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "soilHeatFlux",
+            "description": "soil heat flux (g m-2 d-1)",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "CalculateModel",
+            "description": "Supporting domain logic function for SoilHeatFlux."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "No explicit initialization or state variables are defined; the returned soilHeatFlux is documented as the state output. Inputs are treated as exogenous. No unit tests present."
+        }
+    ]
+}

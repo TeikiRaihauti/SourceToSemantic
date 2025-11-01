@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".NetRadiationEquivalentEvaporation" name="NetRadiationEquivalentEvaporation" timestep="1" version="-">
+	<Description>
+		<Title>NetRadiationEquivalentEvaporation</Title>
+		<Authors>Peter D. Jamieson; Glen S. Francis; Derick R. Wilson; Robert J. Martin</Authors>
+		<Institution>New Zealand Institute for Crop and Food Research Ltd.</Institution>
+		<URI>-</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>This EnergyBalance component computes the net radiation expressed as an equivalent evaporation rate by dividing net radiation at the canopy surface by the latent heat of vaporization of water (lambdaV) and converting to mass flux (×1000). It is used downstream to drive evapotranspiration and heat flux calculations within the SiriusQuality2-style energy balance chain.</ExtendedDescription>
+		<ShortDescription>Converts net radiation to equivalent evaporation using lambdaV.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="s_netRadiation" description="net radiation at canopy surface" inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="MJ m-2 d-1" uri="-"/>
+		<Input name="lambdaV" description="latent heat of vaporization of water" inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="2.454" unit="MJ kg-1" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="netRadiationEquivalentEvaporation" description="net radiation equivalent evaporation" variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="g m-2 d-1" uri="-"/>
+	</Outputs>
+	<Function name="CalculateModel" description="Compute netRadiationEquivalentEvaporation from netRadiation and lambdaV." language="cyml" type="external" filename="algo/pyx/CalculateModel.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/Estimate.pyx"/>
+	<Parametersets/>
+	<Testsets>
+		<Testset name="t_-" description="-">
+			<Test name="t_-">
+				<OutputValue name="-">-</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

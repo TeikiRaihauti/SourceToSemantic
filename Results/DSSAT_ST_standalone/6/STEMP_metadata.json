@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "STEMP",
+        "Authors": "DSSAT (DSSAT Florida)",
+        "Institution": "University of Georgia, Griffin, Georgia; University of Florida, Gainesville, Florida; Iowa State University, Ames, Iowa; International Center for Soil Fertility and Agricultural Development, Muscle Shoals, Alabama; University of Guelph, Guelph, Ontario",
+        "URI": "-",
+        "DOI": "https://doi.org/10.2134/agronj1994.00021962008600060014x",
+        "Extended description": "Computes daily soil temperature by layer using an EPIC-based analytical solution of heat flow with sinusoidal forcing. It initializes soil layer midpoints and cumulative depth, accounts for soil bulk density, water content, and albedo (including mulch effects), and uses long-term average (TAV) and amplitude (TAMP), day of year, and latitude to determine damping depth and phase. Outputs surface (SRFTEMP) and layered temperatures (ST) and maintains a 5-day moving average of temperature.",
+        "Short description": "Determines daily soil temperature by layer.",
+        "Model version": "1.0"
+    }
+}

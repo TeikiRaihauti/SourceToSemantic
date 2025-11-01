@@ -4,7 +4,7 @@
     },
     "process": {
         "name": "process",
-        "description": "Advance soil temperature profile by one time step."
+        "description": "Advance soil temperatures one step using damping depth and surface temperature; optional re-initialization."
     },
     "inputs": [
         {
@@ -35,7 +35,7 @@
         },
         {
             "name": "cAVT",
-            "description": "Constant temperature of deepest soil layer (use long-term mean air temperature)",
+            "description": "Constant temperature at damping depth (long-term mean air temperature)",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "DOUBLE",
@@ -128,7 +128,7 @@
             "name": "rSoilTempArrayRate",
             "description": "Array of daily temperature change",
             "inputtype": "variable",
-            "category": "auxiliary",
+            "category": "state",
             "datatype": "DOUBLEARRAY",
             "len": "-",
             "min": "-20",
@@ -154,7 +154,7 @@
     "outputs": [
         {
             "name": "SoilTempArray",
-            "description": "Updated soil temperature per layer",
+            "description": "Updated soil temperatures per layer",
             "datatype": "DOUBLEARRAY",
             "category": "state",
             "len": "-",
@@ -168,7 +168,7 @@
             "name": "rSoilTempArrayRate",
             "description": "Updated daily soil temperature change per layer",
             "datatype": "DOUBLEARRAY",
-            "category": "auxiliary",
+            "category": "state",
             "len": "-",
             "min": "-20",
             "max": "20",
@@ -178,7 +178,7 @@
         },
         {
             "name": "pSoilLayerDepth",
-            "description": "Depth to bottom of each (including added) soil layer",
+            "description": "Depth to bottom of each (including added) layer (re-initialized if requested)",
             "datatype": "DOUBLEARRAY",
             "category": "state",
             "len": "-",
@@ -192,13 +192,13 @@
     "functions": [
         {
             "name": "reInitialize",
-            "description": "Re-initialize state by calling init() when requested."
+            "description": "Re-initialize state by calling init()."
         }
     ],
     "tests": [
         {
             "name": "test_STMPsimCalculator_case0",
-            "description": "Initializes then processes one day and checks SoilTempArray against expected values.",
+            "description": "Initialize then process one step; verify SoilTempArray.",
             "inputs": [
                 {
                     "name": "cSoilLayerDepth",
@@ -256,19 +256,13 @@
     ],
     "comments": [
         {
-            "comment": "Function and variable names follow the Java source. Boolean iDoInitialize is represented as INT (0/1) due to allowed datatypes."
-        },
-        {
-            "comment": "rSoilTempArrayRate has content type 'rate' in code; mapped to category 'auxiliary'."
-        },
-        {
-            "comment": "pSoilLayerDepth is created with content type 'privat' but is included as a persisted state since it is produced in init() and used in process()."
+            "comment": "Boolean iDoInitialize mapped to INT (0/1) to fit allowed datatypes; default 0."
         },
         {
             "comment": "Array lengths are dynamic and depend on cSoilLayerDepth and cDampingDepth."
         },
         {
-            "comment": "Min/max/default values are taken from createVariables() in the source; they are not enforced here."
+            "comment": "pSoilLayerDepth is maintained as state (initialized in init, reused in process)."
         }
     ]
 }

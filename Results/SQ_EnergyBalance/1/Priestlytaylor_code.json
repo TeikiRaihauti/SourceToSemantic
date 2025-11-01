@@ -1,0 +1,106 @@
+{
+    "init": {
+        "name": "-"
+    },
+    "process": {
+        "name": "CalculateModel",
+        "description": "PriestlyTaylor main process function."
+    },
+    "inputs": [
+        {
+            "name": "psychrometricConstant",
+            "description": "Psychrometric constant",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "Alpha",
+            "description": "PriestlyTaylor coefficient",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "a_netRadiationEquivalentEvaporation",
+            "description": "Net radiation equivalent evaporation",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "a_hslope",
+            "description": "Slope of saturation vapor pressure curve",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "evapoTranspirationPriestlyTaylor",
+            "description": "PriestlyTaylor evapotranspiration",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "0",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "No init or persistent state; the returned value is documented as a state output per schema. Docstring mentions r_evapoTranspirationPriestlyTaylor, but code returns evapoTranspirationPriestlyTaylor. Units and bounds are not specified in the code."
+        }
+    ]
+}

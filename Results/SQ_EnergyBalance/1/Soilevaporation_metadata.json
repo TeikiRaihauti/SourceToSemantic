@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SoilEvaporation (EnergyBalance component)",
+        "Authors": "Peter D. Jamieson; Glen S. Francis; Derick R. Wilson; Robert J. Martin",
+        "Institution": "New Zealand Institute for Crop and Food Research Ltd.",
+        "URI": "EnergyBalance.Strategies.SoilEvaporation",
+        "DOI": "-",
+        "Extended description": "Starting from a soil at field capacity, soil evaporation is assumed to be energy-limited during the first phase and diffusion-limited thereafter. This component computes the soil evaporation rate as the minimum of the energy-limited evaporation (from the Priestley–Taylor/PtSoil pathway) and the diffusion-limited evaporation (driven by the soil diffusion constant and the water deficit of the top layers). It forms part of the EnergyBalance suite that also includes NetRadiation, NetRadiationEquivalentEvaporation, PriestlyTaylor, Penman, PtSoil, DiffusionLimitedEvaporation, SoilHeatFlux, PotentialTranspiration, CropHeatFlux, and CanopyTemperature.",
+        "Short description": "Computes soil evaporation as min(energy-limited, diffusion-limited evaporation).",
+        "Model version": "-"
+    }
+}

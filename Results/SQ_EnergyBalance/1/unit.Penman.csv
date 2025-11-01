@@ -1,0 +1,52 @@
+Inputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+9;9;9;0;0;1.0;1.0;1.0
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+evapoTranspirationPriestlyTaylor;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+hslope;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+VPDair;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+conductance;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+psychrometricConstant;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+Alpha;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+lambdaV;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+rhoDensityAir;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+specificHeatCapacityAir;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Outputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+1;1;1;0;0;1.0;1.0;1.0
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+evapoTranspirationPenman;OK;WRONG;OK;OK;WRONG;WRONG;OK;OK;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Functions stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+0;1;0;1;0;0.0;0;0
+
+True positive
+Name
+
+False positive
+Name
+CalculateModel
+
+False negative
+Name
+

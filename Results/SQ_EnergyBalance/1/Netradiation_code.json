@@ -1,0 +1,160 @@
+{
+    "init": {
+        "name": "-"
+    },
+    "process": {
+        "name": "CalculateModel",
+        "description": "Compute net radiation at the canopy surface."
+    },
+    "inputs": [
+        {
+            "name": "a_minTair",
+            "description": "Minimum air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "a_maxTair",
+            "description": "Maximum air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "a_solarRadiation",
+            "description": "Incoming solar radiation",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "MJ m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "a_vaporPressure",
+            "description": "Vapor pressure",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "hPa",
+            "uri": "-"
+        },
+        {
+            "name": "a_extraSolarRadiation",
+            "description": "Extraterrestrial solar radiation",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "MJ m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "albedoCoefficient",
+            "description": "Canopy albedo (fraction)",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": 0.23,
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "stefanBoltzman",
+            "description": "Stefan-Boltzmann constant",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": 4.903e-09,
+            "unit": "MJ K-4 m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "elevation",
+            "description": "Site elevation",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": 0.0,
+            "unit": "m",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "netRadiation",
+            "description": "Net radiation at the canopy surface",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "MJ m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "netOutGoingLongWaveRadiation",
+            "description": "Net outgoing longwave radiation",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "MJ m-2 d-1",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "CalculateModel",
+            "description": "Computes shortwave and longwave components and returns net radiation and net outgoing longwave radiation."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [],
+            "outputs": []
+        }
+    ],
+    "comments": [
+        {
+            "comment": "Single process function; no initialization or state persistence. Inputs classified as exogenous (meteorological drivers) and parameters (constants). Units taken from docstring. No unit tests present."
+        }
+    ]
+}

@@ -1,12 +1,12 @@
 {
     "metadata": {
-        "Title": "Soil temperature profile model (temp_profile)",
-        "Authors": "STICS",
+        "Title": "Soil temperature profile model (STICS)",
+        "Authors": "STICS development team",
         "Institution": "INRAE",
         "URI": "-",
         "DOI": "http://dx.doi.org/10.1016/j.agrformet.2014.05.002",
-        "Extended description": "Computes the daily soil temperature profile at 1 cm resolution using an exponentially damped response to canopy–air thermal forcing, based on fixed thermal diffusivity (5.37e-3 m2 h-1) and diurnal frequency (7.272e-5 s-1 converted contextually). For each depth z, an attenuation factor vexp(z)=exp(-z*sqrt(temp_freq/(2*therm_diff))) is applied. The new profile blends: (i) persistence from the previous profile, (ii) an exponentially attenuated adjustment driven by the difference between previous canopy temperature and current minimum air temperature, (iii) a relaxation term toward the canopy temperature (weight 0.1), and (iv) half the current temperature amplitude scaled by the attenuation factor. Inputs: temperature amplitude, previous soil temperature profile, previous canopy temperature, and current minimum air temperature. Output: updated soil temperature profile.",
-        "Short description": "STICS-based exponential damping update of daily soil temperature profile from canopy and air thermal forcing.",
+        "Extended description": "Computes the daily soil temperature vertical profile at 1 cm resolution using the previous day’s profile, previous canopy temperature, current minimum air temperature, and the diurnal temperature amplitude. An exponential attenuation with depth is applied using a thermal diffusivity (5.37e-3 m2 s-1) and angular frequency (7.272e-5 s-1) to derive a decay factor vexp(z)=exp(-z*sqrt(temp_freq/(2*therm_diff))). The updated temperature combines: prior profile, an attenuated forcing term from canopy-air minimum difference, a relaxation term toward previous canopy temperature (0.1 factor), and half the attenuated diurnal amplitude. Auxiliary components compute temperature amplitude, canopy mean temperature, layer means, and update state variables.",
+        "Short description": "STICS-based component updating soil temperature profile via depth-attenuated diurnal forcing and canopy-air coupling.",
         "Model version": "1.0"
     }
 }

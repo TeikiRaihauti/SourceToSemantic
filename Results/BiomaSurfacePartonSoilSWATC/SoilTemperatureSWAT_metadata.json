@@ -5,8 +5,8 @@
         "Institution": "University Of Milan",
         "URI": "http://bioma.jrc.ec.europa.eu/ontology/JRC_MARS_biophysical_domain.owl",
         "DOI": "-",
-        "Extended description": "Computes daily soil temperature by layers using the SWAT 2000 damping‑depth approach. The method blends previous-day layer temperatures with a lag coefficient and updates each layer’s temperature using depth-dependent damping derived from soil bulk density, volumetric water content, total profile water, and layer thickness. The depth factor scales the difference between annual mean air temperature and surface soil temperature. Reference: Neitsch et al., SWAT Theoretical Documentation (Version 2000): http://swatmodel.tamu.edu/media/1290/swat2000theory.pdf.",
-        "Short description": "SWAT-based daily soil temperature profile using a lagged, depth-damping formulation.",
+        "Extended description": "Strategy to compute soil temperature by layers using the SWAT method (Soil and Water Assessment Tool). It applies a lagged update with a user-defined LagCoefficient and computes a damping depth as a function of bulk density, soil water content and soil profile depth. References: Neitsch, S.L., Arnold, J.G., Kiniry, J.R., Williams, J.R., King, K.W. Soil and Water Assessment Tool Theoretical Documentation, Version 2000 (http://swatmodel.tamu.edu/media/1290/swat2000theory.pdf). Component class: UNIMI.SoilT.Strategies.Soil.SoilTemperatureSWAT.",
+        "Short description": "SWAT-based soil temperature profile computation with daily lagging.",
         "Model version": "001"
     }
 }

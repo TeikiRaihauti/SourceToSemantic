@@ -1,12 +1,12 @@
 {
     "metadata": {
-        "Title": "Soil Temperature (APSIM Next Generation)",
-        "Authors": "APSIM Initiative Development Team",
-        "Institution": "APSIM Initiative (CSIRO, The University of Queensland, Queensland Department of Agriculture and Fisheries)",
-        "URI": "https://github.com/APSIMInitiative/ApsimX/blob/master/Models/Soils/SoilTemp/SoilTemperature.cs",
+        "Title": "SoilTemperature",
+        "Authors": "-",
+        "Institution": "-",
+        "URI": "Models.Soils.SoilTemp.SoilTemperature",
         "DOI": "-",
-        "Extended description": "A soil heat transfer component in APSIM Next Generation which simulates sub-daily heat fluxes and temperatures from the air node through the soil surface into the profile. It represents the soil as nodes (air=0, surface=1, layer centres=2..N) and uses a tri-diagonal solver (Thomas algorithm) with a Crank–Nicholson-type weighting to step temperatures. Thermal properties (volumetric heat capacity and conductivity) are derived from layer composition (rocks, organic matter, sand, silt, clay, water, air) following formulations based on Campbell (1985). Upper boundary conditions include sensible, latent and net radiative fluxes; atmospheric boundary layer conductance is computed using Monin–Obukhov stability functions and wind, canopy height and instrument height. Net radiation is partitioned into shortwave and longwave components with cloud and vapour effects. The model iterates sub-daily (default 48 steps) to produce daily minimum, maximum and average soil temperatures, and integrates with APSIM weather, microclimate and soil water/physical modules.",
-        "Short description": "Sub-daily soil heat and temperature profile model with atmospheric coupling and Campbell-based thermal physics in APSIM NG.",
+        "Extended description": "One-dimensional soil temperature component which represents the soil profile as layers with temperature nodes from the atmosphere through the soil, plus phantom nodes below the profile to a constant-temperature depth. It simulates transient heat conduction with sub-daily time steps (default 48 per day) using a tri-diagonal solver (Thomas algorithm) and a weighted implicit scheme (nu=0.6). Thermal properties are derived from soil physical characteristics (thickness, bulk density, texture, rocks, organic matter) and water content, while atmospheric boundary-layer conductance and net radiation (shortwave and longwave) are calculated from weather inputs (air temperature, radiation, wind, pressure). The model provides daily minimum, maximum, and average soil temperatures by layer and at the surface, as well as thermal conductivity, volumetric heat capacity, heat storage, and boundary-layer conductance, drawing on methods from Campbell (1985).",
+        "Short description": "1D soil heat-flow and temperature component using sub-daily energy balance and boundary-layer exchange to produce daily min/avg/max soil temperatures.",
         "Model version": "-"
     }
 }

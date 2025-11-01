@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "STEMP_EPIC",
+        "Authors": "Kenneth N. Potter; Jimmy R. Williams",
+        "Institution": "United States Department of Agriculture – Agricultural Research Service (USDA-ARS)",
+        "URI": "-",
+        "DOI": "-",
+        "Extended description": "Computes daily soil temperature by layer using the EPIC method of Potter & Williams (1994). The component updates surface and layer temperatures from air temperature (TAVG, TMAX, TMIN), soil properties (bulk density, layer depths, water limits), soil water and wet-day frequency, and surface cover from biomass, mulch, and snow. It runs within a DSSAT-style control loop and outputs SRFTEMP and ST for each soil layer.",
+        "Short description": "Determines soil temperature by layer.",
+        "Model version": "1.0"
+    }
+}

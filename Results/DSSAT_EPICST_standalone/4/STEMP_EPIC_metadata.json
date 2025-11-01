@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "EPIC Soil Temperature (STEMP_EPIC)",
+        "Authors": "Kenneth N. Potter; Jimmy R. Williams",
+        "Institution": "USDA Agricultural Research Service (USDA-ARS)",
+        "URI": "-",
+        "DOI": "https://doi.org/10.2134/agronj1994.00021962008600060014x",
+        "Extended description": "Daily soil temperature component computing layer temperatures using the EPIC method (Potter & Williams, 1994). It derives a surface temperature signal from air temperature, wet-day frequency, and surface cover (biomass/mulch and snow), estimates damping depth from bulk density and water status, and updates layer temperatures via an exponential depth response with a lag. Integrates with DSSAT-style soil, weather, and management data structures.",
+        "Short description": "Determines daily soil temperature by layer using the EPIC method with water and cover effects.",
+        "Model version": "1.0"
+    }
+}

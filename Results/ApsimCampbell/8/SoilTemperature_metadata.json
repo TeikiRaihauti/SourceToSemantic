@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SoilTemperature",
+        "Authors": "-",
+        "Institution": "-",
+        "URI": "-",
+        "DOI": "-",
+        "Extended description": "A one-dimensional soil temperature component which simulates transient heat flow and temperatures from the air node through the soil surface and layered soil profile down to a deep constant-temperature boundary. The profile is discretized into nodes (including phantom nodes below the profile). Volumetric heat capacity and thermal conductivity are computed from soil constituents and water content following Campbell (1985). Surface energy balance includes short- and long-wave radiation, sensible and latent heat fluxes, and atmospheric boundary layer conductance with stability corrections. The heat diffusion equation is solved each sub-daily step using a tridiagonal (Thomas) solver with a weighting factor (nu). It provides daily min/mean/max soil and surface temperatures and thermal properties, driven by weather, soil physical/organic properties, and soil water.",
+        "Short description": "1D Campbell-based soil temperature and heat flux model for layered soils with implicit tridiagonal solver.",
+        "Model version": "-"
+    }
+}

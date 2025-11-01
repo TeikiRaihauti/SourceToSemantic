@@ -1,0 +1,158 @@
+{
+    "init": {
+        "name": "Init"
+    },
+    "process": {
+        "name": "Estimate",
+        "description": "SoilTemperatureSWAT main process. Update soil temperature by layers using SWAT method."
+    },
+    "inputs": [
+        {
+            "name": "states_LayerThickness",
+            "description": "soil layer thicknesses",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "LagCoefficient",
+            "description": "lag coefficient",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0",
+            "max": "1",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "states_SoilProfileDepth",
+            "description": "soil profile depth",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m",
+            "uri": "-"
+        },
+        {
+            "name": "states_SurfaceSoilTemperature",
+            "description": "surface soil temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_AirTemperatureAnnualAverage",
+            "description": "annual average air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "states_SoilTemperatureByLayers",
+            "description": "previous day's soil temperature by layers",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "states_BulkDensity",
+            "description": "soil bulk density by layers",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "t m-3",
+            "uri": "-"
+        },
+        {
+            "name": "states_VolumetricWaterContent",
+            "description": "soil volumetric water content by layers",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "m3 m-3",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "SoilTemperatureByLayers",
+            "description": "updated soil temperature by layers",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "Only SoilTemperatureByLayers is updated by the main process and is treated as the component's state variable. The input states_SoilTemperatureByLayers represents the prior state and is listed as a state input; the updated state is returned as SoilTemperatureByLayers. Other inputs with the 'states_' prefix are treated as exogenous to this component since they are not updated here. Init uses states_LayerThickness to size the initial state and returns a uniform 15.0 degC per layer, but init outputs are not listed per the schema."
+        }
+    ]
+}

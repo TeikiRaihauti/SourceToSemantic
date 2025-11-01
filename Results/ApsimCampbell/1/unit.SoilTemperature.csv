@@ -1,115 +1,119 @@
 Inputs stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-79;60;60;0;19;1.0;0.759493670886076;0.8633093525179857
+79;63;62;1;17;0.9841269841269841;0.7848101265822784;0.8732394366197183
 
 True positive
 Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+weather_MeanT;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
 weather_Tav;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
 weather_Amp;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-weather_Latitude;WRONG;WRONG;OK;OK;OK;OK;OK;WRONG;OK
-clock_Today_DayOfYear;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-thickness;WRONG;WRONG;OK;WRONG;OK;OK;OK;OK;OK
-physical_BD;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-rocks;WRONG;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-physical_ParticleSizeSand;WRONG;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-physical_ParticleSizeSilt;WRONG;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-physical_ParticleSizeClay;WRONG;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-carbon;WRONG;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-waterBalance_SW;OK;OK;OK;WRONG;OK;OK;WRONG;WRONG;OK
-waterBalance_Salb;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-weather_MeanT;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
+weather_Latitude;WRONG;WRONG;OK;OK;WRONG;WRONG;OK;WRONG;OK
+weather_Radn;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
+weather_AirPressure;OK;OK;OK;OK;OK;OK;OK;OK;OK
 weather_MaxT;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
 weather_MinT;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-weather_Radn;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-instrumHeight;WRONG;WRONG;OK;OK;OK;OK;WRONG;WRONG;OK
-DepthToConstantTemperature;OK;OK;OK;OK;OK;OK;WRONG;OK;OK
-boundarLayerConductanceSource;OK;OK;WRONG;OK;OK;OK;OK;WRONG;OK
-netRadiationSource;OK;OK;WRONG;OK;OK;OK;OK;WRONG;OK
-defaultTimeOfMaximumTemperature;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-nu;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
+weather_Wind;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+waterBalance_SW;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG;OK
+waterBalance_Eo;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+waterBalance_Eos;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+waterBalance_Salb;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;OK
+waterBalance_Es;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+canopyHeight;OK;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK
+thickness;WRONG;WRONG;OK;WRONG;OK;WRONG;WRONG;OK;OK
+physical_BD;OK;OK;OK;WRONG;OK;WRONG;OK;WRONG;OK
+rocks;WRONG;WRONG;OK;WRONG;WRONG;WRONG;WRONG;WRONG;OK
+physical_ParticleSizeSand;WRONG;WRONG;OK;WRONG;WRONG;WRONG;OK;WRONG;OK
+physical_ParticleSizeSilt;WRONG;WRONG;OK;WRONG;WRONG;WRONG;OK;WRONG;OK
+physical_ParticleSizeClay;WRONG;WRONG;OK;WRONG;WRONG;WRONG;OK;WRONG;OK
+carbon;WRONG;WRONG;OK;WRONG;WRONG;WRONG;WRONG;WRONG;OK
+clock_Today_DayOfYear;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;OK
+instrumHeight;WRONG;WRONG;OK;OK;OK;WRONG;WRONG;WRONG;OK
 InitialValues;WRONG;WRONG;OK;WRONG;OK;OK;WRONG;WRONG;OK
-weather_AirPressure;OK;OK;OK;OK;OK;OK;OK;OK;OK
-weather_Wind;OK;OK;OK;OK;OK;OK;OK;OK;OK
-waterBalance_Eos;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-waterBalance_Eo;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-waterBalance_Es;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-canopyHeight;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
-numLayers;WRONG;WRONG;OK;OK;OK;OK;WRONG;WRONG;OK
-numNodes;WRONG;WRONG;OK;OK;OK;OK;WRONG;WRONG;OK
-nodeDepth;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-thermCondPar1;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-thermCondPar2;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-thermCondPar3;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-thermCondPar4;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-volSpecHeatSoil;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-soilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-morningSoilTemp;OK;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-heatStorage;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-thermalConductance;OK;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-thermalConductivity;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-newTemperature;OK;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-bulkDensity;WRONG;WRONG;OK;WRONG;OK;OK;OK;OK;OK
-soilWater;OK;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-minSoilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-maxSoilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-aveSoilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-boundaryLayerConductance;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
-internalTimeStep;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
-timeOfDaySecs;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
-netRadiation;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
+DepthToConstantTemperature;OK;OK;OK;OK;OK;WRONG;WRONG;OK;OK
+airNode;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+surfaceNode;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+topsoilNode;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+numPhantomNodes;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+defaultTimeOfMaximumTemperature;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;OK
+instrumentHeight;OK;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK
+numLayers;WRONG;WRONG;OK;OK;OK;WRONG;WRONG;WRONG;OK
+numNodes;WRONG;WRONG;OK;OK;OK;WRONG;WRONG;WRONG;OK
+nodeDepth;OK;OK;OK;WRONG;OK;WRONG;WRONG;WRONG;OK
+bulkDensity;WRONG;WRONG;OK;WRONG;OK;WRONG;WRONG;WRONG;OK
+soilWater;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG;OK
+sand;WRONG;WRONG;OK;WRONG;WRONG;WRONG;WRONG;WRONG;OK
+silt;WRONG;WRONG;OK;WRONG;WRONG;WRONG;WRONG;WRONG;OK
+clay;WRONG;WRONG;OK;WRONG;WRONG;WRONG;WRONG;WRONG;OK
+maxSoilTemp;OK;OK;OK;WRONG;OK;OK;WRONG;WRONG;OK
+minSoilTemp;OK;OK;OK;WRONG;OK;OK;WRONG;WRONG;OK
+aveSoilTemp;OK;OK;OK;WRONG;OK;OK;WRONG;WRONG;OK
+volSpecHeatSoil;OK;OK;OK;WRONG;OK;WRONG;WRONG;WRONG;OK
+soilTemp;OK;OK;OK;WRONG;OK;OK;WRONG;WRONG;OK
+morningSoilTemp;OK;OK;OK;WRONG;OK;OK;WRONG;WRONG;OK
+newTemperature;OK;OK;OK;WRONG;OK;OK;WRONG;WRONG;OK
+thermalConductivity;OK;OK;OK;WRONG;OK;WRONG;WRONG;WRONG;OK
+heatStorage;OK;OK;OK;WRONG;OK;WRONG;WRONG;WRONG;OK
+thermalConductance;OK;OK;OK;WRONG;OK;WRONG;WRONG;WRONG;OK
+soilRoughnessHeight;OK;OK;OK;OK;OK;WRONG;WRONG;OK;OK
+boundaryLayerConductance;OK;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK
 airTemperature;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
 maxTempYesterday;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
 minTempYesterday;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
-instrumentHeight;WRONG;WRONG;OK;OK;OK;OK;WRONG;WRONG;OK
-sand;WRONG;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-silt;WRONG;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
-clay;WRONG;WRONG;OK;WRONG;OK;OK;OK;WRONG;OK
+netRadiation;OK;OK;OK;OK;OK;OK;WRONG;WRONG;OK
+nu;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;OK
+boundarLayerConductanceSource;OK;OK;WRONG;OK;OK;OK;OK;WRONG;OK
+netRadiationSource;OK;OK;WRONG;OK;OK;OK;OK;WRONG;OK
+pom;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK
+ps;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK
+soilConstituentNames;OK;OK;WRONG;WRONG;OK;OK;WRONG;WRONG;OK
 
 False positive
 Name;inputtype;variablecategory;datatype
+timestep_seconds;parameter;;DOUBLE
 
 False negative
 Name;inputtype;variablecategory;datatype
-ps;parameter;;DOUBLE
 pInitialValues;parameter;;DOUBLEARRAY
 timestep;parameter;;DOUBLE
 latentHeatOfVapourisation;parameter;;DOUBLE
 stefanBoltzmannConstant;parameter;;DOUBLE
-airNode;parameter;;INT
-surfaceNode;parameter;;INT
-topsoilNode;parameter;;INT
-numPhantomNodes;parameter;;INT
 constantBoundaryLayerConductance;parameter;;DOUBLE
 numIterationsForBoundaryLayerConductance;parameter;;INT
 defaultInstrumentHeight;parameter;;DOUBLE
 bareSoilRoughness;parameter;;DOUBLE
 doInitialisationStuff;variable;state;BOOLEAN
+internalTimeStep;variable;state;DOUBLE
+timeOfDaySecs;variable;state;DOUBLE
+thermCondPar1;parameter;;DOUBLEARRAY
+thermCondPar2;parameter;;DOUBLEARRAY
+thermCondPar3;parameter;;DOUBLEARRAY
+thermCondPar4;parameter;;DOUBLEARRAY
 aveSoilWater;variable;state;DOUBLEARRAY
-pom;parameter;;DOUBLE
-soilRoughnessHeight;parameter;;DOUBLE
 MissingValue;parameter;;DOUBLE
-soilConstituentNames;parameter;;STRINGARRAY
 
 
 Outputs stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-22;15;15;0;7;1.0;0.6818181818181818;0.8108108108108109
+22;18;18;0;4;1.0;0.8181818181818182;0.9
 
 True positive
 Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+instrumentHeight;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+soilWater;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG;OK
+canopyHeight;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
+volSpecHeatSoil;OK;OK;OK;WRONG;OK;WRONG;OK;WRONG;OK
+thermalConductivity;OK;OK;OK;WRONG;OK;WRONG;OK;WRONG;OK
+thermalConductance;OK;OK;OK;WRONG;OK;WRONG;OK;WRONG;OK
+heatStorage;OK;OK;OK;WRONG;OK;WRONG;OK;WRONG;OK
 soilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
+newTemperature;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
 minSoilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
 maxSoilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
 aveSoilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-thermalConductivity;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-volSpecHeatSoil;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-heatStorage;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
-boundaryLayerConductance;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-internalTimeStep;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-timeOfDaySecs;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-netRadiation;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
-canopyHeight;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
+boundaryLayerConductance;OK;OK;OK;OK;OK;WRONG;OK;WRONG;OK
 airTemperature;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
+netRadiation;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
+morningSoilTemp;OK;OK;OK;WRONG;OK;OK;OK;WRONG;OK
 maxTempYesterday;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
 minTempYesterday;OK;OK;OK;OK;OK;OK;OK;WRONG;OK
 
@@ -118,18 +122,15 @@ Name;inputtype;variablecategory;datatype
 
 False negative
 Name;inputtype;variablecategory;datatype
-instrumentHeight;;state;DOUBLE
-morningSoilTemp;;state;DOUBLEARRAY
-newTemperature;;state;DOUBLEARRAY
-thermalConductance;;state;DOUBLEARRAY
-soilWater;;state;DOUBLEARRAY
 doInitialisationStuff;;state;BOOLEAN
+internalTimeStep;;state;DOUBLE
+timeOfDaySecs;;state;DOUBLE
 InitialValues;;state;DOUBLEARRAY
 
 
 Functions stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-8;32;3;29;5;0.09375;0.375;0.15
+8;30;3;27;5;0.1;0.375;0.15789473684210528
 
 True positive
 Name
@@ -147,6 +148,7 @@ kelvinT
 longWaveRadn
 airDensity
 volumetricSpecificHeat
+ThermalConductance
 volumetricFractionRocks
 volumetricFractionOrganicMatter
 volumetricFractionSand
@@ -155,19 +157,16 @@ volumetricFractionClay
 volumetricFractionWater
 volumetricFractionIce
 volumetricFractionAir
-ThermalConductance
 shapeFactor
 mapLayer2Node
-doThermalConductivityCoeffs
+calcLayerTemperature
+doNetRadiation
+interpolateNetRadiation
 interpolateTemperature
 doVolumetricSpecificHeat
 doThermalConductivity
 doThomas
-doUpdate
 getBoundaryLayerConductance
-calcLayerTemperature
-doNetRadiation
-interpolateNetRadiation
 
 False negative
 Name

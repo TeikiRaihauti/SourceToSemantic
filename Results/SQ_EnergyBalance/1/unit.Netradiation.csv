@@ -1,0 +1,52 @@
+Inputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+8;8;8;0;0;1.0;1.0;1.0
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+minTair;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+maxTair;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+solarRadiation;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+vaporPressure;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+extraSolarRadiation;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+albedoCoefficient;OK;OK;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+stefanBoltzman;OK;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;WRONG
+elevation;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Outputs stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+2;2;2;0;0;1.0;1.0;1.0
+
+True positive
+Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
+netRadiation;OK;WRONG;OK;OK;WRONG;WRONG;OK;OK;WRONG
+netOutGoingLongWaveRadiation;OK;WRONG;OK;OK;WRONG;WRONG;OK;WRONG;WRONG
+
+False positive
+Name;inputtype;variablecategory;datatype
+
+False negative
+Name;inputtype;variablecategory;datatype
+
+
+Functions stats
+Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
+0;1;0;1;0;0.0;0;0
+
+True positive
+Name
+
+False positive
+Name
+CalculateModel
+
+False negative
+Name
+

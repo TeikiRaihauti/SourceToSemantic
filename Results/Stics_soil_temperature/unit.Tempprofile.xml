@@ -1,27 +1,30 @@
 <?xml version="1.0" ?>
-<ModelUnit modelid=".Soil temperature profile model (temp_profile)" name="Soil temperature profile model (temp_profile)" timestep="1" version="1.0">
+<ModelUnit modelid=".Soil temperature profile model (STICS)" name="Soil temperature profile model (STICS)" timestep="1" version="1.0">
 	<Description>
-		<Title>Soil temperature profile model (temp_profile)</Title>
-		<Authors>STICS</Authors>
+		<Title>Soil temperature profile model (STICS)</Title>
+		<Authors>STICS development team</Authors>
 		<Institution>INRAE</Institution>
 		<URI>-</URI>
 		<Reference>http://dx.doi.org/10.1016/j.agrformet.2014.05.002</Reference>
-		<ExtendedDescription>Computes the daily soil temperature profile at 1 cm resolution using an exponentially damped response to canopy–air thermal forcing, based on fixed thermal diffusivity (5.37e-3 m2 h-1) and diurnal frequency (7.272e-5 s-1 converted contextually). For each depth z, an attenuation factor vexp(z)=exp(-z*sqrt(temp_freq/(2*therm_diff))) is applied. The new profile blends: (i) persistence from the previous profile, (ii) an exponentially attenuated adjustment driven by the difference between previous canopy temperature and current minimum air temperature, (iii) a relaxation term toward the canopy temperature (weight 0.1), and (iv) half the current temperature amplitude scaled by the attenuation factor. Inputs: temperature amplitude, previous soil temperature profile, previous canopy temperature, and current minimum air temperature. Output: updated soil temperature profile.</ExtendedDescription>
-		<ShortDescription>STICS-based exponential damping update of daily soil temperature profile from canopy and air thermal forcing.</ShortDescription>
+		<ExtendedDescription>Computes the daily soil temperature vertical profile at 1 cm resolution using the previous day’s profile, previous canopy temperature, current minimum air temperature, and the diurnal temperature amplitude. An exponential attenuation with depth is applied using a thermal diffusivity (5.37e-3 m2 s-1) and angular frequency (7.272e-5 s-1) to derive a decay factor vexp(z)=exp(-z*sqrt(temp_freq/(2*therm_diff))). The updated temperature combines: prior profile, an attenuated forcing term from canopy-air minimum difference, a relaxation term toward previous canopy temperature (0.1 factor), and half the attenuated diurnal amplitude. Auxiliary components compute temperature amplitude, canopy mean temperature, layer means, and update state variables.</ExtendedDescription>
+		<ShortDescription>STICS-based component updating soil temperature profile via depth-attenuated diurnal forcing and canopy-air coupling.</ShortDescription>
 	</Description>
 	<Inputs>
-		<Input name="air_temp_day1" description="Air temperature used to initialize the profile (degC)." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
-		<Input name="layer_thick" description="Soil layer thicknesses (cm). Sum defines soil depth in cm." inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="-" default="-" unit="cm" uri="-"/>
-		<Input name="temp_amp" description="Daily temperature amplitude (degC)." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
-		<Input name="prev_temp_profile" description="Previous day soil temperature profile at 1 cm resolution (degC)." inputtype="variable" variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
-		<Input name="prev_canopy_temp" description="Previous day's canopy temperature (degC)." inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
-		<Input name="min_air_temp" description="Current day's minimum air temperature (degC)." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="air_temp_day1" description="Air temperature used to initialize soil profile and canopy temperature." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="layer_thick" description="Soil layer thicknesses; sum defines soil depth in 1-cm layers." inputtype="parameter" parametercategory="constant" datatype="INTARRAY" max="-" min="-" default="-" unit="cm" uri="-"/>
+		<Input name="temp_amp" description="Daily temperature amplitude." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="prev_temp_profile" description="Previous soil temperature profile at 1-cm resolution." inputtype="variable" variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="prev_canopy_temp" description="Previous canopy temperature." inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="min_air_temp" description="Current minimum air temperature." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
 	</Inputs>
 	<Outputs>
-		<Output name="temp_profile" description="Current soil temperature profile at 1 cm resolution (degC)." variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" unit="degC" uri="-"/>
-		<Output name="prev_canopy_temp" description="Previous canopy temperature carried forward as state (degC)." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="temp_profile" description="Current soil temperature profile at 1-cm resolution." variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="prev_temp_profile" description="Initialized previous soil temperature profile at 1-cm resolution (from init)." variablecategory="state" datatype="DOUBLEARRAY" len="-" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="prev_canopy_temp" description="Initialized previous canopy temperature (from init)." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
 	</Outputs>
 	<Initialization name="init_temp_profile" language="cyml" filename="algo/pyx/init_temp_profile.pyx"/>
+	<Function name="model_temp_profile" description="Compute updated soil temperature profile using previous profile and temperature drivers." language="cyml" type="external" filename="algo/pyx/model_temp_profile.pyx"/>
+	<Function name="init_temp_profile" description="Initialize previous soil temperature profile and canopy temperature from day-1 air temperature and layer thickness." language="cyml" type="external" filename="algo/pyx/init_temp_profile.pyx"/>
 	<Algorithm language="cyml" platform="" filename="algo/pyx/model_temp_profile.pyx"/>
 	<Parametersets/>
 	<Testsets>

@@ -1,0 +1,80 @@
+{
+    "init": {
+        "name": "-"
+    },
+    "process": {
+        "name": "CalculateModel",
+        "description": "Compute diffusion limited evaporation from the soil."
+    },
+    "inputs": [
+        {
+            "name": "a_deficitOnTopLayers",
+            "description": "Deficit on top soil layers",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2",
+            "uri": "-"
+        },
+        {
+            "name": "soilDiffusionConstant",
+            "description": "Soil diffusion constant",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "4.2",
+            "unit": "-",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "diffusionLimitedEvaporation",
+            "description": "Evaporation limited by diffusion",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "No explicit initialization or persisted state; the single function returns a computed value. Output categorized as state per specification. Units: a_deficitOnTopLayers in g m-2; output in g m-2 d-1; soilDiffusionConstant is dimensionless. Thresholds use deficit/1000 conversion."
+        }
+    ]
+}

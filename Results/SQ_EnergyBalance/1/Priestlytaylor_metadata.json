@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "Priestley-Taylor evapotranspiration (EnergyBalance)",
+        "Authors": "Peter D. Jamieson, Glen S. Francis, Derick R. Wilson, Robert J. Martin",
+        "Institution": "New Zealand Institute for Crop and Food Research Ltd.",
+        "URI": "EnergyBalance.Strategies.PriestlyTaylor",
+        "DOI": "-",
+        "Extended description": "Implements the Priestley–Taylor method to compute potential evapotranspiration from available energy. The strategy takes net radiation expressed as equivalent evaporation (a.netRadiationEquivalentEvaporation) and the slope of the saturation vapor pressure curve (a.hslope), and applies ET_PT = max(Alpha * hslope * netRadiationEquivalentEvaporation / (hslope + psychrometricConstant), 0). Parameters include psychrometricConstant (default 0.66) and Alpha (default 1.5). Output is r.evapoTranspirationPriestlyTaylor.",
+        "Short description": "Priestley–Taylor evapotranspiration calculation using available energy and hslope.",
+        "Model version": "-"
+    }
+}

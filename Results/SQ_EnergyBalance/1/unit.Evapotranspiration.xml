@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".EvapoTranspiration (EnergyBalance strategy, SiriusQuality2)" name="EvapoTranspiration (EnergyBalance strategy, SiriusQuality2)" timestep="1" version="-">
+	<Description>
+		<Title>EvapoTranspiration (EnergyBalance strategy, SiriusQuality2)</Title>
+		<Authors>Peter D. Jamieson; Glen S. Francis; Derick R. Wilson; Robert J. Martin</Authors>
+		<Institution>New Zealand Institute for Crop and Food Research Ltd.</Institution>
+		<URI>-</URI>
+		<Reference>-</Reference>
+		<ExtendedDescription>This strategy computes daily evapotranspiration by selecting between two methods depending on data availability. If wind and vapour pressure are available (isWindVpDefined = 1), it uses the Penman approach; otherwise it uses the Priestley–Taylor method. Inputs are the pre-computed Priestley–Taylor ET (r.evapoTranspirationPriestlyTaylor) and Penman ET (r.evapoTranspirationPenman), and the output is the selected evapotranspiration (r.evapoTranspiration). The component is part of the SiriusQuality2 EnergyBalance module.</ExtendedDescription>
+		<ShortDescription>Chooses Penman or Priestley–Taylor evapotranspiration based on data availability.</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="evapoTranspirationPriestlyTaylor" description="Priestly-Taylor evapotranspiration rate." inputtype="variable" variablecategory="rate" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="evapoTranspirationPenman" description="Penman-Monteith evapotranspiration rate." inputtype="variable" variablecategory="rate" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="isWindVpDefined" description="Indicator (1 or 0) whether wind and vapour pressure are defined (1 -&gt; use Penman, 0 -&gt; use Priestly-Taylor)." inputtype="parameter" parametercategory="constant" datatype="INT" max="1" min="0" default="1" unit="-" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="evapoTranspiration" description="Selected evapotranspiration rate based on data availability." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="-" uri="-"/>
+	</Outputs>
+	<Function name="Estimate" description="Main biophysical process function for EvapoTranspiration." language="cyml" type="external" filename="algo/pyx/Estimate.pyx"/>
+	<Function name="CalculateModel" description="Supporting function implementing the evapotranspiration selection logic." language="cyml" type="external" filename="algo/pyx/CalculateModel.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/Estimate.pyx"/>
+	<Parametersets/>
+	<Testsets>
+		<Testset name="t_-" description="-">
+			<Test name="t_-">
+				<OutputValue name="-">-</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

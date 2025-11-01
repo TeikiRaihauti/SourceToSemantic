@@ -1,0 +1,157 @@
+{
+    "init": {
+        "name": "-"
+    },
+    "process": {
+        "name": "CalculateModel",
+        "description": "Compute minimal and maximal canopy temperature from crop heat flux and boundary layer conductance."
+    },
+    "inputs": [
+        {
+            "name": "minTair",
+            "description": "minimum air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "maxTair",
+            "description": "maximum air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "cropHeatFlux",
+            "description": "crop heat flux",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "conductance",
+            "description": "boundary layer conductance",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "lambdaV",
+            "description": "latent heat of vaporization of water",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "2.454",
+            "unit": "MJ/kg",
+            "uri": "-"
+        },
+        {
+            "name": "rhoDensityAir",
+            "description": "density of air",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "1.225",
+            "unit": "kg/m^3",
+            "uri": "-"
+        },
+        {
+            "name": "specificHeatCapacityAir",
+            "description": "specific heat capacity of dry air",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "0.00101",
+            "unit": "MJ/kg/degC",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "minCanopyTemperature",
+            "description": "minimal canopy temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "maxCanopyTemperature",
+            "description": "maximal canopy temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "CalculateModel",
+            "description": "Compute minimal and maximal canopy temperature from crop heat flux and boundary layer conductance."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "No initialization function is defined. The single process function returns two values treated as state outputs. Units for cropHeatFlux and conductance are not specified in the source; defaults and units for lambdaV, rhoDensityAir, and specificHeatCapacityAir are taken from the docstring. conductance is assumed exogenous."
+        }
+    ]
+}

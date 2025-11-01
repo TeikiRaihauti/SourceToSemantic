@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<ModelUnit modelid=".STEMP (Soil Temperature module, DSSAT)" name="STEMP (Soil Temperature module, DSSAT)" timestep="1" version="1.0">
+	<Description>
+		<Title>STEMP (Soil Temperature module, DSSAT)</Title>
+		<Authors>DSSAT Development Team; Cheryl H. Porter; Gerrit Hoogenboom; A. J. Gijsman; P. W. Wilkens</Authors>
+		<Institution>The University of Georgia, Griffin, Georgia; University of Florida, Gainesville, Florida; Iowa State University, Ames, Iowa; International Center for Soil Fertility and Agricultural Development (IFDC), Muscle Shoals, Alabama; University of Guelph, Guelph, Ontario</Institution>
+		<URI>https://github.com/DSSAT/dssat-csm</URI>
+		<Reference>https://doi.org/10.2134/agronj1994.00021962008600060014x</Reference>
+		<ExtendedDescription>STEMP computes daily soil temperature by layer within the DSSAT framework using EPIC-based formulations. It estimates a damping depth (DD) from bulk density and a water-content function (WC) based on potential extractable soil water, then applies a sinusoidal annual forcing with latitude-dependent phase (HDAY) to calculate temperatures at layer midpoints: T(z) = TAV + (TAMP/2·cos(ALX+ZD) + DT)·exp(ZD), where ZD = −depth/DD. The module maintains a 5-day moving average of air temperature (TMA) to compute the departure term (DT) and also provides a surface temperature (SRFTEMP). Seasonal initialization spins up the profile and sets albedo from mulch/soil albedo (MSALB).</ExtendedDescription>
+		<ShortDescription>Daily soil temperature profile by layer using EPIC-derived damping depth and sinusoidal forcing (DSSAT STEMP).</ShortDescription>
+	</Description>
+	<Inputs>
+		<Input name="control_dynamic" description="Control flag for model phase (use 2 for SEASINIT, 3 for RATE)." inputtype="variable" variablecategory="exogenous" datatype="INT" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="control_yrdoy" description="Date as YYYYDDD used to derive day of year." inputtype="variable" variablecategory="exogenous" datatype="INT" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="control_run" description="Run number indicator." inputtype="variable" variablecategory="exogenous" datatype="INT" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="control_rnmode" description="Run mode code (e.g., 'B','Q','F',...)." inputtype="variable" variablecategory="exogenous" datatype="CHAR" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="iswitch_iswwat" description="Water simulation switch ('Y' or 'N')." inputtype="parameter" parametercategory="constant" datatype="CHAR" max="-" min="-" default="Y" unit="-" uri="-"/>
+		<Input name="soilprop_bd" description="Soil bulk density by layer." inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="soilprop_dlayr" description="Soil layer thicknesses." inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="soilprop_ds" description="Cumulative soil depth to layer bottoms." inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="soilprop_dul" description="Drained upper limit (field capacity) by layer." inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="soilprop_ll" description="Lower limit (wilting point) by layer." inputtype="parameter" parametercategory="constant" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="soilprop_nlayr" description="Number of soil layers." inputtype="parameter" parametercategory="constant" datatype="INT" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="soilprop_msalb" description="Soil albedo for moisture conditions." inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="0.13" unit="-" uri="-"/>
+		<Input name="SRAD" description="Daily solar radiation." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="SW" description="Soil water content by layer." inputtype="variable" variablecategory="exogenous" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="TAVG" description="Daily average air temperature." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="TMAX" description="Daily maximum air temperature." inputtype="variable" variablecategory="exogenous" datatype="DOUBLE" max="-" min="-" default="-" unit="-" uri="-"/>
+		<Input name="XLAT" description="Latitude (degrees; sign determines hemisphere)." inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="degree" uri="-"/>
+		<Input name="TAV" description="Average annual air temperature." inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="TAMP" description="Annual temperature amplitude." inputtype="parameter" parametercategory="constant" datatype="DOUBLE" max="-" min="-" default="-" unit="degC" uri="-"/>
+		<Input name="CUMDPT" description="Cumulative depth for thermal calculations (state)." inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="0.0" unit="-" uri="-"/>
+		<Input name="DSMID" description="Depth to midpoint of each soil layer (state)." inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" default="[0.0]*NLAYR" unit="-" uri="-"/>
+		<Input name="TDL" description="Total drained upper limit (state accumulator)." inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="0.0" unit="-" uri="-"/>
+		<Input name="TMA" description="Running 5-day average of TAVG (state)." inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="5" max="-" min="-" default="[0.0]*5" unit="degC" uri="-"/>
+		<Input name="ATOT" description="Sum of last 5 daily average temperatures (state)." inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="0.0" unit="degC" uri="-"/>
+		<Input name="SRFTEMP" description="Surface soil temperature (state)." inputtype="variable" variablecategory="state" datatype="DOUBLE" max="-" min="-" default="0.0" unit="degC" uri="-"/>
+		<Input name="ST" description="Soil temperature by layer (state)." inputtype="variable" variablecategory="state" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" default="[0.0]*NLAYR" unit="degC" uri="-"/>
+	</Inputs>
+	<Outputs>
+		<Output name="CUMDPT" description="Updated cumulative depth for thermal calculations." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="-" uri="-"/>
+		<Output name="DSMID" description="Updated depth to midpoint of each soil layer." variablecategory="state" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" unit="-" uri="-"/>
+		<Output name="TDL" description="Updated total drained upper limit accumulator." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="-" uri="-"/>
+		<Output name="TMA" description="Updated running 5-day average array." variablecategory="state" datatype="DOUBLELIST" len="5" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="ATOT" description="Updated sum of the last 5 daily average temperatures." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="SRFTEMP" description="Updated surface soil temperature." variablecategory="state" datatype="DOUBLE" max="-" min="-" unit="degC" uri="-"/>
+		<Output name="ST" description="Updated soil temperature by layer." variablecategory="state" datatype="DOUBLELIST" len="soilprop_nlayr" max="-" min="-" unit="degC" uri="-"/>
+	</Outputs>
+	<Initialization name="STEMP" language="cyml" filename="algo/pyx/STEMP.pyx"/>
+	<Function name="fortran_nint" description="Fortran NINT-equivalent: nearest integer with ties away from zero." language="cyml" type="external" filename="algo/pyx/fortran_nint.pyx"/>
+	<Function name="YR_DOY" description="Convert YRDOY (YYYYDDD) to (YEAR, DOY)." language="cyml" type="external" filename="algo/pyx/YR_DOY.pyx"/>
+	<Function name="SOILT" description="Computes soil temperature profile and surface temperature given forcing and soil properties." language="cyml" type="external" filename="algo/pyx/SOILT.pyx"/>
+	<Function name="STEMP" description="Main component: seasonal initialization (SEASINIT) and daily rate (RATE) computations for soil temperature." language="cyml" type="external" filename="algo/pyx/STEMP.pyx"/>
+	<Function name="test_STEMP_basic" description="Basic sanity test to exercise initialization and one rate step; checks types and lengths." language="cyml" type="external" filename="algo/pyx/test_STEMP_basic.pyx"/>
+	<Algorithm language="cyml" platform="" filename="algo/pyx/STEMP.pyx"/>
+	<Parametersets/>
+	<Testsets>
+		<Testset name="t_test_STEMP_basic" description="Initialization (SEASINIT) followed by one RATE step; asserts SRFTEMP is float and array lengths are correct.">
+			<Test name="t_test_STEMP_basic">
+				<OutputValue name="type(SRFTEMP)_after_init">float</OutputValue>
+				<OutputValue name="len(ST)_after_init">4</OutputValue>
+				<OutputValue name="len(TMA)_after_init">5</OutputValue>
+				<OutputValue name="type(SRFTEMP)_after_rate">float</OutputValue>
+				<OutputValue name="len(ST)_after_rate">4</OutputValue>
+				<OutputValue name="len(TMA)_after_rate">5</OutputValue>
+			</Test>
+		</Testset>
+	</Testsets>
+</ModelUnit>

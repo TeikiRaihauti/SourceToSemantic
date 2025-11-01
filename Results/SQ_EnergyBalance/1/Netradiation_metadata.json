@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "NetRadiation (EnergyBalance component)",
+        "Authors": "Peter D. Jamieson; Glen S. Francis; Derick R. Wilson; Robert J. Martin",
+        "Institution": "New Zealand Institute for Crop and Food Research Ltd.",
+        "URI": "-",
+        "DOI": "-",
+        "Extended description": "NetRadiation computes canopy-surface net radiation as the difference between incoming shortwave and outgoing longwave radiation. Shortwave net radiation is (1 − albedoCoefficient) × solarRadiation. Clear-sky solar radiation is estimated as (0.75 + 2×10⁻⁵ × elevation) × extraSolarRadiation. Outgoing longwave is calculated with the Stefan–Boltzmann law using the mean of (Tmax+273.16)^4 and (Tmin+273.16)^4, a surface emissivity term (0.34 − 0.14 √(vaporPressure/10)), and a cloud-cover factor (1.35 × solarRadiation/clearSkySolarRadiation − 0.35). Finally, netRadiation = Nsr − Nolr. Inputs: minTair, maxTair, solarRadiation, vaporPressure, extraSolarRadiation; parameters: albedoCoefficient (default 0.23), stefanBoltzman (4.903E-09), elevation (m). Outputs: netRadiation and netOutGoingLongWaveRadiation.",
+        "Short description": "Computes canopy net radiation from shortwave and longwave components using albedo, elevation-adjusted clear-sky radiation, emissivity, and cloud-cover corrections.",
+        "Model version": "-"
+    }
+}

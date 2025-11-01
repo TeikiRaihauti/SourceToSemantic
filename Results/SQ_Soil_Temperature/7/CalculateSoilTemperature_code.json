@@ -1,0 +1,185 @@
+{
+    "init": {
+        "name": "Init"
+    },
+    "process": {
+        "name": "Estimate",
+        "description": "Main biophysical process function."
+    },
+    "inputs": [
+        {
+            "name": "exogenous_meanAnnualAirTemp",
+            "description": "Annual Mean Air Temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "°C",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_maxTAir",
+            "description": "Maximum Air Temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "°C",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_meanTAir",
+            "description": "Mean Air Temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "°C",
+            "uri": "-"
+        },
+        {
+            "name": "exogenous_minTAir",
+            "description": "Minimum Air Temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "°C",
+            "uri": "-"
+        },
+        {
+            "name": "ratesexternal_heatFlux",
+            "description": "Soil Heat Flux",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g m-2 d-1",
+            "uri": "-"
+        },
+        {
+            "name": "deeplayerstates_deepLayerT",
+            "description": "Deep soil layer temperature from previous step",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "°C",
+            "uri": "-"
+        },
+        {
+            "name": "lambda_",
+            "description": "Latent heat of water vaporization at 20°C",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "2.454",
+            "unit": "MJ kg-1",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "states_minTSoil",
+            "description": "Minimum Soil Temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "°C",
+            "uri": "-"
+        },
+        {
+            "name": "states_maxTSoil",
+            "description": "Maximum Soil Temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "°C",
+            "uri": "-"
+        },
+        {
+            "name": "deeplayerstates_deepLayerT",
+            "description": "Updated deep soil layer temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "°C",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "SoilMinimumTemperature",
+            "description": "Compute soil minimum temperature (°C)."
+        },
+        {
+            "name": "SoilMaximumTemperature",
+            "description": "Compute soil maximum temperature (°C)."
+        },
+        {
+            "name": "SoilTempA",
+            "description": "Soil temperature component A."
+        },
+        {
+            "name": "SoilTempB",
+            "description": "Soil temperature component B."
+        },
+        {
+            "name": "UpdateTemperature",
+            "description": "Update the deep soil layer temperature (°C) based on min and max soil temperatures."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "states_minTSoil and states_maxTSoil are treated as state outputs per naming/return convention; deeplayerstates_deepLayerT is a state input/output. ratesexternal_heatFlux is categorized as an exogenous input though it represents a flux. Estimate uses sentinel values (-999, 999) to flag missing air temperatures; in that case outputs are set to 999.0, -999.0, and 0.0 respectively. No explicit bounds are provided, so min/max/default fields are set to '-'."
+        }
+    ]
+}

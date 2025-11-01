@@ -4,7 +4,7 @@
     },
     "process": {
         "name": "Estimate",
-        "description": "Compute soil temperature by layers using the SWAT method with damping depth and lag."
+        "description": "Compute soil temperature by layers using the SWAT method."
     },
     "inputs": [
         {
@@ -23,8 +23,8 @@
         {
             "name": "SoilProfileDepth",
             "description": "Soil profile depth",
-            "inputtype": "parameter",
-            "category": "constant",
+            "inputtype": "variable",
+            "category": "state",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "0",
@@ -37,7 +37,7 @@
             "name": "SurfaceSoilTemperature",
             "description": "Average surface soil temperature",
             "inputtype": "variable",
-            "category": "auxiliary",
+            "category": "state",
             "datatype": "DOUBLE",
             "len": "-",
             "min": "-60",
@@ -61,7 +61,7 @@
         },
         {
             "name": "SoilTemperatureByLayers",
-            "description": "Soil temperature of each layer (state from previous step)",
+            "description": "Soil temperature of each layer (previous step values)",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLEARRAY",
@@ -74,9 +74,9 @@
         },
         {
             "name": "BulkDensity",
-            "description": "Bulk density by soil layer",
-            "inputtype": "parameter",
-            "category": "constant",
+            "description": "Bulk density by layer",
+            "inputtype": "variable",
+            "category": "state",
             "datatype": "DOUBLEARRAY",
             "len": "SOILPROP_NLAYR",
             "min": "0.9",
@@ -89,7 +89,7 @@
             "name": "VolumetricWaterContent",
             "description": "Volumetric soil water content by layer",
             "inputtype": "variable",
-            "category": "exogenous",
+            "category": "state",
             "datatype": "DOUBLEARRAY",
             "len": "SOILPROP_NLAYR",
             "min": "0",
@@ -100,9 +100,9 @@
         },
         {
             "name": "LayerThickness",
-            "description": "Soil layer thickness",
-            "inputtype": "parameter",
-            "category": "constant",
+            "description": "Soil layer thickness by layer",
+            "inputtype": "variable",
+            "category": "state",
             "datatype": "DOUBLEARRAY",
             "len": "SOILPROP_NLAYR",
             "min": "0.005",
@@ -121,7 +121,7 @@
             "len": "SOILPROP_NLAYR",
             "min": "-60",
             "max": "60",
-            "default": "15",
+            "default": "-",
             "unit": "degC",
             "uri": "-"
         }
@@ -129,43 +129,17 @@
     "functions": [
         {
             "name": "Init",
-            "description": "Initialize soil temperature by layers to 15 degC for all layers."
+            "description": "Initialize SoilTemperatureByLayers to 15 degC for each layer."
         },
         {
             "name": "Estimate",
-            "description": "Compute soil temperature by layers using the SWAT method with damping depth and lag."
+            "description": "Compute soil temperature by layers using the SWAT method."
         }
     ],
-    "tests": [
-        {
-            "name": "-",
-            "description": "-",
-            "inputs": [
-                {
-                    "name": "-",
-                    "value": "-"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "-",
-                    "value": "-"
-                }
-            ]
-        }
-    ],
+    "tests": [],
     "comments": [
         {
-            "comment": "Source code is authoritative. SoilTemperatureByLayers is a state variable used as input (carryover) and updated as output."
-        },
-        {
-            "comment": "AirTemperatureAnnualAverage is treated as an exogenous variable (per code), despite some docs listing it as a constant parameter."
-        },
-        {
-            "comment": "SurfaceSoilTemperature is categorized as auxiliary; VolumetricWaterContent as exogenous; LayerThickness, BulkDensity, and SoilProfileDepth as constant parameters."
-        },
-        {
-            "comment": "Array lengths use SOILPROP_NLAYR, inferred from LayerThickness.Length."
+            "comment": "Categories follow code domain classes: AirTemperatureAnnualAverage is exogenous; other inputs are from States and treated as state variables. SoilTemperatureByLayers is both a state input and an updated state output. Array lengths are represented as SOILPROP_NLAYR."
         }
     ]
 }

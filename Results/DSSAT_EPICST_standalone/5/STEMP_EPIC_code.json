@@ -1,0 +1,544 @@
+{
+    "init": {
+        "name": "STEMP_EPIC_initialize"
+    },
+    "process": {
+        "name": "STEMP_EPIC",
+        "description": "Daily EPIC soil temperature process (RATE step)."
+    },
+    "inputs": [
+        {
+            "name": "iswitch_ISWWAT",
+            "description": "'Y' if water balance simulated, else other",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "CHAR",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "soilprop_BD",
+            "description": "Soil bulk density by layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLELIST",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "g/cm3",
+            "uri": "-"
+        },
+        {
+            "name": "soilprop_DLAYR",
+            "description": "Layer thickness",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLELIST",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "cm",
+            "uri": "-"
+        },
+        {
+            "name": "soilprop_DS",
+            "description": "Cumulative depth to bottom of each layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLELIST",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "cm",
+            "uri": "-"
+        },
+        {
+            "name": "soilprop_DUL",
+            "description": "Drained upper limit by layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLELIST",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "cm3/cm3",
+            "uri": "-"
+        },
+        {
+            "name": "soilprop_LL",
+            "description": "Lower limit by layer",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLELIST",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "cm3/cm3",
+            "uri": "-"
+        },
+        {
+            "name": "soilprop_NLAYR",
+            "description": "Number of soil layers",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "INT",
+            "len": "-",
+            "min": "1",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "SW",
+            "description": "Soil water by layer for current day",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLELIST",
+            "len": "NLAYR",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "cm3/cm3",
+            "uri": "-"
+        },
+        {
+            "name": "TAVG",
+            "description": "Daily average air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "TMAX",
+            "description": "Daily maximum air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "TMIN",
+            "description": "Daily minimum air temperature",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "TAV",
+            "description": "Long-term average temperature",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "ORGC_MULCHMASS",
+            "description": "Mulch mass on surface (initialization)",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "kg/ha",
+            "uri": "-"
+        },
+        {
+            "name": "WATER_SNOW",
+            "description": "Snow water equivalent on surface (initialization)",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "weather_RAIN",
+            "description": "Rainfall",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm/d",
+            "uri": "-"
+        },
+        {
+            "name": "mgmt_DEPIR",
+            "description": "Irrigation depth",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm/d",
+            "uri": "-"
+        },
+        {
+            "name": "plant_BIOMAS",
+            "description": "Plant biomass",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "kg/ha",
+            "uri": "-"
+        },
+        {
+            "name": "orgc_MULCHMASS",
+            "description": "Mulch mass on surface (daily process)",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "kg/ha",
+            "uri": "-"
+        },
+        {
+            "name": "water_SNOW",
+            "description": "Snow water equivalent on surface (daily process)",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "CUMDPT",
+            "description": "Profile depth",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "DSMID",
+            "description": "Depth to midpoint of soil layers",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "NLAYR",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "TDL",
+            "description": "Sum of (DUL*DLAYR) across layers (accumulator)",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "0.0",
+            "max": "-",
+            "default": "-",
+            "unit": "cm",
+            "uri": "-"
+        },
+        {
+            "name": "TMA",
+            "description": "5-day memory of surface temperature driver",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "5",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "NDays",
+            "description": "Number of days in wet-day memory",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "INT",
+            "len": "-",
+            "min": "0",
+            "max": "30",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "WetDay",
+            "description": "30-day memory of wet days (0/1 flags)",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "INTARRAY",
+            "len": "30",
+            "min": "0",
+            "max": "1",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "X2_PREV",
+            "description": "Previous smoothed surface temperature driver",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "0.0",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "SRFTEMP",
+            "description": "Surface soil temperature",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "ST",
+            "description": "Soil temperature by layer",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "CUMDPT",
+            "description": "Profile depth after daily step (unchanged here)",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "DSMID",
+            "description": "Depth to midpoint of soil layers after daily step (unchanged)",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "mm",
+            "uri": "-"
+        },
+        {
+            "name": "TDL",
+            "description": "Accumulator per original code (updated without reset)",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "cm",
+            "uri": "-"
+        },
+        {
+            "name": "TMA",
+            "description": "Updated 5-day memory of surface temperature driver",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "5",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "NDays",
+            "description": "Updated number of days in wet-day memory",
+            "datatype": "INT",
+            "category": "state",
+            "len": "-",
+            "min": "0",
+            "max": "30",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "WetDay",
+            "description": "Updated 30-day memory of wet-day flags",
+            "datatype": "INTARRAY",
+            "category": "state",
+            "len": "30",
+            "min": "0",
+            "max": "1",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "X2_PREV",
+            "description": "Updated previous smoothed surface temperature driver",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "SRFTEMP",
+            "description": "Updated surface soil temperature",
+            "datatype": "DOUBLE",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        },
+        {
+            "name": "ST",
+            "description": "Updated soil temperature by layer",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "NLAYR",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "deg C",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "STEMP_EPIC_initialize",
+            "description": "Initialize EPIC soil temperature state and spin-up profile using SOILT_EPIC."
+        },
+        {
+            "name": "STEMP_EPIC",
+            "description": "Daily EPIC soil temperature process (RATE step) updating wet-day memory, cover effects, and calling SOILT_EPIC."
+        },
+        {
+            "name": "SOILT_EPIC",
+            "description": "Compute surface and layer soil temperatures using damping depth and cover/wetness effects."
+        },
+        {
+            "name": "nint",
+            "description": "Nearest integer rounding helper (used inside initialization)."
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "STEMP_EPIC is treated as the major process; STEMP_EPIC_initialize sets initial states and performs an 8-iteration spin-up via SOILT_EPIC."
+        },
+        {
+            "comment": "TDL in STEMP_EPIC is accumulated each call without reset, matching the provided code behavior."
+        },
+        {
+            "comment": "Parameter vs exogenous classification: soil properties, iswitch_ISWWAT, and TAV are parameters (constants), while daily weather/management inputs (SW, TAVG/TMAX/TMIN, rainfall, irrigation, biomass, mulch, snow) are exogenous."
+        },
+        {
+            "comment": "Two naming variants exist for mulch and snow between initialize (ORGC_MULCHMASS, WATER_SNOW) and process (orgc_MULCHMASS, water_SNOW); both are documented separately."
+        },
+        {
+            "comment": "Wet-day memory stores last 30 flags; NDays increments up to 30, then the buffer shifts. WFT is NWetDays/NDays; during initialization WFT is set to 0.1 for spin-up."
+        },
+        {
+            "comment": "Units mix cm (DLAYR, DS), mm (CUMDPT, DP), and cm3/cm3 (water contents); conversions are handled internally as in the source."
+        },
+        {
+            "comment": "There is a no-op alias isswitch_ISWWAT in STEMP_EPIC; it does not affect logic."
+        }
+    ]
+}

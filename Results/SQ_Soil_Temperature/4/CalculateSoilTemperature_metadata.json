@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "CalculateSoilTemperature",
+        "Authors": "Loic Manceau",
+        "Institution": "INRA",
+        "URI": "http://biomamodelling.org",
+        "DOI": "-",
+        "Extended description": "Computes daily minimum and maximum soil temperature using air temperature inputs (min/mean/max), soil heat flux, and a latent heat parameter, with a deep-layer temperature memory that is initialized from the annual mean air temperature and updated by exponential smoothing.",
+        "Short description": "Daily min/max soil temperature with deep-layer memory.",
+        "Model version": "1.0.0.0"
+    }
+}

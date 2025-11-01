@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "SiriusQuality-SoilTemperature",
+        "Authors": "Loic Manceau",
+        "Institution": "INRA",
+        "URI": "http://biomamodelling.org",
+        "DOI": "-",
+        "Extended description": "Soil temperature component providing daily minimum and maximum soil temperatures and, optionally, an hourly soil temperature profile. Daily min/max are computed from air temperatures, soil heat flux, and the latent heat parameter (lambda_) using two formulations: (A) a heat-flux driven function with a low-temperature adjustment and (B) an average of air minimum and deep-layer temperature; min is the minimum of A and B, max is the maximum of A and B. Deep-layer temperature is updated by exponential smoothing of daily mean soil temperature. Hourly temperatures follow the Parton and Logan (1981) diurnal scheme parameterized by a, b, and c and the day length. Inputs include max/min/mean air temperature, mean annual air temperature (for initialization), soil heat flux, and day length; outputs include daily min/max soil temperature, hourly soil temperature (optional), and deep-layer temperature.",
+        "Short description": "Component to compute daily min/max and optional hourly soil temperatures from weather and soil heat flux, with deep-layer temperature smoothing.",
+        "Model version": "1.0.0.0"
+    }
+}

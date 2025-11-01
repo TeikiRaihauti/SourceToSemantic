@@ -1,0 +1,132 @@
+{
+    "init": {
+        "name": "init_temp_profile"
+    },
+    "process": {
+        "name": "model_temp_profile",
+        "description": "Compute soil temperature profile for 1 cm layers."
+    },
+    "inputs": [
+        {
+            "name": "air_temp_day1",
+            "description": "Air temperature for day 1 used to initialize soil and canopy temperatures.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "layer_thick",
+            "description": "Thickness of soil layers (sum determines initial profile depth in 1 cm layers).",
+            "inputtype": "parameter",
+            "category": "constant",
+            "datatype": "INTARRAY",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "temp_amp",
+            "description": "Temperature amplitude driving the soil temperature profile.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "prev_temp_profile",
+            "description": "Previous time step soil temperature profile (1 cm layers).",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLELIST",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "prev_canopy_temp",
+            "description": "Previous time step canopy temperature.",
+            "inputtype": "variable",
+            "category": "state",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        },
+        {
+            "name": "min_air_temp",
+            "description": "Minimum air temperature for the current step.",
+            "inputtype": "variable",
+            "category": "exogenous",
+            "datatype": "DOUBLE",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "temp_profile",
+            "description": "Soil temperature profile for current step (1 cm layers).",
+            "datatype": "DOUBLELIST",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "-",
+            "uri": "-"
+        }
+    ],
+    "functions": [
+        {
+            "name": "-",
+            "description": "-"
+        }
+    ],
+    "tests": [
+        {
+            "name": "-",
+            "description": "-",
+            "inputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "-",
+                    "value": "-"
+                }
+            ]
+        }
+    ],
+    "comments": [
+        {
+            "comment": "Units are not specified in the source; temperatures likely in degC but left as '-'. temp_amp and min_air_temp treated as exogenous. init_temp_profile creates a 1-cm layered profile whose length equals max(sum(layer_thick), 0). The temperature profile state is represented as prev_temp_profile (input) and temp_profile (output). prev_canopy_temp is a state input but is not updated by model_temp_profile."
+        }
+    ]
+}

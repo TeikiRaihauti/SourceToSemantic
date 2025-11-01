@@ -1,0 +1,143 @@
+import math
+from typing import Tuple
+
+def Init(
+    deeplayerstates_deepLayerT: float,
+    exogenous_meanAnnualAirTemp: float
+) -> float:
+    """
+    Initialize deep soil layer temperature.
+
+    Inputs:
+    - deeplayerstates_deepLayerT: float, °C, previous deep soil layer temperature (ignored)
+    - exogenous_meanAnnualAirTemp: float, °C, annual mean air temperature
+
+    Returns:
+    - deeplayerstates_deepLayerT: float, °C, initialized deep soil layer temperature
+    """
+    return exogenous_meanAnnualAirTemp
+
+
+def SoilMinimumTemperature(
+    weatherMaxTemp: float,
+    weatherMeanTemp: float,
+    weatherMinTemp: float,
+    soilHeatFlux: float,
+    lambda_: float,
+    deepTemperature: float
+) -> float:
+    """
+    Compute soil minimum temperature (°C).
+    """
+    return min(
+        SoilTempA(weatherMaxTemp, weatherMeanTemp, soilHeatFlux, lambda_),
+        SoilTempB(weatherMinTemp, deepTemperature)
+    )
+
+
+def SoilMaximumTemperature(
+    weatherMaxTemp: float,
+    weatherMeanTemp: float,
+    weatherMinTemp: float,
+    soilHeatFlux: float,
+    lambda_: float,
+    deepTemperature: float
+) -> float:
+    """
+    Compute soil maximum temperature (°C).
+    """
+    return max(
+        SoilTempA(weatherMaxTemp, weatherMeanTemp, soilHeatFlux, lambda_),
+        SoilTempB(weatherMinTemp, deepTemperature)
+    )
+
+
+def SoilTempA(
+    weatherMaxTemp: float,
+    weatherMeanTemp: float,
+    soilHeatFlux: float,
+    lambda_: float
+) -> float:
+    """
+    Soil temperature component A (°C).
+    - soilHeatFlux: g m-2 d-1
+    - lambda_: MJ kg-1 (latent heat of vaporization)
+    """
+    TempAdjustment = (-0.5 * weatherMeanTemp + 4.0) if (weatherMeanTemp < 8.0) else 0.0
+    SoilAvailableEnergy = soilHeatFlux * lambda_ / 1000.0
+    return weatherMaxTemp + 11.2 * (1.0 - math.exp(-0.07 * (SoilAvailableEnergy - 5.5))) + TempAdjustment
+
+
+def SoilTempB(
+    weatherMinTemp: float,
+    deepTemperature: float
+) -> float:
+    """
+    Soil temperature component B (°C).
+    """
+    return (weatherMinTemp + deepTemperature) / 2.0
+
+
+def UpdateTemperature(
+    minSoilTemp: float,
+    maxSoilTemp: float,
+    Temperature: float
+) -> float:
+    """
+    Update deep soil layer temperature using exponential smoothing.
+
+    Inputs:
+    - minSoilTemp: float, °C
+    - maxSoilTemp: float, °C
+    - Temperature: float, °C, previous deep layer temperature
+
+    Returns:
+    - Temperature: float, °C, updated deep layer temperature
+    """
+    meanTemp = (minSoilTemp + maxSoilTemp) / 2.0
+    Temperature = (9.0 * Temperature + meanTemp) / 10.0
+    return Temperature
+
+
+def Estimate(
+    deeplayerstates_deepLayerT: float,
+    exogenous_maxTAir: float,
+    exogenous_meanTAir: float,
+    exogenous_minTAir: float,
+    ratesexternal_heatFlux: float,
+    lambda_: float = 2.454
+) -> Tuple[float, float, float]:
+    """
+    Main biophysical process: calculate daily soil min/max temperature and update deep layer temperature.
+
+    Inputs:
+    - deeplayerstates_deepLayerT: float, °C, current deep soil layer temperature
+    - exogenous_maxTAir: float, °C, daily max air temperature
+    - exogenous_meanTAir: float, °C, daily mean air temperature
+    - exogenous_minTAir: float, °C, daily min air temperature
+    - ratesexternal_heatFlux: float, g m-2 d-1, soil heat flux
+    - lambda_: float, MJ kg-1, latent heat of water vaporization at 20°C (default 2.454)
+
+    Returns:
+    - deeplayerstates_deepLayerT: float, °C, updated deep soil layer temperature
+    - states_maxTSoil: float, °C, daily max soil temperature
+    - states_minTSoil: float, °C, daily min soil temperature
+    """
+    if exogenous_maxTAir == -999 and exogenous_minTAir == 999:
+        states_minTSoil = 999.0
+        states_maxTSoil = -999.0
+        deeplayerstates_deepLayerT = 0.0
+    else:
+        states_minTSoil = SoilMinimumTemperature(
+            exogenous_maxTAir, exogenous_meanTAir, exogenous_minTAir,
+            ratesexternal_heatFlux, lambda_, deeplayerstates_deepLayerT
+        )
+        states_maxTSoil = SoilMaximumTemperature(
+            exogenous_maxTAir, exogenous_meanTAir, exogenous_minTAir,
+            ratesexternal_heatFlux, lambda_, deeplayerstates_deepLayerT
+        )
+        deeplayerstates_deepLayerT = UpdateTemperature(
+            states_minTSoil, states_maxTSoil, deeplayerstates_deepLayerT
+        )
+
+    return deeplayerstates_deepLayerT, states_maxTSoil, states_minTSoil

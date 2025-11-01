@@ -25,16 +25,16 @@ Name;inputtype;variablecategory;datatype
 
 Outputs stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-2;3;2;1;0;0.6666666666666666;1.0;0.8
+3;3;3;0;0;1.0;1.0;1.0
 
 True positive
 Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
 SoilTempArray;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;WRONG
 rSoilTempArrayRate;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG;WRONG
+pSoilLayerDepth;OK;OK;WRONG;OK;WRONG;WRONG;OK;OK;WRONG
 
 False positive
 Name;inputtype;variablecategory;datatype
-pSoilLayerDepth;;state;DOUBLELIST
 
 False negative
 Name;inputtype;variablecategory;datatype

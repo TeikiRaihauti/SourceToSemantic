@@ -1,0 +1,12 @@
+{
+    "metadata": {
+        "Title": "STEMP - Soil Temperature Component",
+        "Authors": "DSSAT (DSSAT Florida)",
+        "Institution": "The University of Georgia; University of Florida; Iowa State University; International Center for Soil Fertility and Agricultural Development; University of Guelph",
+        "URI": "-",
+        "DOI": "https://doi.org/10.2134/agronj1994.00021962008600060014x",
+        "Extended description": "STEMP computes daily soil temperature profiles by layer using the Parton-Logan approach with a corrected soil water term. It uses weather inputs (solar radiation, average and maximum air temperature, latitude), long-term temperature statistics (TAV, TAMP), and soil properties (albedo with mulch effects, bulk density, layer depths, water contents) to update a 5-day moving average and estimate surface and layer temperatures.",
+        "Short description": "Determines soil temperature by layer.",
+        "Model version": "1.0"
+    }
+}

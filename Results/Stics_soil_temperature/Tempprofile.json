@@ -4,12 +4,12 @@
     },
     "process": {
         "name": "model_temp_profile",
-        "description": "Compute current soil temperature profile from previous profile and canopy/air temperatures."
+        "description": "Compute soil temperature profile for 1-cm layers from previous profile, canopy temperature, minimum air temperature, and temperature amplitude."
     },
     "inputs": [
         {
             "name": "air_temp_day1",
-            "description": "Air temperature used to initialize the profile (degC).",
+            "description": "Air temperature used to initialize soil profile and canopy temperature.",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -22,7 +22,7 @@
         },
         {
             "name": "layer_thick",
-            "description": "Soil layer thicknesses (cm). Sum defines soil depth in cm.",
+            "description": "Soil layer thicknesses; sum defines soil depth in 1-cm layers.",
             "inputtype": "parameter",
             "category": "constant",
             "datatype": "INT",
@@ -35,7 +35,7 @@
         },
         {
             "name": "temp_amp",
-            "description": "Daily temperature amplitude (degC).",
+            "description": "Daily temperature amplitude.",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -48,7 +48,7 @@
         },
         {
             "name": "prev_temp_profile",
-            "description": "Previous day soil temperature profile at 1 cm resolution (degC).",
+            "description": "Previous soil temperature profile at 1-cm resolution.",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLEARRAY",
@@ -61,7 +61,7 @@
         },
         {
             "name": "prev_canopy_temp",
-            "description": "Previous day's canopy temperature (degC).",
+            "description": "Previous canopy temperature.",
             "inputtype": "variable",
             "category": "state",
             "datatype": "DOUBLE",
@@ -74,7 +74,7 @@
         },
         {
             "name": "min_air_temp",
-            "description": "Current day's minimum air temperature (degC).",
+            "description": "Current minimum air temperature.",
             "inputtype": "variable",
             "category": "exogenous",
             "datatype": "DOUBLE",
@@ -89,7 +89,19 @@
     "outputs": [
         {
             "name": "temp_profile",
-            "description": "Current soil temperature profile at 1 cm resolution (degC).",
+            "description": "Current soil temperature profile at 1-cm resolution.",
+            "datatype": "DOUBLEARRAY",
+            "category": "state",
+            "len": "-",
+            "min": "-",
+            "max": "-",
+            "default": "-",
+            "unit": "degC",
+            "uri": "-"
+        },
+        {
+            "name": "prev_temp_profile",
+            "description": "Initialized previous soil temperature profile at 1-cm resolution (from init).",
             "datatype": "DOUBLEARRAY",
             "category": "state",
             "len": "-",
@@ -101,7 +113,7 @@
         },
         {
             "name": "prev_canopy_temp",
-            "description": "Previous canopy temperature carried forward as state (degC).",
+            "description": "Initialized previous canopy temperature (from init).",
             "datatype": "DOUBLE",
             "category": "state",
             "len": "-",
@@ -112,7 +124,16 @@
             "uri": "-"
         }
     ],
-    "functions": [],
+    "functions": [
+        {
+            "name": "model_temp_profile",
+            "description": "Compute updated soil temperature profile using previous profile and temperature drivers."
+        },
+        {
+            "name": "init_temp_profile",
+            "description": "Initialize previous soil temperature profile and canopy temperature from day-1 air temperature and layer thickness."
+        }
+    ],
     "tests": [
         {
             "name": "-",
@@ -133,7 +154,7 @@
     ],
     "comments": [
         {
-            "comment": "Source code defines init_temp_profile (initializer) and model_temp_profile (main process). prev_temp_profile and prev_canopy_temp are initialized by init; prev_temp_profile is consumed by the process and temp_profile is produced. prev_canopy_temp is treated as state and listed as both input and output to reflect initialization, though it is not updated by the process. Datatypes normalized: DOUBLELIST->DOUBLEARRAY; INTARRAY->INT. Array lengths are dynamic (1 cm resolution with length equal to sum(layer_thick)). Internal constants (therm_diff, temp_freq) are not exposed."
+            "comment": "Source code defines two subroutines: init_temp_profile (outputs prev_temp_profile, prev_canopy_temp) and model_temp_profile (outputs temp_profile). prev_canopy_temp is treated as a state variable (initialized in init, read by process). layer_thick is an integer array in code; represented with datatype INT and described as an array; length is dynamic (sum determines profile depth). Temperatures use degC; thickness uses cm. Internal constants (therm_diff, temp_freq) are hard-coded and not exposed."
         }
     ]
 }
