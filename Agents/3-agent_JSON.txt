@@ -14,9 +14,9 @@ Output a single JSON object. Do not include any extra text, explanations, or key
 # DEFINITIONS
 - Parameter: Constant configuration value (unchanged during a run unless explicitly reconfigured).
 - Variable categories:
-	- state: Persisted across time steps and updated by the model (e.g., biomass, LAI).
+	- state: Persisted across time steps and updated by the model.
 	- rate: Derivatives/fluxes affecting state changes within a time step.
-	- exogenous: External drivers/forcings supplied from outside this component (e.g., weather, soil moisture from another module).
+	- exogenous: External driven variables supplied from outside this component.
 	- auxiliary: Computed helper variables used across calls.
 - Initialization function: Function that sets up initial state/parameters before the main simulation steps.
 - Major biophysical process function : The single function performing the core process for each step.
@@ -24,18 +24,20 @@ Output a single JSON object. Do not include any extra text, explanations, or key
 - Unit test function: A function or block clearly intended to verify behavior.
 
 # PROCEDURE
-1. Read and understand the whole codebase.
+1. Read and understand the whole Python module.
 2. Identify the initialization function (if any).
 3. Identify the single major biophysical process function.
 4. List supporting functions (if any).
-5. Extract inputs used by init, main process, and supporting functions per input rules.
-6. Extract outputs written by init and main process.
+5. Extract inputs used by init and main process per input rules.
+6. Extract outputs written by main process.
 7. Identify unit tests and extract their fixed inputs and expected outputs (if any).
-8. Produce the JSON exactly matching the schema.
+8. Note any misunderstanding, ambigousity, assumptions done during the creation of the JSON object in the "comments" field.
+9. Produce the JSON exactly matching the schema.
 	
 # INPUT CLASSIFICATION
 - If a variable is read before modification : list it as an input.
 - Do not include loop counters or purely local temporaries as inputs.
+- Include each input explicitly defined in init and main process functions signature.
 - Be exhaustive.
 - Provide for each input :
 	- name
@@ -49,11 +51,11 @@ Output a single JSON object. Do not include any extra text, explanations, or key
 	- default value (if applicable)
 	- unit (if applicable)
 	- URI (if applicable)
-		
 
 # OUTPUT CLASSIFICATION
 - Outputs are variables written by the main process that represent model state after the step.
 - Outputs category is always "state".
+- Include each output explicitly defined.
 - Provide for each output :
 	- name 
 	- description
@@ -135,6 +137,11 @@ Output a single JSON object. Do not include any extra text, explanations, or key
         }
       ]
     }
-  ]
+  ],
+  "comments": [
+	{
+		"comment" : ""
+	}
+	]
 }
 ```

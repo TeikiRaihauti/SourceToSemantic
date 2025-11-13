@@ -44,7 +44,6 @@ C-----------------------------------------------------------------------
 C  Called : Main
 C  Calls  : SOILT
 C=======================================================================
-!%%CyML Model Begin%%
       SUBROUTINE STEMP(CONTROL, ISWITCH, SOILPROP,
      &    SRAD,     !Input
      &    SW,       !Input
@@ -61,7 +60,6 @@ C=======================================================================
      &    SRFTEMP,  !InOut
      &    ST)       !InOut
      
-!%%CyML Ignore Begin%%
 !     &    ISWWAT,   !Input
 !     &    BD,       !Input
 !     &    DLAYR,    !Input
@@ -70,7 +68,6 @@ C=======================================================================
 !     &    LL,       !Input
 !     &    NLAYR,    !Input
 !     &    MSALB,    !Input
-!%%CyML Ignore End%%
 
 C-----------------------------------------------------------------------
       USE ModuleDefs     !Definitions of constructed variable types, 
@@ -80,12 +77,10 @@ C-----------------------------------------------------------------------
       SAVE
 
       CHARACTER*1  ISWWAT !, IDETL Mon Dieu le père
-!%%CyML Ignore Begin%%
       CHARACTER*1  RNMODE
       CHARACTER*6, PARAMETER :: ERRKEY = "STEMP "
       CHARACTER*30 FILEIO
       INTEGER DYNAMIC, LUNIO, YRDOY, RUN, YEAR
-!%%CyML Ignore End%%
       
       INTEGER DOY, I, L, NLAYR
       REAL ABD, ALBEDO, ATOT, B, CUMDPT 
@@ -97,9 +92,7 @@ C-----------------------------------------------------------------------
      &      ST, SW, SWI
 
 !-----------------------------------------------------------------------
-!%%CyML Ignore Begin%%     
       TYPE (ControlType) CONTROL      
-!%%CyML Ignore End%%            
       TYPE (SoilType) SOILPROP
       TYPE (SwitchType) ISWITCH
 
@@ -109,10 +102,8 @@ C-----------------------------------------------------------------------
 !     IF (INDEX('N0',IDETL) > 0) RETURN
 
 !     Transfer values from constructed data types into local variables.
-!%%CyML Ignore Begin%%
       DYNAMIC = CONTROL % DYNAMIC  
       YRDOY   = CONTROL % YRDOY 
-!%%CyML Ignore End%%         
 
       ISWWAT = ISWITCH % ISWWAT
 
@@ -125,9 +116,7 @@ C-----------------------------------------------------------------------
       MSALB  = SOILPROP % MSALB        
 
 !-----------------------------------------------------------------------
-!%%CyML Ignore Begin%%
       CALL YR_DOY(YRDOY, YEAR, DOY)
-!%%CyML Ignore End%%
 
 !***********************************************************************
 !***********************************************************************
@@ -175,7 +164,6 @@ C-----------------------------------------------------------------------
 !          SWI = DUL
 !          DSI = SOILPROP % DS
 !        ENDIF
-!%%CyML Init Begin%%
         SWI = SW
         DSI = SOILPROP % DS
 
@@ -237,19 +225,15 @@ C-----------------------------------------------------------------------
      &        PESW, SRAD, TAMP, TAV, TAVG, TMAX, WW, DSMID,!Input
      &        ATOT, TMA, SRFTEMP, ST)                     !Output
         END DO
-!%%CyML Init End%%
       ENDIF
 
-!%%CyML Ignore Begin%%
 !     Print soil temperature data in STEMP.OUT
       CALL OPSTEMP(CONTROL, ISWITCH, DOY, SRFTEMP, ST, TAV, TAMP)
-!%%CyML Ignore End%%
 !***********************************************************************
 !***********************************************************************
 !     Daily rate calculations
 !***********************************************************************
       ELSEIF (DYNAMIC .EQ. RATE) THEN
-!%%CyML Rate Begin%%
 !-----------------------------------------------------------------------
       TBD = 0.0
       TLL = 0.0
@@ -280,17 +264,14 @@ C-----------------------------------------------------------------------
      &    PESW, SRAD, TAMP, TAV, TAVG, TMAX, WW, DSMID,!Input
      &    ATOT, TMA, SRFTEMP, ST)                     !Output
 
-!%%CyML Rate End%%
       
 !***********************************************************************
 !***********************************************************************
 !     Output & Seasonal summary
 !***********************************************************************
-!%%CyML Ignore Begin%%
       ELSEIF (DYNAMIC .EQ. OUTPUT .OR. DYNAMIC .EQ. SEASEND) THEN
 !-----------------------------------------------------------------------
       CALL OPSTEMP(CONTROL, ISWITCH, DOY, SRFTEMP, ST, TAV, TAMP)
-!%%CyML Ignore End%%
 !***********************************************************************
 !***********************************************************************
 !     END OF DYNAMIC IF CONSTRUCT
@@ -300,7 +281,6 @@ C-----------------------------------------------------------------------
       RETURN
       END !SUBROUTINE STEMP
 !=======================================================================
-!%%CyML Model End%%
 
 C=======================================================================
 C  SOILT, Subroutine
@@ -407,99 +387,3 @@ C=======================================================================
       RETURN
       END SUBROUTINE SOILT
 C=======================================================================
-
-
-!=======================================================================
-! STEMP and SOILT Variable definitions - updated 2/15/2004
-!======================================================================= 
-!%%Documentation%%
-!%%CyML Description Begin%%
-! ABD      Average bulk density for soil profile (g [soil] / cm3 [soil])
-!            ()  state variable   
-! ATOT     Sum of TMA array (last 5 days soil temperature) (degC) () state variable
-! B        Exponential decay factor (Parton and Logan) (in subroutine 
-!            HTEMP) 
-! BD(NL)    Bulk density, soil layer NL (g [soil] / cm3 [soil]) () soil parameter
-! CONTROL  Composite variable containing variables related to control 
-!            and/or timing of simulation.    See Appendix A. 
-! CUMDPT   Cumulative depth of soil profile (mm) () state variable
-! DD        
-! DLAYR(NL) Thickness of soil layer L (cm) () constant parameter
-! DOY      Current day of simulation (d) () exogenous variable
-! DP        
-! DS(NL)    Cumulative depth in soil layer L (cm) () soil parameter
-! DSMID(NL) Depth to midpoint of soil layer L (cm) () state variable
-! DT        
-! DUL(NL)   Volumetric soil water content at Drained Upper Limit in soil 
-!            layer L (cm3[water]/cm3[soil]) () soil parameter
-! ERRNUM   Error number for input 
-! FILEIO   Filename for input file (e.g., IBSNAT35.INP) 
-! FOUND    Indicator that good data was read from file by subroutine FIND 
-!            (0 - End-of-file encountered, 1 - NAME was found) 
-! FX        
-! HDAY     Haverst day (day) () state variable
-! ICWD     Initial water table depth (cm)
-! ISWITCH  Composite variable containing switches which control flow of (Y) constant parameter
-!            execution for model.  The structure of the variable 
-!            (SwitchType) is defined in ModuleDefs.for.
-! ISWWAT   Water simulation control switch (dimensionless) (Y) constant parameter
-! LINC     Line number of input file 
-! LL(NL)    Volumetric soil water content in soil layer L at lower limit
-!           (cm3 [water] / cm3 [soil]) () soil parameter
-! LNUM     Current line number of input file 
-! LUNIO    Logical unit number for FILEIO 
-! MSG      Text array containing information to be written to WARNING.OUT 
-!            file. 
-! MSGCOUNT Number of lines of message text to be sent to WARNING.OUT 
-! NLAYR    Actual number of soil layers (dimensionless) () constant parameter
-! NL       Number of soil layers (dimensionless) () constant parameter
-! PESW     Potential extractable soil water (= SW - LL) summed over root 
-!            depth (cm)
-! RNMODE    Simulation run mode (I=Interactive, A=All treatments, 
-!             B=Batch mode, E=Sensitivity, D=Debug, N=Seasonal, Q=Sequence)
-! RUN      Change in date between two observations for linear interpolation
-! MSALB    Soil albedo with mulch and soil water effects (dimensionless) () constant parameter
-! SECTION  Section name in input file 
-! SOILPROP Composite variable containing soil properties including bulk 
-!            density, drained upper limit, lower limit, pH, saturation 
-!            water content.  Structure defined in ModuleDefs. 
-! SRAD     Solar radiation (MJ/m2-d) () exogenous variable
-! SRFTEMP  Temperature of soil surface litter (degC) () state variable
-! ST(NL)    Soil temperature in soil layer L (degC) () state variable
-! SW(NL)    Volumetric soil water content in layer L
-!           (cm3 [water] / cm3 [soil]) () soil parameter
-! SWI(NL)   Initial soil water content (cm3[water]/cm3[soil])
-! TA       Daily normal temperature (�C)
-! TAMP     Amplitude of temperature function used to calculate soil 
-!            temperatures (degC) () exogenous variable
-! TAV      Average annual soil temperature, used with TAMP to calculate 
-!            soil temperature. (degC) () exogenous variable
-! TAVG     Average daily temperature (degC) () exogenous variable
-! TBD      Sum of bulk density over soil profile () soil parameter
-! TDL      Total water content of soil at drained upper limit (cm) () state variable
-! TLL      Total soil water in the profile at the lower limit of 
-!            plant-extractable water (cm) () soil parameter
-! TMA(5)   Array of previous 5 days of average soil temperatures (degC) () state variable
-! TMAX     Maximum daily temperature (degC) () exogenous variable 
-! TSW      Total soil water in profile (cm)
-! WC        
-! WW        
-! XLAT     Latitude (degC) () constant parameter
-! YEAR     Year of current date of simulation 
-! YRDOY    Current day of simulation (YYYYDDD)
-! ZD  
-!%%CyML Description End%%     
-!=======================================================================
-
-!%%Cyml Test Start%% 
-! Paramset_1
-!
-!
-!
-!
-! Paramsets_2
-
-
-
-
-!%%Cyml Test End%% 

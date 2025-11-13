@@ -4,7 +4,6 @@ from pathlib import Path
 import json
 import xml.dom.minidom
 import xml.etree.ElementTree as ET
-from time import sleep
 
 
 # TO-DO
@@ -87,6 +86,8 @@ def list_files_with_extension(folder_path, extension, exclude_filename):
     for file in files:
       if extension == ".cpp" and file.lower().endswith(".h") and file != exclude_filename:
         file_list.append(os.path.join(root, file))
+      if extension == ".java" and file.lower().endswith(".xml") and file != exclude_filename:
+        file_list.append(os.path.join(root, file))
       elif file.lower().endswith(extension) and file != exclude_filename:
         file_list.append(os.path.join(root, file))
   return file_list
@@ -107,13 +108,14 @@ def create_prompt_all_files(folder_path, main_file, list_files, language_name):
   if main_file_path is None:
     raise FileNotFoundError(f"File {main_file} is not there.")
   
-  prompt = f"Analyze the {nb_files + 1} following crop model source code files, written in {language_name} as a single crop model component. The main file is {main_file}.\n"
-  prompt += f"Follow the system instructions. Each file is marked clearly with --- FILE: filename --- at the start and --- END FILE --- at the end.\n\n\n"
+  prompt = f"Analyze the 1 following crop model source code files, written in {language_name}. The main file to process is {main_file}, the rest is auxiliary files for context only.\n"
+  prompt += f"Each file is marked clearly with --- FILE: filename --- at the start and --- END FILE --- at the end.\n"
+  prompt += f"Follow the system instructions.\n\n"
   prompt += f"--- FILE: {main_file} ---\n{extract_text(main_file_path)}\n--- END FILE ---"
   
-  if nb_files > 0:
-    for file in list_files:
-      prompt += f"\n\n--- FILE: {os.path.basename(file)} ---\n{extract_text(file)}\n--- END FILE ---"
+  #if nb_files > 0:
+  #  for file in list_files:
+  #    prompt += f"\n\n--- FILE: {os.path.basename(file)} ---\n{extract_text(file)}\n--- END FILE ---"
   
   return prompt
 
@@ -123,9 +125,32 @@ def create_prompt_all_files(folder_path, main_file, list_files, language_name):
 # This function constructs a prompt based on the refactored code.
 #-----------------------------------------------------------------
 def create_prompt_refactor(code_refactored):
-  prompt = f"Analyze the following Python crop model source code as a single crop model component.\n"
-  prompt += f"Follow the system instructions and output a JSON file describing the model.\n\n"
+  prompt = f"Analyze the following Python crop model source code and follow the system instructions.\n\n"
   prompt += f"{code_refactored}"
+  return prompt
+
+
+def create_prompt_JSON(json_path, folder_path, main_file, language_name, nb_iterations):
+  main_file_path = None
+  for root, dirs, files in os.walk(folder_path):
+    if main_file in files:
+      main_file_path = os.path.join(root, main_file)
+      break
+  if main_file_path is None:
+    raise FileNotFoundError(f"File {main_file} is not there.")
+  main_file_no_ext = Path(main_file).stem
+
+  
+  prompt = f"You will be provided {nb_iterations} JSON files, corresponding to interfaces of the source code file {main_file} written in {language_name}.\n"
+  prompt += f"Each JSON file is marked clearly with --- JSON FILE --- at the start and --- END JSON FILE --- at the end.\n"
+  prompt += f"The source file is marked clearly with --- SOURCE CODE FILE: filename --- at the start and --- END SOURCE CODE FILE --- at the end.\n"
+  prompt += f"Follow the system instructions.\n\n"
+  prompt += f"--- SOURCE CODE FILE: {main_file} ---\n{extract_text(main_file_path)}\n--- END FILE ---"
+ 
+  for i in range(1, nb_iterations + 1):
+    json_file_path = f"{json_path}{i}/{main_file_no_ext}_code.json"
+    prompt += f"\n\n--- JSON FILE {i} ---\n{extract_text(json_file_path)}\n--- END FILE ---"
+  
   return prompt
 
 
@@ -133,27 +158,48 @@ def create_prompt_refactor(code_refactored):
 # Function to send instructions and prompt to OpenAI's model
 # This function takes instructions, a prompt, an API key, and a model name and returns the response from the model.
 #-----------------------------------------------------------------
-def send_to_gpt(instructions, prompt, api_key, model, reasoning_effort, text_format, verbosity):
+def send_to_gpt(instructions, prompt, api_key, model, reasoning_effort, text_format, verbosity, web_search):
   client = OpenAI(api_key = api_key)
 
-  response = client.responses.create(
-    model=model,
-    reasoning={"effort": reasoning_effort},
-    store=True,
-    text={
-      "format": {"type": text_format},
-      "verbosity": verbosity,
-      },
-    input=[
-      {"role": "developer",
-        "content": [{"type": "input_text", "text": instructions}],
-      },
-      {
-        "role": "user",
-        "content": [{"type": "input_text", "text": prompt}],
-      }
-    ],
-  )
+  if web_search:
+    response = client.responses.create(
+      model=model,
+      reasoning={"effort": reasoning_effort},
+      store=True,
+      text={
+        "format": {"type": text_format},
+        "verbosity": verbosity,
+        },
+      input=[
+        {"role": "developer",
+          "content": [{"type": "input_text", "text": instructions}],
+        },
+        {
+          "role": "user",
+          "content": [{"type": "input_text", "text": prompt}],
+        }
+      ],
+    )
+
+  else:
+    response = client.responses.create(
+      model=model,
+      reasoning={"effort": reasoning_effort},
+      store=True,
+      text={
+        "format": {"type": text_format},
+        "verbosity": verbosity,
+        },
+      input=[
+        {"role": "developer",
+          "content": [{"type": "input_text", "text": instructions}],
+        },
+        {
+          "role": "user",
+          "content": [{"type": "input_text", "text": prompt}],
+        }
+      ],
+    )
 
   response = response.output_text
   if response.startswith("```json"):
@@ -210,14 +256,15 @@ def json_to_xml(file_path, json_metadata, json_code):
     })
 
   # Functions
-  for func in functions:
-    ET.SubElement(root, 'Function', {
-      'name': func['name'],
-      'description': func['description'],
-      'language': 'cyml',
-      'type': 'external',
-      'filename': f"algo/pyx/{func['name']}.pyx"
-    })
+  if functions != '-' and functions != []:
+    for func in functions:
+      ET.SubElement(root, 'Function', {
+        'name': func['name'],
+        'description': func['description'],
+        'language': 'cyml',
+        'type': 'external',
+        'filename': f"algo/pyx/{func['name']}.pyx"
+      })
 
   # Main Algorithm
   ET.SubElement(root, 'Algorithm', {
@@ -326,33 +373,47 @@ def add_tests(root_XML, json_tests, json_inputs):
 # list the relevant files in the specified folder, and constructs a prompt for the GPT model.
 # It then sends the prompt to the model and saves the response as a JSON file and a XML/Crop2ML file. 
 #-----------------------------------------------------------------
-def main(api_key_path, agent1_path, agent2_path, agent3_path, model, folder_path, output_path, main_file):
+def create_metadata(api_key_path, agent1_path, model, folder_path, output_path, main_file):
   api_key = extract_api_key(api_key_path)
   extension = extract_extension(folder_path + main_file)
   language_name = language(extension)
   list_files = list_files_with_extension(folder_path, extension, main_file)
 
   instructions_metadata = extract_text(agent1_path)
-  instructions_refactor = extract_text(agent2_path)
-  instructions_json = extract_text(agent3_path)
 
   prompt_all_files = create_prompt_all_files(folder_path, main_file, list_files, language_name)
-  response_metadata = send_to_gpt(instructions_metadata, prompt_all_files, api_key, model, "high", "json_object", "low")
-  response_refactored = send_to_gpt(instructions_refactor, prompt_all_files, api_key, model, "high", "text", "medium")
-
-  prompt_refactored = create_prompt_refactor(response_refactored)
-  response_json = send_to_gpt(instructions_json, prompt_refactored, api_key, model, "high", "json_object", "low")
+  response_metadata = send_to_gpt(instructions_metadata, prompt_all_files, api_key, model, "medium", "json_object", "low", True)
 
   os.makedirs(output_path, exist_ok=True)
   base, _ = os.path.splitext(main_file)
   json_metadata_path = output_path + base + "_metadata.json"
-  json_code_path = output_path + base + "_code.json"
-  python_code_path = output_path + base + "_code.py"
   json_metadata = json.loads(response_metadata)
-  json_code = json.loads(response_json)
 
   with open(json_metadata_path, "w", encoding="utf-8") as f:
     json.dump(json_metadata, f, ensure_ascii=False, indent=4)
+  return json_metadata
+
+
+def create_code(api_key_path, agent2_path, agent3_path, model, folder_path, output_path, main_file, json_metadata):
+  api_key = extract_api_key(api_key_path)
+  extension = extract_extension(folder_path + main_file)
+  language_name = language(extension)
+  list_files = list_files_with_extension(folder_path, extension, main_file)
+
+  instructions_refactor = extract_text(agent2_path)
+  instructions_json = extract_text(agent3_path)
+
+  prompt_all_files = create_prompt_all_files(folder_path, main_file, list_files, language_name)
+  response_refactored = send_to_gpt(instructions_refactor, prompt_all_files, api_key, model, "high", "text", "low", False)
+
+  prompt_refactored = create_prompt_refactor(response_refactored)
+  response_json = send_to_gpt(instructions_json, prompt_refactored, api_key, model, "medium", "json_object", "low", False)
+
+  os.makedirs(output_path, exist_ok=True)
+  base, _ = os.path.splitext(main_file)
+  json_code_path = output_path + base + "_code.json"
+  python_code_path = output_path + base + "_code.py"
+  json_code = json.loads(response_json)
 
   with open(json_code_path, "w", encoding="utf-8") as f:
     json.dump(json_code, f, ensure_ascii=False, indent=4)
@@ -367,24 +428,50 @@ def main(api_key_path, agent1_path, agent2_path, agent3_path, model, folder_path
     f.write(dom.toprettyxml())
 
 
+
+def concatenate_JSON(api_key_path, agent4_path, model, json_path, folder_path, output_path, main_file, json_metadata, nb_iterations):
+  api_key = extract_api_key(api_key_path)
+  extension = extract_extension(folder_path + main_file)
+  language_name = language(extension)
+
+  instructions_concatenate = extract_text(agent4_path)
+
+  prompt = create_prompt_JSON(json_path, folder_path, main_file, language_name, nb_iterations)
+  response = send_to_gpt(instructions_concatenate, prompt, api_key, model, "high", "json_object", "low", False)
+
+  os.makedirs(output_path, exist_ok=True)
+  base, _ = os.path.splitext(main_file)
+  json_path = output_path + base + ".json"
+  json_file = json.loads(response)
+
+  with open(json_path, "w", encoding="utf-8") as f:
+    json.dump(json_file, f, ensure_ascii=False, indent=4)
+
+  xml_path = output_path + "unit." + base + ".xml"
+  xml_data = json_to_xml(folder_path, json_metadata, json_file)
+  dom = xml.dom.minidom.parseString(xml_data)
+  with open(xml_path, 'w', encoding='utf-8') as f:
+    f.write(dom.toprettyxml())
+
 #-----------------------------------------------------------------
 #CONFIGURATION
 #-----------------------------------------------------------------
 AGENT1_PATH = "./1-agent_metadata.txt"
 AGENT2_PATH = "./2-agent_refactor.txt"
 AGENT3_PATH = "./3-agent_JSON.txt"
+AGENT4_PATH = "./4-agent_concatenation.txt"
 API_KEY_PATH = "./api_key.txt"
 MODEL = "gpt-5"
 
 COMPONENTS_DICT = {
-  "../Components/ApsimCampbell/": "SoilTemperature.cs",
-  "../Components/BiomaSurfacePartonSoilSWATC/": "SoilTemperatureSWAT.cs",
-  "../Components/BiomaSurfaceSWATSoilSWATC/": "SoilTemperatureSWAT.cs",
-  "../Components/DSSAT_EPICST_standalone/": "STEMP_EPIC.for",
-  "../Components/DSSAT_ST_standalone/": "STEMP.for",
-  "../Components/Simplace_Soil_Temperature/": "STMPsimCalculator.java",
-  "../Components/SQ_Soil_Temperature/": "CalculateSoilTemperature.cs",
-  "../Components/Stics_soil_temperature/": "Tempprofile.f90"
+  "ApsimCampbell/": "SoilTemperature.cs",
+  "BiomaSurfacePartonSoilSWATC/": "SoilTemperatureSWAT.cs",
+  "BiomaSurfaceSWATSoilSWATC/": "SoilTemperatureSWAT.cs",
+  "DSSAT_EPICST_standalone/": "STEMP_EPIC.for",
+  "DSSAT_ST_standalone/": "STEMP.for",
+  "Simplace_Soil_Temperature/": "STMPsimCalculator.java",
+  "SQ_Soil_Temperature/": "CalculateSoilTemperature.cs",
+  "Stics_soil_temperature/": "Tempprofile.f90"
 }
 
 ENERGY_BALANCE_DIRECTORY = "../Components/SQ_EnergyBalance/"
@@ -403,11 +490,56 @@ ENERGY_BALANCE_FILES =  [
     "Diffusionlimitedevaporation.cs"
   ]
 
-first_index_component = 0
-last_index_component = len(COMPONENTS_DICT) - 1
-number_iteration = 10
+SNOW_DIRECTORY = "../Components/STICS_SNOW/"
+SNOW_FILES =  [
+    "Melting.f90",
+    "Preciprec.f90",
+    "Refreezing.f90",
+    "Snowaccumulation.f90",
+    "Snowdensity.f90",
+    "Snowdepth.f90",
+    "Snowdepthtrans.f90",
+    "Snowdry.f90",
+    "Snowmelt.f90",
+    "Snowwet.f90",
+    "Tavg.f90",
+    "Tempmax.f90",
+    "Tempmin.f90"
+  ]
+
+LINTUL_DIRECTORY = "../Components/LINTUL/"
+LINTUL_FILES =  [
+    "DayLength.java",
+    "LintulBiomass.java",
+    "LintulPhenology.java",
+    "Partitioning.java",
+    "Photoperiod.java",
+    "Vernalisation.java"
+  ]
+
+CROSS_PLATFORMS_ST = {
+  "AP_all/": "SoilTemperature",
+  "DS_all/": "STEMP",
+  "SW_all/": "SoilTemperatureSWAT"
+}
+CROSS_PLATFORMS_MP = {
+  "apsim/": ".cs",
+  "bioma/": ".cs",
+  "dssat/": ".f90",
+  "simplace/": ".java",
+  "sirius/": ".cs",
+  "stics/": ".f90"
+}
+
+first_index_component = 4
+last_index_component = 4#len(COMPONENTS_DICT) - 1
+number_iteration = 1
 component_keys = list(COMPONENTS_DICT.keys())
 component_values = list(COMPONENTS_DICT.values())
+cross_st_keys = list(CROSS_PLATFORMS_ST.keys())
+cross_st_values = list(CROSS_PLATFORMS_ST.values())
+cross_mp_keys = list(CROSS_PLATFORMS_MP.keys())
+cross_mp_values = list(CROSS_PLATFORMS_MP.values())
 
 #-----------------------------------------------------------------
 # Simulation section
@@ -415,15 +547,55 @@ component_values = list(COMPONENTS_DICT.values())
 # Soil temperature section
 '''for i in range(first_index_component, last_index_component + 1):
   print(f"Processing {component_keys[i]} : {component_values[i]}")
-  for j in range(5, number_iteration + 1): 
+  metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, f"../Components/{component_keys[i]}", f"../Results/{component_keys[i]}", component_values[i])
+  for j in range(7, 8): 
     print(f"Iteration {j}")
-    output_path = f"{component_keys[i]}{j}/"
-    main(API_KEY_PATH, AGENT1_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, component_keys[i], output_path, component_values[i])
+    create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, f"../Components/{component_keys[i]}", f"../Results/{component_keys[i]}{j}/", component_values[i], metadata)
+  concatenate_JSON(API_KEY_PATH, AGENT4_PATH, MODEL, f"../Results/{component_keys[i]}/", f"../Components/{component_keys[i]}", f"../Results/{component_keys[i]}/", component_values[i], metadata, number_iteration)
 '''
 # Energy balance section
-for i in range(11, len(ENERGY_BALANCE_FILES)):
-  print(f"Processing {ENERGY_BALANCE_DIRECTORY} : {ENERGY_BALANCE_FILES[i]}")
-  for j in range(1, number_iteration + 1): 
-    print(f"Iteration {j}")
-    output_path = f"{ENERGY_BALANCE_DIRECTORY}{j}/"
-    main(API_KEY_PATH, AGENT1_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, ENERGY_BALANCE_DIRECTORY, output_path, ENERGY_BALANCE_FILES[i])
+#for i in range(0, len(ENERGY_BALANCE_FILES)):
+#  print(f"Processing {ENERGY_BALANCE_DIRECTORY} : {ENERGY_BALANCE_FILES[i]}")
+#  metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, ENERGY_BALANCE_DIRECTORY, f"../Results/SQ_EnergyBalance/", ENERGY_BALANCE_FILES[i])
+  #for j in range(1, 6): 
+  #  print(f"Iteration {j}")
+#  create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, ENERGY_BALANCE_DIRECTORY, f"../Results/SQ_EnergyBalance/", ENERGY_BALANCE_FILES[i], metadata)    
+
+  # Snow section
+#for i in range(0, len(SNOW_FILES)):
+  #print(f"Processing {SNOW_DIRECTORY} : {SNOW_FILES[i]}")
+  #metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, SNOW_DIRECTORY, f"../Results/STICS_SNOW/", SNOW_FILES[i])
+  #for j in range(1, 3): 
+    #print(f"Iteration {j}")
+
+    #create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, SNOW_DIRECTORY, f"../Results/STICS_SNOW/{j}/", SNOW_FILES[i], metadata)    
+ # base = Path(SNOW_FILES[i]).stem
+ # p = Path(f"../Results/STICS_SNOW/{base}_metadata.json")
+ # with p.open("r", encoding="utf-8") as fh:
+ #   metadata = json.load(fh)
+  #  concatenate_JSON(API_KEY_PATH, AGENT4_PATH, MODEL, f"../Results/STICS_SNOW/", SNOW_DIRECTORY, f"../Results/STICS_SNOW/", SNOW_FILES[i], metadata, 2)
+
+# LINTUL section
+for i in range(3, 4):
+  #print(f"Processing {LINTUL_DIRECTORY} : {LINTUL_FILES[i]}")
+  #metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, LINTUL_DIRECTORY, f"../Results/LINTUL/", LINTUL_FILES[i])
+  #for j in range(1, 2): 
+  #  print(f"Iteration {j}")
+  #  create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, LINTUL_DIRECTORY, f"../Results/LINTUL/{j}/", LINTUL_FILES[i], metadata)    
+  base = Path(LINTUL_FILES[i]).stem
+  p = Path(f"../Results/LINTUL/{base}_metadata.json")
+  with p.open("r", encoding="utf-8") as fh:
+    metadata = json.load(fh)
+    concatenate_JSON(API_KEY_PATH, AGENT4_PATH, MODEL, f"../Results/LINTUL/", LINTUL_DIRECTORY, f"../Results/LINTUL/", LINTUL_FILES[i], metadata, 2)
+
+
+# Cross platform section
+'''for i in range(0, 1):
+  print(f"Processing {cross_st_keys[i]}")
+  for j in range(4, 5):
+    print(f"{cross_mp_keys[j]}")
+    metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, f"../Components/{cross_st_keys[i]}{cross_mp_keys[j]}", 
+                               f"../Results/{cross_st_keys[i]}{cross_mp_keys[j]}", f"{cross_st_values[i]}{cross_mp_values[j]}")
+    create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, f"../Components/{cross_st_keys[i]}{cross_mp_keys[j]}", 
+                f"../Results/{cross_st_keys[i]}{cross_mp_keys[j]}", f"{cross_st_values[i]}{cross_mp_values[j]}", metadata)
+                '''

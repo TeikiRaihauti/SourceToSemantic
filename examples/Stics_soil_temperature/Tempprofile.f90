@@ -2,7 +2,6 @@ MODULE temp_profile_mod
    IMPLICIT NONE
 
 CONTAINS
-   !%%CyML Model Begin%%
    SUBROUTINE model_temp_profile(temp_amp, &
                                prev_temp_profile, &
                                prev_canopy_temp, &
@@ -17,89 +16,6 @@ CONTAINS
       REAL, INTENT(IN)  :: min_air_temp
       REAL, allocatable, INTENT(OUT) :: temp_profile(:)
 
-      !%%CyML Description Begin%%
-      !- Name: temp_profile -Version: 1.0, -Time step: 1
-      !- Description:
-      !            * Title: tempprofile model
-      !            * Author: STICS
-      !            * Reference: doi:http://dx.doi.org/10.1016/j.agrformet.2014.05.002
-      !            * Institution: INRAE
-      !            * Abstract: Calculates soil temperature profile
-      !- inputs:
-      !            * name: temp_amp
-      !                          ** description : current temperature amplitude
-      !                          ** inputtype : variable
-      !                          ** variablecategory : state
-      !                          ** datatype : DOUBLE
-      !                          ** default : 0.0
-      !                          ** min : 0.0
-      !                          ** max : 100.0
-      !                          ** unit : degC
-      !                          ** uri :
-      !            * name: prev_temp_profile
-      !                          ** description : previous soil temperature profile (for 1 cm layers)
-      !                          ** inputtype : variable
-      !                          ** variablecategory : state
-      !                          ** datatype : DOUBLEARRAY
-      !                          ** default : 
-      !                          ** min : -50.0
-      !                          ** max : 50.0
-      !                          ** unit : degC
-      !                          ** uri :
-      !                          ** len : 
-      !            * name: prev_canopy_temp
-      !                          ** description : previous crop temperature
-      !                          ** inputtype : variable
-      !                          ** variablecategory : state
-      !                          ** datatype : DOUBLE
-      !                          ** default :
-      !                          ** min : 0.0
-      !                          ** max : 50.0
-      !                          ** unit : degC
-      !                          ** uri :
-      !            * name: min_air_temp
-      !                          ** description : current minimum air temperature
-      !                          ** inputtype : variable
-      !                          ** variablecategory : exogenous
-      !                          ** datatype : DOUBLE
-      !                          ** default :
-      !                          ** min : -50.0
-      !                          ** max : 50.0
-      !                          ** unit : degC
-      !                          ** uri :
-      !            * name: air_temp_day1
-      !                          ** description : Mean temperature on first day
-      !                          ** inputtype : parameter
-      !                          ** parametercategory : constant
-      !                          ** datatype : DOUBLE
-      !                          ** default : 0.0
-      !                          ** min : 0.0
-      !                          ** max : 100.0
-      !                          ** unit : degC
-      !                          ** uri :
-      !            * name: layer_thick
-      !                          ** description : layers thickness
-      !                          ** inputtype : parameter
-      !                          ** parametercategory : constant
-      !                          ** datatype : INTARRAY
-      !                          ** default :
-      !                          ** min :
-      !                          ** max :
-      !                          ** unit : cm
-      !                          ** uri :
-      !                          ** len : 
-      !- outputs:
-      !            * name: temp_profile
-      !                          ** description : current soil profile temperature (for 1 cm layers)
-      !                          ** variablecategory : state
-      !                          ** datatype : DOUBLEARRAY
-      !                          ** min : -50.0
-      !                          ** max : 50.0
-      !                          ** unit : degC
-      !                          ** uri :
-      !                          ** len :
-      !%%CyML Description End%%
-
 
       INTEGER :: z,n
       REAL, allocatable :: vexp(:)
@@ -108,7 +24,6 @@ CONTAINS
       REAL :: therm_amp
       
 
-      !%%CyML Compute Begin%%
       n = size(prev_temp_profile)
 
       !if (.NOT. ALLOCATED(temp_profile)) then
@@ -132,7 +47,6 @@ CONTAINS
                            (temp_amp * vexp(z))/2
       END DO
       
-      !%%CyML Compute End%%
    END SUBROUTINE model_temp_profile
 
 
@@ -146,29 +60,12 @@ CONTAINS
       real, allocatable, intent(OUT) :: prev_temp_profile(:)
       
 
-      !%%CyML Init Begin%%       
       integer :: soil_depth  
       soil_depth = sum(layer_thick)
       allocate(prev_temp_profile(soil_depth))
       prev_temp_profile = air_temp_day1
       prev_canopy_temp = air_temp_day1
-      !%%CyML Init End%% 
    END SUBROUTINE
-   
-   !%%CyML Model End%%
 
-
-
-   ! SUBROUTINE model_therm_amp(therm_diff, temp_freq, therm_amp)
-   !    IMPLICIT NONE
-
-   !    REAL, INTENT(IN)  :: therm_diff
-   !    REAL, INTENT(IN)  :: temp_freq
-   !    REAL, INTENT(OUT) :: therm_amp
-     
-   !    therm_amp = sqrt(temp_freq/2/therm_diff)
-
-
-   ! END SUBROUTINE model_therm_amp
 END MODULE temp_profile_mod
 
