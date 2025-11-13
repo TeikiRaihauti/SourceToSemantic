@@ -1,12 +1,12 @@
 {
     "metadata": {
-        "Title": "SoilTemperature (APSIM Next Generation)",
-        "Authors": "APSIM Initiative (Eric Zurcher, John Hargreaves, Val Snow, Dean Holzworth)",
-        "Institution": "APSIM Initiative (CSIRO, The University of Queensland, AgResearch, and partners)",
-        "URI": "https://github.com/APSIMInitiative/ApsimX/blob/master/Models/Soils/SoilTemp/SoilTemperature.cs",
+        "Title": "Soil Temperature Model",
+        "Authors": "-",
+        "Institution": "-",
+        "URI": "-",
         "DOI": "-",
-        "Extended description": "APSIM’s SoilTemperature component simulates sub-daily heat fluxes and temperatures from the soil surface through the soil profile. It represents the profile using nodes (including an atmospheric node, a surface node, layer-centre nodes, and several phantom nodes below the profile) and solves the 1-D heat diffusion using a tri-diagonal (Thomas) algorithm with a configurable differencing coefficient (nu). Thermal properties are computed from soil constituents (minerals, organic matter, water, air, etc.) and soil state (water content, bulk density), drawing on formulations largely based on Campbell (1985). The model iterates through intra-day time steps (default 48 per day), computes net radiation (short- and long-wave) and an atmospheric boundary layer conductance with stability corrections, and updates surface and layer temperatures along with daily min/avg/max diagnostics. It links to APSIM weather, soil physical, organic matter, and soil water components (including albedo, evaporation, and canopy height from MicroClimate/SoilWater). References: Campbell, G.S. (1985) Soil Physics with BASIC. See APSIM Next Generation repository and documentation for broader model context: https://github.com/APSIMInitiative/ApsimX and https://apsimnextgeneration.netlify.app/",
-        "Short description": "A sub-daily soil heat flow and temperature profile model (APSIM NG) based on Campbell (1985), with radiative and convective surface exchange and Thomas-scheme solution.",
+        "Extended description": "The soil temperature model simulates the heat flux and temperatures over the soil profile, including the temperature on the soil surface. The model is based on processes described in Campbell, G.S. (1985) 'Soil physics with BASIC: Transport models for soil-plant systems'. The model includes functionality for simulating the heat flux and temperatures over the soil profile. It uses a geometric progression for element lengths to achieve the best simulation results. The model is designed to work with short elements near the soil surface and longer ones deeper in the soil.",
+        "Short description": "A model to simulate heat flux and temperatures over the soil profile.",
         "Model version": "-"
     }
 }

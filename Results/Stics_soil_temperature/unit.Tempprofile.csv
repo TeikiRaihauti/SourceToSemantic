@@ -8,7 +8,7 @@ air_temp_day1;WRONG;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
 layer_thick;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
 temp_amp;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
 prev_temp_profile;OK;OK;OK;WRONG;WRONG;WRONG;WRONG;OK;WRONG
-prev_canopy_temp;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
+prev_canopy_temp;OK;WRONG;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
 min_air_temp;OK;OK;OK;OK;WRONG;WRONG;WRONG;OK;WRONG
 
 False positive
@@ -20,7 +20,7 @@ Name;inputtype;variablecategory;datatype
 
 Outputs stats
 Crop2ML-generated;AI-generated;True positive;False positive;False negative;Precision;Recall;F1-Score
-1;3;1;2;0;0.3333333333333333;1.0;0.5
+1;1;1;0;0;1.0;1.0;1.0
 
 True positive
 Name;inputtype;variablecategory;datatype;len;max;min;default;unit;uri
@@ -28,8 +28,6 @@ temp_profile;OK;OK;OK;WRONG;WRONG;WRONG;OK;OK;WRONG
 
 False positive
 Name;inputtype;variablecategory;datatype
-prev_temp_profile;;state;DOUBLEARRAY
-prev_canopy_temp;;state;DOUBLE
 
 False negative
 Name;inputtype;variablecategory;datatype

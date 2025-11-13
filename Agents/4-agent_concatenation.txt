@@ -24,7 +24,7 @@
 3. Canonical data typing, units, and lengths
 - Allowed datatypes: INT, DOUBLE, CHAR, DOUBLEARRAY. Normalize synonyms accordingly.
 - Length rules: • Any per-layer array should use len: SOILPROP_NLAYR (not NLAYR), with NLAYR retained as an auxiliary mirror only if the code uses it. • Scalars use len: "-"
-- Ranges: • Keep numeric min/max where known and consistent (e.g., 0–1 for volumetric water fractions, 1–366 for DOY). Otherwise use "-". • Do not contradict the source code.
+- Ranges: • Keep numeric min/max where known and consistent. Otherwise use "-". • Do not contradict the source code.
 
 4. Roles and categories
 - Keep inputtype as parameter for constants/configuration, variable otherwise.

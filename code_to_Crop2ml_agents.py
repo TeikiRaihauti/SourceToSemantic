@@ -108,14 +108,14 @@ def create_prompt_all_files(folder_path, main_file, list_files, language_name):
   if main_file_path is None:
     raise FileNotFoundError(f"File {main_file} is not there.")
   
-  prompt = f"Analyze the {nb_files + 1} following crop model source code files, written in {language_name}. The main file to process is {main_file}, the rest is auxiliary files for context only.\n"
+  prompt = f"Analyze the 1 following crop model source code files, written in {language_name}. The main file to process is {main_file}, the rest is auxiliary files for context only.\n"
   prompt += f"Each file is marked clearly with --- FILE: filename --- at the start and --- END FILE --- at the end.\n"
   prompt += f"Follow the system instructions.\n\n"
   prompt += f"--- FILE: {main_file} ---\n{extract_text(main_file_path)}\n--- END FILE ---"
   
-  if nb_files > 0:
-    for file in list_files:
-      prompt += f"\n\n--- FILE: {os.path.basename(file)} ---\n{extract_text(file)}\n--- END FILE ---"
+  #if nb_files > 0:
+  #  for file in list_files:
+  #    prompt += f"\n\n--- FILE: {os.path.basename(file)} ---\n{extract_text(file)}\n--- END FILE ---"
   
   return prompt
 
@@ -407,7 +407,7 @@ def create_code(api_key_path, agent2_path, agent3_path, model, folder_path, outp
   response_refactored = send_to_gpt(instructions_refactor, prompt_all_files, api_key, model, "high", "text", "low", False)
 
   prompt_refactored = create_prompt_refactor(response_refactored)
-  response_json = send_to_gpt(instructions_json, prompt_refactored, api_key, model, "high", "json_object", "low", False)
+  response_json = send_to_gpt(instructions_json, prompt_refactored, api_key, model, "medium", "json_object", "low", False)
 
   os.makedirs(output_path, exist_ok=True)
   base, _ = os.path.splitext(main_file)
@@ -490,29 +490,112 @@ ENERGY_BALANCE_FILES =  [
     "Diffusionlimitedevaporation.cs"
   ]
 
-first_index_component = 0
-last_index_component = len(COMPONENTS_DICT) - 1
-number_iteration = 10
+SNOW_DIRECTORY = "../Components/STICS_SNOW/"
+SNOW_FILES =  [
+    "Melting.f90",
+    "Preciprec.f90",
+    "Refreezing.f90",
+    "Snowaccumulation.f90",
+    "Snowdensity.f90",
+    "Snowdepth.f90",
+    "Snowdepthtrans.f90",
+    "Snowdry.f90",
+    "Snowmelt.f90",
+    "Snowwet.f90",
+    "Tavg.f90",
+    "Tempmax.f90",
+    "Tempmin.f90"
+  ]
+
+LINTUL_DIRECTORY = "../Components/LINTUL/"
+LINTUL_FILES =  [
+    "DayLength.java",
+    "LintulBiomass.java",
+    "LintulPhenology.java",
+    "Partitioning.java",
+    "Photoperiod.java",
+    "Vernalisation.java"
+  ]
+
+CROSS_PLATFORMS_ST = {
+  "AP_all/": "SoilTemperature",
+  "DS_all/": "STEMP",
+  "SW_all/": "SoilTemperatureSWAT"
+}
+CROSS_PLATFORMS_MP = {
+  "apsim/": ".cs",
+  "bioma/": ".cs",
+  "dssat/": ".f90",
+  "simplace/": ".java",
+  "sirius/": ".cs",
+  "stics/": ".f90"
+}
+
+first_index_component = 4
+last_index_component = 4#len(COMPONENTS_DICT) - 1
+number_iteration = 1
 component_keys = list(COMPONENTS_DICT.keys())
 component_values = list(COMPONENTS_DICT.values())
+cross_st_keys = list(CROSS_PLATFORMS_ST.keys())
+cross_st_values = list(CROSS_PLATFORMS_ST.values())
+cross_mp_keys = list(CROSS_PLATFORMS_MP.keys())
+cross_mp_values = list(CROSS_PLATFORMS_MP.values())
 
 #-----------------------------------------------------------------
 # Simulation section
 #-----------------------------------------------------------------
 # Soil temperature section
-for i in range(first_index_component, last_index_component + 1):
+'''for i in range(first_index_component, last_index_component + 1):
   print(f"Processing {component_keys[i]} : {component_values[i]}")
   metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, f"../Components/{component_keys[i]}", f"../Results/{component_keys[i]}", component_values[i])
-  for j in range(3, number_iteration + 1): 
+  for j in range(7, 8): 
     print(f"Iteration {j}")
     create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, f"../Components/{component_keys[i]}", f"../Results/{component_keys[i]}{j}/", component_values[i], metadata)
   concatenate_JSON(API_KEY_PATH, AGENT4_PATH, MODEL, f"../Results/{component_keys[i]}/", f"../Components/{component_keys[i]}", f"../Results/{component_keys[i]}/", component_values[i], metadata, number_iteration)
+'''
+# Energy balance section
+#for i in range(0, len(ENERGY_BALANCE_FILES)):
+#  print(f"Processing {ENERGY_BALANCE_DIRECTORY} : {ENERGY_BALANCE_FILES[i]}")
+#  metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, ENERGY_BALANCE_DIRECTORY, f"../Results/SQ_EnergyBalance/", ENERGY_BALANCE_FILES[i])
+  #for j in range(1, 6): 
+  #  print(f"Iteration {j}")
+#  create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, ENERGY_BALANCE_DIRECTORY, f"../Results/SQ_EnergyBalance/", ENERGY_BALANCE_FILES[i], metadata)    
 
-'''# Energy balance section
-for i in range(11, len(ENERGY_BALANCE_FILES)):
-  print(f"Processing {ENERGY_BALANCE_DIRECTORY} : {ENERGY_BALANCE_FILES[i]}")
-  for j in range(1, number_iteration + 1): 
-    print(f"Iteration {j}")
-    output_path = f"{ENERGY_BALANCE_DIRECTORY}{j}/"
-    main(API_KEY_PATH, AGENT1_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, ENERGY_BALANCE_DIRECTORY, output_path, ENERGY_BALANCE_FILES[i])
-    '''
+  # Snow section
+#for i in range(0, len(SNOW_FILES)):
+  #print(f"Processing {SNOW_DIRECTORY} : {SNOW_FILES[i]}")
+  #metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, SNOW_DIRECTORY, f"../Results/STICS_SNOW/", SNOW_FILES[i])
+  #for j in range(1, 3): 
+    #print(f"Iteration {j}")
+
+    #create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, SNOW_DIRECTORY, f"../Results/STICS_SNOW/{j}/", SNOW_FILES[i], metadata)    
+ # base = Path(SNOW_FILES[i]).stem
+ # p = Path(f"../Results/STICS_SNOW/{base}_metadata.json")
+ # with p.open("r", encoding="utf-8") as fh:
+ #   metadata = json.load(fh)
+  #  concatenate_JSON(API_KEY_PATH, AGENT4_PATH, MODEL, f"../Results/STICS_SNOW/", SNOW_DIRECTORY, f"../Results/STICS_SNOW/", SNOW_FILES[i], metadata, 2)
+
+# LINTUL section
+for i in range(3, 4):
+  #print(f"Processing {LINTUL_DIRECTORY} : {LINTUL_FILES[i]}")
+  #metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, LINTUL_DIRECTORY, f"../Results/LINTUL/", LINTUL_FILES[i])
+  #for j in range(1, 2): 
+  #  print(f"Iteration {j}")
+  #  create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, LINTUL_DIRECTORY, f"../Results/LINTUL/{j}/", LINTUL_FILES[i], metadata)    
+  base = Path(LINTUL_FILES[i]).stem
+  p = Path(f"../Results/LINTUL/{base}_metadata.json")
+  with p.open("r", encoding="utf-8") as fh:
+    metadata = json.load(fh)
+    concatenate_JSON(API_KEY_PATH, AGENT4_PATH, MODEL, f"../Results/LINTUL/", LINTUL_DIRECTORY, f"../Results/LINTUL/", LINTUL_FILES[i], metadata, 2)
+
+
+# Cross platform section
+'''for i in range(0, 1):
+  print(f"Processing {cross_st_keys[i]}")
+  for j in range(4, 5):
+    print(f"{cross_mp_keys[j]}")
+    metadata = create_metadata(API_KEY_PATH, AGENT1_PATH, MODEL, f"../Components/{cross_st_keys[i]}{cross_mp_keys[j]}", 
+                               f"../Results/{cross_st_keys[i]}{cross_mp_keys[j]}", f"{cross_st_values[i]}{cross_mp_values[j]}")
+    create_code(API_KEY_PATH, AGENT2_PATH, AGENT3_PATH, MODEL, f"../Components/{cross_st_keys[i]}{cross_mp_keys[j]}", 
+                f"../Results/{cross_st_keys[i]}{cross_mp_keys[j]}", f"{cross_st_values[i]}{cross_mp_values[j]}", metadata)
+                '''

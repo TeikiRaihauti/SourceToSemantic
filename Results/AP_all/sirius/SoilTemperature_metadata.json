@@ -1,11 +1,11 @@
 {
     "metadata": {
         "Title": "SoilTemperature",
-        "Authors": "APSIM Initiative",
+        "Authors": "APSIM",
         "Institution": "APSIM Initiative",
         "URI": "https://github.com/APSIMInitiative/ApsimX/blob/master/Models/Soils/SoilTemperature.cs",
         "DOI": "-",
-        "Extended description": "Computes diurnal soil and surface temperatures across a 1-D soil profile using a finite-difference heat diffusion scheme with phantom nodes. The model estimates volumetric specific heat from soil constituents (rocks, organic matter, sand, silt, clay, water, ice, air) and an effective thermal conductivity via a mixing approach. Energy balance at the surface includes net shortwave/longwave radiation, sensible and latent heat fluxes; net radiation can be calculated from solar geometry and cloud fraction or sourced from inputs. Atmospheric boundary-layer conductance is either fixed or iteratively computed using Monin–Obukhov stability concepts. A tridiagonal (Thomas) solver advances temperatures at sub-daily internal time-steps. Initial conditions use either user-provided temperatures or an annual harmonic driven by Tav/Amp and latitude. Based on Campbell (1985).",
+        "Extended description": "APSIM’s SoilTemperature component computes heat fluxes and soil temperature profiles using a 1D finite-difference scheme coupled to atmospheric boundary layer conductance and net radiation estimates. It accounts for soil physical properties (texture, bulk density, organic matter, rocks), water content, radiative and sensible/latent heat fluxes, and diurnal forcing. Based on Campbell (1985).",
         "Short description": "Heat flux and temperatures over the surface and soil profile (based on Campbell, 1985).",
         "Model version": "1.0"
     }

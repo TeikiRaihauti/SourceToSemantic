@@ -1,12 +1,12 @@
 {
     "metadata": {
-        "Title": "STEMP (Soil Temperature module, DSSAT)",
-        "Authors": "DSSAT Development Team; Cheryl H. Porter; Gerrit Hoogenboom; A. J. Gijsman; P. W. Wilkens",
-        "Institution": "The University of Georgia, Griffin, Georgia; University of Florida, Gainesville, Florida; Iowa State University, Ames, Iowa; International Center for Soil Fertility and Agricultural Development (IFDC), Muscle Shoals, Alabama; University of Guelph, Guelph, Ontario",
+        "Title": "STEMP: Soil Temperature Module (DSSAT component)",
+        "Authors": "DSSAT Development Team (DSSAT Florida)",
+        "Institution": "The University of Georgia; University of Florida; Iowa State University; International Center for Soil Fertility and Agricultural Development (IFDC); University of Guelph",
         "URI": "https://github.com/DSSAT/dssat-csm",
         "DOI": "https://doi.org/10.2134/agronj1994.00021962008600060014x",
-        "Extended description": "STEMP computes daily soil temperature by layer within the DSSAT framework using EPIC-based formulations. It estimates a damping depth (DD) from bulk density and a water-content function (WC) based on potential extractable soil water, then applies a sinusoidal annual forcing with latitude-dependent phase (HDAY) to calculate temperatures at layer midpoints: T(z) = TAV + (TAMP/2·cos(ALX+ZD) + DT)·exp(ZD), where ZD = −depth/DD. The module maintains a 5-day moving average of air temperature (TMA) to compute the departure term (DT) and also provides a surface temperature (SRFTEMP). Seasonal initialization spins up the profile and sets albedo from mulch/soil albedo (MSALB).",
-        "Short description": "Daily soil temperature profile by layer using EPIC-derived damping depth and sinusoidal forcing (DSSAT STEMP).",
+        "Extended description": "STEMP computes daily soil temperature by layer for the DSSAT crop modeling system using EPIC-derived harmonic formulations. It updates a 5-day moving average of mean air temperature and uses long-term mean temperature (TAV) and amplitude (TAMP) to drive a sinusoidal annual signal shifted by the climatological hottest day (HDAY). Damping depth (DP) is a function of bulk density (ABD) and a moisture-dependent factor (FX), with the water content ratio WC = max(0.01, PESW)/(WW*CUMDPT)*10 influencing thermal damping. Layer temperatures are calculated at layer midpoints (DSMID) as a decaying cosine with depth, and a surface litter temperature (SRFTEMP) is also provided. The routine accounts for soil albedo (including mulch effects) and distinguishes whether soil water is simulated (ISWWAT). It is adapted from EPIC soil temperature routines and is widely used across DSSAT components.",
+        "Short description": "Daily multilayer soil temperature calculation for DSSAT using EPIC-based damping and sinusoidal forcing.",
         "Model version": "1.0"
     }
 }
